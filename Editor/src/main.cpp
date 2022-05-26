@@ -8,6 +8,9 @@
 #include <fstream>
 #include <string>
 #include "renderer/shaderProgram.h"
+#include "renderer/vao.h"
+#include "renderer/vbo.h"
+#include "renderer/ebo.h"
 
 static float vertices[] = {
 	0.5f, 0.5f, 0.5f,
@@ -56,24 +59,20 @@ int main(int argc, char* args[]) {
 
 	bool running = true;
 
-	GLuint vao, ebo, vbo;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
+	VAO vao;
+	vao.bind();
 
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	VBO vbo;
+	vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
+	vao.attachVBO(vbo, 0, 3, 3, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+	EBO ebo;
+	ebo.setData(indicies, sizeof(indicies), GL_STATIC_DRAW);
+	ebo.bind();
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vao.unbind();
+	ebo.unbind();
+	vbo.unbind();
 
 	const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
 	const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
@@ -104,9 +103,9 @@ int main(int argc, char* args[]) {
 		}
 
 		shaderProgram.bind();
-		glBindVertexArray(vao);
+		vao.bind();
 		glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(indicies[0]), GL_UNSIGNED_INT, (void*)0);
-		glBindVertexArray(0);
+		vao.unbind();
 		shaderProgram.unbind();
 
 		SDL_GL_SwapWindow(window);

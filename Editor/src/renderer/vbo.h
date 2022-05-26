@@ -5,7 +5,7 @@
 class VBO {
 public:
 	VBO();
-	void setData(float* vertices, int numVertices, GLenum usage);
+	void setData(float* vertices, int sizeOfVertices, GLenum usage);
 	void bind();
 	void unbind();
 
