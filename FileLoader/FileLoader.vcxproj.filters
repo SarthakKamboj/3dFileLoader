@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\fileLoader.cpp">
+    <ClCompile Include="src\fbxLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\fileLoader.h">
+    <ClInclude Include="src\fbxLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

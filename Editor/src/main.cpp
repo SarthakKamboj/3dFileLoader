@@ -4,7 +4,7 @@
 #include "stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "fileLoader.h"
+#include "fbxLoader.h"
 #include <fstream>
 #include <string>
 #include "renderer/shaderProgram.h"
@@ -33,6 +33,9 @@ static unsigned int indicies[] = {
 };
 
 int main(int argc, char* args[]) {
+
+	loadFbx();
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		std::cout << "sdl gave error" << std::endl;
 		return 0;
