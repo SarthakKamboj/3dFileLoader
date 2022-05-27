@@ -11,6 +11,10 @@
 #include "renderer/vao.h"
 #include "renderer/vbo.h"
 #include "renderer/ebo.h"
+#include <vector>
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl.h"
 
 static float vertices[] = {
 	0.5f, 0.5f, 0.5f,
@@ -32,9 +36,22 @@ static unsigned int indicies[] = {
 	4,3,0,4,3,6
 };
 
+glm::mat4 getRotationMatrix(glm::vec3 rot) {
+	glm::mat4 rotMatrix(1.0f);
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.x), glm::vec3(1, 0, 0));
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.y), glm::vec3(0, 1, 0));
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.z), glm::vec3(0, 0, 1));
+	return rotMatrix;
+}
+
 int main(int argc, char* args[]) {
 
-	loadFbx();
+	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	SceneData sceneData = loadFbx(fbxFilePath);
+
+	if (sceneData.meshCount == -1) {
+		return 0;
+	}
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		std::cout << "sdl gave error" << std::endl;
@@ -56,41 +73,70 @@ int main(int argc, char* args[]) {
 	SDL_GL_MakeCurrent(window, context);
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplSDL2_InitForOpenGL(window, context);
+	const char* glsl_version = "#version 330";
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	bool running = true;
 
-	VAO vao;
-	vao.bind();
+	int numMeshes = sceneData.meshCount;
+	// numMeshes = 3;
 
-	VBO vbo;
-	vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
-	vao.attachVBO(vbo, 0, 3, 3, 0);
+	std::vector<VAO> vaos;
+	std::vector<VBO> vbos;
+	std::vector<EBO> ebos;
 
-	EBO ebo;
-	ebo.setData(indicies, sizeof(indicies), GL_STATIC_DRAW);
-	ebo.bind();
+	vaos.resize(numMeshes);
+	vbos.resize(numMeshes);
+	ebos.resize(numMeshes);
 
-	vao.unbind();
-	ebo.unbind();
-	vbo.unbind();
+	for (int meshId = 0; meshId < numMeshes; meshId++) {
+		Mesh mesh = sceneData.meshes[meshId];
+
+		VAO vao;
+		vao.bind();
+
+		VBO vbo;
+		int numFloatsPerVert = 6;
+		vbo.setData((float*)&mesh.vertices[0], mesh.vertexCount * sizeof(mesh.vertices[0]), GL_STATIC_DRAW);
+		vao.attachVBO(vbo, 0, 3, 6, 0);
+		vao.attachVBO(vbo, 1, 3, 6, 3 * sizeof(float));
+
+		EBO ebo;
+		ebo.setData(mesh.indicies, mesh.indexCount * sizeof(mesh.indicies[0]), GL_STATIC_DRAW);
+		ebo.bind();
+
+		vao.unbind();
+		ebo.unbind();
+		vbo.unbind();
+
+		vaos[meshId] = vao;
+		vbos[meshId] = vbo;
+		ebos[meshId] = ebo;
+	}
 
 	const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
 	const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
 
 	ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
 
-	glm::mat4 model(1.0f);
-	model = glm::translate(model, glm::vec3(0.2f, 0.2f, 0.1f));
-	model = glm::rotate(model, glm::radians(10.0f), glm::vec3(0, 1, 0));
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 0.1f, 100.0f);
+	glm::vec3 camPos(0, 0, 0);
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
-	shaderProgram.setMat4("model", model);
-	shaderProgram.setMat4("view", view);
 	shaderProgram.setMat4("projection", proj);
+
+	int i = 0;
+
+	float radius = 2000.0f;
 
 	while (running) {
 		glViewport(0, 0, width, height);
@@ -100,18 +146,53 @@ int main(int argc, char* args[]) {
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
+			ImGui_ImplSDL2_ProcessEvent(&event);
 			if (event.type == SDL_QUIT) {
 				running = false;
 			}
 		}
 
-		shaderProgram.bind();
-		vao.bind();
-		glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(indicies[0]), GL_UNSIGNED_INT, (void*)0);
-		vao.unbind();
-		shaderProgram.unbind();
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
+		float speed = 0.01f;
+		camPos.x = cos(i * speed) * radius;
+		camPos.z = sin(i * speed) * radius;
+		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		shaderProgram.setMat4("view", view);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		for (int meshId = 0; meshId < numMeshes; meshId++) {
+			Mesh& mesh = sceneData.meshes[meshId];
+			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
+			glm::mat4 rotation = getRotationMatrix(mesh.rotation);
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.scale);
+
+			glm::mat4 model = translation * rotation * scale;
+
+			shaderProgram.setMat4("model", model);
+			shaderProgram.bind();
+			vaos[meshId].bind();
+			glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, (void*)0);
+			vaos[meshId].unbind();
+			shaderProgram.unbind();
+		}
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		ImGui::Begin("camPos");
+
+		ImGui::SliderFloat("cam distance", &radius, 0, 4000);
+
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		SDL_GL_SwapWindow(window);
+
+		i += 1;
 	}
 
 	return -1;

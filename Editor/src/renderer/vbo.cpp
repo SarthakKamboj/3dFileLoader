@@ -4,9 +4,9 @@ VBO::VBO() {
 	glGenBuffers(1, &vbo);
 }
 
-void VBO::setData(float* vertices, int sizeOfVertices, GLenum usage) {
+void VBO::setData(float* vertices, int byteSizeOfVertices, GLenum usage) {
 	bind();
-	glBufferData(GL_ARRAY_BUFFER, sizeOfVertices, vertices, usage);
+	glBufferData(GL_ARRAY_BUFFER, byteSizeOfVertices, vertices, usage);
 	unbind();
 }
 
