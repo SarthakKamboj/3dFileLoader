@@ -24,13 +24,14 @@ SceneData loadFbx(const char* fbxFilePath) {
 	}
 	FbxScene* scene = FbxScene::Create(fbxManager, "scene");
 
+	/*
 	FbxGeometryConverter fbxGeometryConverter(fbxManager);
 	if (!fbxGeometryConverter.Triangulate(scene, false)) {
 		std::cout << "could not triangulate scene" << std::endl;
 		fbxData.meshCount = -1;
 		return fbxData;
 	}
-	//Triangulate(scene, false);
+	*/
 
 	fbxImporter->Import(scene);
 	fbxImporter->Destroy();
@@ -53,32 +54,6 @@ SceneData loadFbx(const char* fbxFilePath) {
 
 	return fbxData;
 
-}
-
-FbxString getAttributeTypeName(FbxNodeAttribute::EType type) {
-	switch (type) {
-	case FbxNodeAttribute::eUnknown: return "unidentified";
-	case FbxNodeAttribute::eNull: return "null";
-	case FbxNodeAttribute::eMarker: return "marker";
-	case FbxNodeAttribute::eSkeleton: return "skeleton";
-	case FbxNodeAttribute::eMesh: return "mesh";
-	case FbxNodeAttribute::eNurbs: return "nurbs";
-	case FbxNodeAttribute::ePatch: return "patch";
-	case FbxNodeAttribute::eCamera: return "camera";
-	case FbxNodeAttribute::eCameraStereo: return "stereo";
-	case FbxNodeAttribute::eCameraSwitcher: return "camera switcher";
-	case FbxNodeAttribute::eLight: return "light";
-	case FbxNodeAttribute::eOpticalReference: return "optical reference";
-	case FbxNodeAttribute::eOpticalMarker: return "marker";
-	case FbxNodeAttribute::eNurbsCurve: return "nurbs curve";
-	case FbxNodeAttribute::eTrimNurbsSurface: return "trim nurbs surface";
-	case FbxNodeAttribute::eBoundary: return "boundary";
-	case FbxNodeAttribute::eNurbsSurface: return "nurbs surface";
-	case FbxNodeAttribute::eShape: return "shape";
-	case FbxNodeAttribute::eLODGroup: return "lodgroup";
-	case FbxNodeAttribute::eSubDiv: return "subdiv";
-	default: return "unknown";
-	}
 }
 
 float randNum() {
@@ -108,10 +83,9 @@ Mesh getNodeData(FbxNode* node) {
 	for (int i = 0; i < node->GetNodeAttributeCount(); i++) {
 		FbxNodeAttribute* nodeAttribute = node->GetNodeAttributeByIndex(i);
 		const char* nodeAttributeName = nodeAttribute->GetName();
-		FbxString nodeType = getAttributeTypeName(nodeAttribute->GetAttributeType());
 		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh) {
 			FbxMesh* fbxMesh = (FbxMesh*)nodeAttribute;
-			std::cout << "node attribute " << nodeAttributeName << " is of type " << nodeType.Buffer() << " and has " << fbxMesh->GetControlPointsCount() << " vertices" << std::endl;;
+			std::cout << "node attribute " << nodeAttributeName << " is of type mesh and has " << fbxMesh->GetControlPointsCount() << " vertices" << std::endl;;
 
 			mesh.vertexCount = fbxMesh->GetControlPointsCount();
 			Vertex* vertices = new Vertex[mesh.vertexCount];
