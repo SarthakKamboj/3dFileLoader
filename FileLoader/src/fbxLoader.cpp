@@ -92,11 +92,11 @@ Mesh getNodeData(FbxNode* node) {
 			FbxGeometryElement::EMappingMode uvMappingMode = uvElement->GetMappingMode();
 			FbxGeometryElement::EReferenceMode uvRefMode = uvElement->GetReferenceMode();
 
-			int numNormals = fbxMesh->GetElementNormalCount();
+			int numNormalEls = fbxMesh->GetElementNormalCount();
 			FbxGeometryElementNormal* normalsElement = fbxMesh->GetElementNormal(0);
 			FbxGeometryElement::EMappingMode normalsMappingMode = normalsElement->GetMappingMode();
 			FbxGeometryElement::EReferenceMode normalsRefMode = normalsElement->GetReferenceMode();
-			std::cout << "numNormalsElements: " << numNormals << std::endl;
+			std::cout << "numNormalEls: " << numNormalEls << std::endl;
 			// std::cout <<  << std::endl;
 
 			int controlPointsSize = fbxMesh->GetControlPointsCount();
@@ -187,7 +187,7 @@ Mesh getNodeData(FbxNode* node) {
 			/*
 			bool sameMatForWholeMesh = true;
 			std::cout << "mesh has " << fbxMesh->GetElementMaterialCount() << " materials" << std::endl;
-			for (int matIdx = 0; matIdx < fbxMesh->GetElementMaterialCount(); fbxMesh++) {
+			for (int matIdx = 0; matIdx < fbxMesh->GetElementMaterialCount(); matIdx++) {
 				FbxGeometryElementMaterial* elMaterial = fbxMesh->GetElementMaterial(matIdx);
 				FbxGeometryElement::EMappingMode mappingMode = elMaterial->GetMappingMode();
 				if (mappingMode == FbxGeometryElement::eByPolygon) {
@@ -199,6 +199,7 @@ Mesh getNodeData(FbxNode* node) {
 					FbxProperty diffuseProperty = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
 					int numTextures = diffuseProperty.GetSrcObjectCount<FbxTexture>();
 					int numLayeredTextures = diffuseProperty.GetSrcObjectCount<FbxLayeredTexture>();
+
 					for (int layerTexId = 0; layerTexId < numLayeredTextures; layerTexId++) {
 						FbxLayeredTexture* layeredTex = diffuseProperty.GetSrcObject<FbxLayeredTexture>(layerTexId);
 						int textureCount = layeredTex->GetSrcObjectCount<FbxTexture>();
