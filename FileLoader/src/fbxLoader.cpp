@@ -89,8 +89,15 @@ Mesh getNodeData(FbxNode* node) {
 			FbxMesh* fbxMesh = (FbxMesh*)nodeAttribute;
 
 			FbxGeometryElementUV* uvElement = fbxMesh->GetElementUV(0);
-			FbxGeometryElement::EMappingMode mappingMode = uvElement->GetMappingMode();
-			FbxGeometryElement::EReferenceMode refMode = uvElement->GetReferenceMode();
+			FbxGeometryElement::EMappingMode uvMappingMode = uvElement->GetMappingMode();
+			FbxGeometryElement::EReferenceMode uvRefMode = uvElement->GetReferenceMode();
+
+			int numNormals = fbxMesh->GetElementNormalCount();
+			FbxGeometryElementNormal* normalsElement = fbxMesh->GetElementNormal(0);
+			FbxGeometryElement::EMappingMode normalsMappingMode = normalsElement->GetMappingMode();
+			FbxGeometryElement::EReferenceMode normalsRefMode = normalsElement->GetReferenceMode();
+			std::cout << "numNormalsElements: " << numNormals << std::endl;
+			// std::cout <<  << std::endl;
 
 			int controlPointsSize = fbxMesh->GetControlPointsCount();
 			FbxVector4* fbxLclPositions = fbxMesh->GetControlPoints();
@@ -117,10 +124,10 @@ Mesh getNodeData(FbxNode* node) {
 
 					i += 1;
 
-					switch (mappingMode) {
+					switch (uvMappingMode) {
 						// mapping per vertex 
 					case FbxGeometryElement::eByControlPoint:
-						switch (refMode) {
+						switch (uvRefMode) {
 							// can get data directly with array
 						case FbxGeometryElement::eDirect:
 							break;
@@ -133,14 +140,14 @@ Mesh getNodeData(FbxNode* node) {
 					case FbxGeometryElement::eByPolygonVertex: {
 						FbxVector2 uv;
 						int idx;
-						switch (refMode) {
+						switch (uvRefMode) {
 						case FbxGeometryElement::eDirect:
 						case FbxGeometryElement::eIndexToDirect:
 							int uvIdx = fbxMesh->GetTextureUVIndex(polygonId, polyVertIdx);
 							uv = uvElement->GetDirectArray().GetAt(uvIdx);
 
-							vertex.uvs[0] = uv.mData[0];
-							vertex.uvs[1] = uv.mData[1];
+							vertex.uvs[0] = uv[0];
+							vertex.uvs[1] = uv[1];
 							break;
 						}
 					}
@@ -156,8 +163,49 @@ Mesh getNodeData(FbxNode* node) {
 						break;
 					}
 
+					switch (normalsMappingMode) {
+					case FbxGeometryElement::eByControlPoint:
+						break;
+					case FbxGeometryElement::eByPolygonVertex:
+						switch (normalsRefMode) {
+						case FbxGeometryElement::eDirect:
+						case FbxGeometryElement::eIndexToDirect:
+							int idx = normalsElement->GetIndexArray().GetAt(positionId);
+							FbxVector4 normal = normalsElement->GetDirectArray().GetAt(idx);
+							vertex.normal[0] = normal[0];
+							vertex.normal[1] = normal[1];
+							vertex.normal[2] = normal[2];
+
+							std::cout << "normal: (" << normal[0] << ", " << normal[1] << ", " << normal[2] << ")" << std::endl;
+
+						}
+					}
+
 				}
 			}
+
+			/*
+			bool sameMatForWholeMesh = true;
+			std::cout << "mesh has " << fbxMesh->GetElementMaterialCount() << " materials" << std::endl;
+			for (int matIdx = 0; matIdx < fbxMesh->GetElementMaterialCount(); fbxMesh++) {
+				FbxGeometryElementMaterial* elMaterial = fbxMesh->GetElementMaterial(matIdx);
+				FbxGeometryElement::EMappingMode mappingMode = elMaterial->GetMappingMode();
+				if (mappingMode == FbxGeometryElement::eByPolygon) {
+					sameMatForWholeMesh = false;
+				}
+				int idx = elMaterial->GetIndexArray().GetAt(0);
+				FbxSurfaceMaterial* material = fbxMesh->GetNode()->GetMaterial(idx);
+				if (idx >= 0) {
+					FbxProperty diffuseProperty = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+					int numTextures = diffuseProperty.GetSrcObjectCount<FbxTexture>();
+					int numLayeredTextures = diffuseProperty.GetSrcObjectCount<FbxLayeredTexture>();
+					for (int layerTexId = 0; layerTexId < numLayeredTextures; layerTexId++) {
+						FbxLayeredTexture* layeredTex = diffuseProperty.GetSrcObject<FbxLayeredTexture>(layerTexId);
+						int textureCount = layeredTex->GetSrcObjectCount<FbxTexture>();
+					}
+				}
+			}
+			*/
 		}
 	}
 

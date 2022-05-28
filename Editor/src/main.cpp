@@ -168,6 +168,7 @@ int main(int argc, char* args[]) {
 		vao.attachVBO(vbo, 0, 3, numFloats, offsetof(Vertex, position));
 		vao.attachVBO(vbo, 1, 3, numFloats, offsetof(Vertex, color));
 		vao.attachVBO(vbo, 2, 2, numFloats, offsetof(Vertex, uvs));
+		vao.attachVBO(vbo, 3, 3, numFloats, offsetof(Vertex, normal));
 
 		// EBO ebo;
 		// ebo.setData(mesh.indicies, mesh.indexCount * sizeof(mesh.indicies[0]), GL_STATIC_DRAW);
@@ -204,7 +205,7 @@ int main(int argc, char* args[]) {
 
 	while (running) {
 		glViewport(0, 0, width, height);
-		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearStencil(0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
