@@ -16,6 +16,7 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
 #include "stb_image.h"
+#include "renderer/texture.h"
 
 /*
 static float vertices[] = {
@@ -93,9 +94,9 @@ glm::mat4 getRotationMatrix(glm::vec3 rot) {
 
 int main(int argc, char* args[]) {
 
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
-	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
 	SceneData sceneData = loadFbx(fbxFilePath);
 
 	if (sceneData.meshCount == -1 || !sceneData.meshes) {
@@ -168,10 +169,6 @@ int main(int argc, char* args[]) {
 		vao.attachVBO(vbo, 1, 3, numFloats, offsetof(Vertex, color));
 		vao.attachVBO(vbo, 2, 2, numFloats, offsetof(Vertex, uvs));
 
-		// vao.attachVBO(vbo, 0, 3, 8, 0);
-		// vao.attachVBO(vbo, 1, 3, 8, 3 * sizeof(float));
-		// vao.attachVBO(vbo, 2, 2, 8, 6 * sizeof(float));
-
 		// EBO ebo;
 		// ebo.setData(mesh.indicies, mesh.indexCount * sizeof(mesh.indicies[0]), GL_STATIC_DRAW);
 		// ebo.bind();
@@ -199,44 +196,11 @@ int main(int argc, char* args[]) {
 
 	float radius = 2000.0f;
 
-	stbi_set_flip_vertically_on_load(true);
-
-	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
-	// const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
-	// const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.png";
-
-	int imgWidth, imgHeight, nrChannels;
-	unsigned char* data = stbi_load(texFilePath, &imgWidth, &imgHeight, &nrChannels, 0);
-
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// sets the row alignment to 1, so rows are aligned every 1 byte, which is basically no space between rows
-	// glPixelStorei(GL_UNPACK_ALIGNMENT, 8) would set alignment to 8, so rows always start at memory location that is multiple of 8
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (nrChannels == 4) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	}
-	else if (nrChannels == 3) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	}
-
-	glGenerateMipmap(GL_TEXTURE_2D);
 
 	shaderProgram.setInt("texUnit", 0);
 
-	stbi_image_free(data);
+	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
+	Texture texture(texFilePath, 0);
 
 	while (running) {
 		glViewport(0, 0, width, height);
@@ -263,8 +227,9 @@ int main(int argc, char* args[]) {
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, texture);
+		texture.bind();
 		glEnable(GL_DEPTH_TEST);
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -279,9 +244,7 @@ int main(int argc, char* args[]) {
 			shaderProgram.setMat4("model", model);
 			shaderProgram.bind();
 			vaos[meshId].bind();
-			// glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, (void*)0);
 			glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
-			// glDrawArrays(GL_TRIANGLES, 0, 18);
 			vaos[meshId].unbind();
 			shaderProgram.unbind();
 		}
