@@ -43,6 +43,14 @@ void ShaderProgram::setMat4(const char* varName, glm::mat4& mat) {
 	unbind();
 }
 
+void ShaderProgram::setInt(const char* varName, int val) {
+	if (programId == -1) return;
+	bind();
+	GLint loc = glGetUniformLocation(programId, varName);
+	glUniform1i(loc, val);
+	unbind();
+}
+
 GLuint ShaderProgram::createShader(const char* path, GLenum shaderType) {
 	std::string line, fileContents;
 	std::ifstream file(path);

@@ -9,6 +9,7 @@ public:
 	ShaderProgram();
 	ShaderProgram(const char* vertexPath, const char* fragmentPath);
 	void setMat4(const char* varName, glm::mat4& mat);
+	void setInt(const char* varName, int val);
 	void bind();
 	void unbind();
 

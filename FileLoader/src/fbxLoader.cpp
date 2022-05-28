@@ -14,13 +14,14 @@ SceneData loadFbx(const char* fbxFilePath) {
 	fbxManager->SetIOSettings(ioSettings);
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
-	SceneData fbxData = {};
+	SceneData sceneData = {};
 
 	if (!fbxImporter->Initialize(fbxFilePath, -1, fbxManager->GetIOSettings())) {
 		std::cout << "fbx import failed" << std::endl;
 		std::cout << "ERROR: " << fbxImporter->GetStatus().GetErrorString() << std::endl;
-		fbxData.meshCount = -1;
-		return fbxData;
+		sceneData.meshCount = -1;
+		sceneData.meshes = NULL;
+		return sceneData;
 	}
 	FbxScene* scene = FbxScene::Create(fbxManager, "scene");
 
@@ -40,19 +41,27 @@ SceneData loadFbx(const char* fbxFilePath) {
 
 	FbxNode* rootNode = scene->GetRootNode();
 	Mesh* meshes = new Mesh[rootNode->GetChildCount()];
-	fbxData.meshes = meshes;
-	fbxData.meshCount = rootNode->GetChildCount();
+	// Mesh* meshes = new Mesh[1];
+	sceneData.meshes = meshes;
+	sceneData.meshCount = rootNode->GetChildCount();
+	// sceneData.meshCount = 1;
 	if (rootNode) {
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
+			// for (int i = 0; i < 1; i++) {
 			FbxNode* childNode = rootNode->GetChild(i);
 			Mesh mesh = getNodeData(childNode);
+			if (mesh.vertices == NULL) {
+				sceneData.meshCount = -1;
+				sceneData.meshes = NULL;
+				return sceneData;
+			}
 			meshes[i] = mesh;
 		}
 	}
 
 	fbxManager->Destroy();
 
-	return fbxData;
+	return sceneData;
 
 }
 
@@ -69,13 +78,6 @@ Mesh getNodeData(FbxNode* node) {
 	FbxDouble3 rotation = node->LclRotation.Get();
 	FbxDouble3 scaling = node->LclScaling.Get();
 
-	printf("node name='%s' translation='(%f, %f, %f)' rotation='(%f, %f, %f)' scaling='(%f, %f, %f)'>\n",
-		nodeName,
-		translation[0], translation[1], translation[2],
-		rotation[0], rotation[1], rotation[2],
-		scaling[0], scaling[1], scaling[2]
-	);
-
 	mesh.position = glm::vec3(translation[0], translation[1], translation[2]);
 	mesh.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
 	mesh.scale = glm::vec3(scaling[0], scaling[1], scaling[2]);
@@ -85,48 +87,79 @@ Mesh getNodeData(FbxNode* node) {
 		const char* nodeAttributeName = nodeAttribute->GetName();
 		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh) {
 			FbxMesh* fbxMesh = (FbxMesh*)nodeAttribute;
-			std::cout << "node attribute " << nodeAttributeName << " is of type mesh and has " << fbxMesh->GetControlPointsCount() << " vertices" << std::endl;;
 
-			mesh.vertexCount = fbxMesh->GetControlPointsCount();
-			Vertex* vertices = new Vertex[mesh.vertexCount];
-			mesh.vertices = vertices;
+			FbxGeometryElementUV* uvElement = fbxMesh->GetElementUV(0);
+			FbxGeometryElement::EMappingMode mappingMode = uvElement->GetMappingMode();
+			FbxGeometryElement::EReferenceMode refMode = uvElement->GetReferenceMode();
 
-			FbxVector4* fbxVertices = fbxMesh->GetControlPoints();
-			for (int vertexId = 0; vertexId < fbxMesh->GetControlPointsCount(); vertexId++) {
-				FbxDouble* data = fbxVertices[vertexId].mData;
-
-				Vertex& vertex = vertices[vertexId];
-				vertex.position[0] = data[0];
-				vertex.position[1] = data[1];
-				vertex.position[2] = data[2];
-
-				vertex.color[0] = randNum();
-				vertex.color[1] = randNum();
-				vertex.color[2] = randNum();
-
-				// seem to be relative to parent
-				std::cout << "vertex " << vertexId << ": (" << data[0] << ", " << data[1] << ", " << data[2] << ", " << data[3] << std::endl;
-			}
-			int polygonCount = fbxMesh->GetPolygonCount();
-			std::cout << "getPolygonVertexCount: " << fbxMesh->GetPolygonVertexCount() << std::endl;
+			int controlPointsSize = fbxMesh->GetControlPointsCount();
+			FbxVector4* fbxLclPositions = fbxMesh->GetControlPoints();
 			int numIndicies = fbxMesh->GetPolygonVertexCount();
-			unsigned int* indicies = new unsigned int[numIndicies];
-			mesh.indexCount = numIndicies;
-			mesh.indicies = indicies;
+			mesh.vertexCount = numIndicies;
+			mesh.vertices = new Vertex[mesh.vertexCount];
+			mesh.indexCount = 0;
+			mesh.indicies = NULL;
+
 			int i = 0;
-			for (int polygonId = 0; polygonId < polygonCount; polygonId++) {
-				int numVerticesOnPolygon = fbxMesh->GetPolygonSize(polygonId);
-				std::cout << "polygon " << polygonId << " has " << numVerticesOnPolygon << " vertices" << std::endl;
-				for (int polyVertIdx = 0; polyVertIdx < numVerticesOnPolygon; polyVertIdx++) {
-					int vertexId = fbxMesh->GetPolygonVertex(polygonId, polyVertIdx);
-					indicies[i] = vertexId;
+			for (int polygonId = 0; polygonId < fbxMesh->GetPolygonCount(); polygonId++) {
+				for (int polyVertIdx = 0; polyVertIdx < fbxMesh->GetPolygonSize(polygonId); polyVertIdx++) {
+					int positionId = fbxMesh->GetPolygonVertex(polygonId, polyVertIdx);
+					Vertex& vertex = mesh.vertices[i];
+					FbxDouble* position = fbxLclPositions[positionId].mData;
+
+					vertex.position[0] = position[0];
+					vertex.position[1] = position[1];
+					vertex.position[2] = position[2];
+
+					vertex.color[0] = (rand() % 10) / 10.0f;
+					vertex.color[1] = (rand() % 10) / 10.0f;
+					vertex.color[2] = (rand() % 10) / 10.0f;
+
 					i += 1;
+
+					switch (mappingMode) {
+						// mapping per vertex 
+					case FbxGeometryElement::eByControlPoint:
+						switch (refMode) {
+							// can get data directly with array
+						case FbxGeometryElement::eDirect:
+							break;
+							// must get index then access array
+						case FbxGeometryElement::eIndexToDirect:
+							break;
+						}
+						break;
+						// mapping per vertex per polygon
+					case FbxGeometryElement::eByPolygonVertex: {
+						FbxVector2 uv;
+						int idx;
+						switch (refMode) {
+						case FbxGeometryElement::eDirect:
+						case FbxGeometryElement::eIndexToDirect:
+							int uvIdx = fbxMesh->GetTextureUVIndex(polygonId, polyVertIdx);
+							uv = uvElement->GetDirectArray().GetAt(uvIdx);
+
+							vertex.uvs[0] = uv.mData[0];
+							vertex.uvs[1] = uv.mData[1];
+							break;
+						}
+					}
+															 break;
+					case FbxGeometryElement::eByEdge:
+						std::cout << "mapping per edge" << std::endl;
+						break;
+					case FbxGeometryElement::eByPolygon:
+						std::cout << "mapping per entire polygon" << std::endl;
+						break;
+					case FbxGeometryElement::eAllSame:
+						std::cout << "same for entire mesh" << std::endl;
+						break;
+					}
+
 				}
 			}
 		}
 	}
-
-	std::cout << std::endl;
 
 	return mesh;
 
