@@ -143,15 +143,12 @@ int main(int argc, char* args[]) {
 	bool running = true;
 
 	int numMeshes = sceneData.meshCount;
-	// numMeshes = 3;
 
 	std::vector<VAO> vaos;
 	std::vector<VBO> vbos;
-	// std::vector<EBO> ebos;
 
 	vaos.resize(numMeshes);
 	vbos.resize(numMeshes);
-	// ebos.resize(numMeshes);
 
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
 		Mesh mesh = sceneData.meshes[meshId];
@@ -161,30 +158,17 @@ int main(int argc, char* args[]) {
 
 		VBO vbo;
 		vbo.setData((float*)&mesh.vertices[0], mesh.vertexCount * sizeof(Vertex), GL_STATIC_DRAW);
-		// vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
 
-		// vao.attachVBO(vbo, 0, 3, 6, 0);
-		// vao.attachVBO(vbo, 1, 3, 6, 3 * sizeof(float));
-
-		int numFloats = sizeof(Vertex) / sizeof(float);
-		// int numFloats = 11;
 		vao.attachVBO(vbo, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
 		vao.attachVBO(vbo, 1, 3, sizeof(Vertex), offsetof(Vertex, color));
 		vao.attachVBO(vbo, 2, 2, sizeof(Vertex), offsetof(Vertex, uvs));
-		// vao.attachVBO(vbo, 3, 3, numFloats, offsetof(Vertex, normal));
 		vao.attachVBO(vbo, 3, 3, sizeof(Vertex), offsetof(Vertex, avgNormal));
 
-		// EBO ebo;
-		// ebo.setData(mesh.indicies, mesh.indexCount * sizeof(mesh.indicies[0]), GL_STATIC_DRAW);
-		// ebo.bind();
-
 		vao.unbind();
-		// ebo.unbind();
 		vbo.unbind();
 
 		vaos[meshId] = vao;
 		vbos[meshId] = vbo;
-		// ebos[meshId] = ebo;
 	}
 
 	const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
@@ -192,7 +176,7 @@ int main(int argc, char* args[]) {
 
 	ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
 
-	glm::vec3 camPos(0, 0, 0);
+	// glm::vec3 camPos(0, 0, 0);
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
 	shaderProgram.setMat4("projection", proj);
@@ -209,10 +193,13 @@ int main(int argc, char* args[]) {
 	Line line;
 	line.shaderProgram.setMat4("projection", proj);
 
+	glm::vec3 camPos(500.0f, 0, 500.0f);
+
 	glEnable(GL_DEPTH_TEST);
 	while (running) {
 		glViewport(0, 0, width, height);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 		glClearStencil(0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -238,7 +225,7 @@ int main(int argc, char* args[]) {
 
 		texture.bind();
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			Mesh& mesh = sceneData.meshes[meshId];
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
@@ -273,11 +260,13 @@ int main(int argc, char* args[]) {
 			shaderProgram.unbind();
 		}
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		ImGui::Begin("camPos");
 
-		ImGui::SliderFloat("cam distance", &radius, 0, 4000);
+		ImGui::SliderFloat("cam x", &camPos.x, -4000, 4000);
+		ImGui::SliderFloat("cam y", &camPos.y, -4000, 4000);
+		ImGui::SliderFloat("cam z", &camPos.z, -4000, 4000);
 
 		ImGui::End();
 
