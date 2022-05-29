@@ -62,10 +62,28 @@ int main(int argc, char* args[]) {
 	SDL_GL_MakeCurrent(window, context);
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
 
+	/*
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	*/
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
 	ImGui::StyleColorsDark();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
 
 	ImGui_ImplSDL2_InitForOpenGL(window, context);
 	const char* glsl_version = "#version 330";
@@ -145,6 +163,9 @@ int main(int argc, char* args[]) {
 			if (event.type == SDL_QUIT) {
 				running = false;
 			}
+			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
+				running = false;
+			}
 		}
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -211,11 +232,20 @@ int main(int argc, char* args[]) {
 
 		ImGui::End();
 
-		// ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 		// ImGui::PopFont();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			SDL_Window* backupCurrentWindow = SDL_GL_GetCurrentWindow();
+			SDL_GLContext backupCurrentContext = SDL_GL_GetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			SDL_GL_MakeCurrent(backupCurrentWindow, backupCurrentContext);
+		}
 
 		SDL_GL_SwapWindow(window);
 
