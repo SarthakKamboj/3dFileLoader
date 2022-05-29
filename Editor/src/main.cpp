@@ -183,11 +183,10 @@ int main(int argc, char* args[]) {
 
 	int i = 0;
 
-	float radius = 2000.0f;
-
 	shaderProgram.setInt("texUnit", 0);
 
-	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
+	// const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
+	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
 	Texture texture(texFilePath, 0);
 
 	Line line;
@@ -196,9 +195,15 @@ int main(int argc, char* args[]) {
 	glm::vec3 camPos(500.0f, 0, 500.0f);
 
 	glEnable(GL_DEPTH_TEST);
+
+	// ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("ext\\imgui\\fonts\\Roboto-Medium.ttf", 16.0f);
+	float fontSize = 16.0f;
+	io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
+	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
+
+	float radius = 2000.0f;
 	while (running) {
 		glViewport(0, 0, width, height);
-		// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 		glClearStencil(0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -215,10 +220,13 @@ int main(int argc, char* args[]) {
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
+		// ImGui::PushFont(robotoFont);
+
 		float speed = 0.01f;
 		camPos.x = cos(i * speed) * radius;
 		camPos.z = sin(i * speed) * radius;
-		camPos.y = -150;
+		// camPos.y = -150;
+		camPos.y = 10;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("view", view);
@@ -238,8 +246,8 @@ int main(int argc, char* args[]) {
 			for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
 				Vertex& vert = mesh.vertices[vertexIdx];
 				glm::vec3 startPoint(vert.position[0], vert.position[1], vert.position[2]);
-				glm::vec3 endPoint = startPoint + glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
-				glm::vec3 avgEndPoint = startPoint + 1.25f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
+				glm::vec3 endPoint = startPoint + 100.0f * glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
+				glm::vec3 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
 				line.setStartPoint(startPoint);
 
 				line.setColor(glm::vec3(1, 0, 0));
@@ -264,11 +272,18 @@ int main(int argc, char* args[]) {
 
 		ImGui::Begin("camPos");
 
+		ImGui::SliderFloat("cam x", &radius, -4000, 4000);
+
+		/*
 		ImGui::SliderFloat("cam x", &camPos.x, -4000, 4000);
 		ImGui::SliderFloat("cam y", &camPos.y, -4000, 4000);
 		ImGui::SliderFloat("cam z", &camPos.z, -4000, 4000);
+		*/
 
 		ImGui::End();
+
+		ImGui::ShowDemoWindow();
+		// ImGui::PopFont();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -68,6 +68,8 @@ Mesh getNodeData(FbxNode* node) {
 
 	const char* nodeName = node->GetName();
 
+	std::cout << nodeName << std::endl;
+
 	FbxDouble3 translation = node->LclTranslation.Get();
 	FbxDouble3 rotation = node->LclRotation.Get();
 	FbxDouble3 scaling = node->LclScaling.Get();
@@ -231,12 +233,12 @@ Mesh getNodeData(FbxNode* node) {
 		}
 	}
 
-	return mesh;
 
-	/*
-	for (int i = 0; i < node->GetChildCount(); i++) {
+	int childCount = node->GetChildCount();
+	for (int i = 0; i < childCount; i++) {
 		getNodeData(node->GetChild(i));
 	}
-	*/
+
+	return mesh;
 }
 
