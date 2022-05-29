@@ -1,6 +1,8 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include <string>
+#include <vector>
 
 struct Vertex {
 	float position[3];
@@ -12,7 +14,6 @@ struct Vertex {
 };
 
 struct Mesh {
-
 	Vertex* vertices;
 	int vertexCount;
 	unsigned int* indicies;
@@ -21,11 +22,16 @@ struct Mesh {
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
+
+	int numChildren;
+	std::vector<Mesh> childMeshes;
+
+	std::string name;
 };
 
-struct SceneData {
-	Mesh* meshes;
-	int meshCount;
+struct Scene {
+	std::vector<Mesh> meshes;
+	int numMeshes;
 };
 
-SceneData loadFbx(const char* fbxFilePath);
+Scene loadFbx(const char* fbxFilePath);

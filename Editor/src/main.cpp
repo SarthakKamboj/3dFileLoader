@@ -19,72 +19,6 @@
 #include "renderer/texture.h"
 #include "renderer/line.h"
 
-/*
-static float vertices[] = {
-	0.5f, 0.5f, 0.5f,
-	0.5f, 0.5f, -0.5f,
-	0.5f, -0.5f, 0.5f,
-	0.5f, -0.5f, -0.5f,
-	-0.5f, 0.5f, 0.5f,
-	-0.5f, 0.5f, -0.5f,
-	-0.5f, -0.5f, 0.5f,
-	-0.5f, -0.5f, -0.5f,
-};
-
-static unsigned int indicies[] = {
-	0,5,1,0,4,5,
-	4,5,6,5,6,7,
-	1,0,3,3,2,0,
-	7,2,6,7,3,2,
-	5,6,7,5,6,1,
-	4,3,0,4,3,6
-};
-*/
-
-float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f
-};
-
 glm::mat4 getRotationMatrix(glm::vec3 rot) {
 	glm::mat4 rotMatrix(1.0f);
 	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.x), glm::vec3(1, 0, 0));
@@ -101,9 +35,9 @@ int main(int argc, char* args[]) {
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cube.fbx";
-	SceneData sceneData = loadFbx(fbxFilePath);
+	Scene scene = loadFbx(fbxFilePath);
 
-	if (sceneData.meshCount == -1 || !sceneData.meshes) {
+	if (scene.numMeshes == -1) {
 		std::cout << "scene data not valid" << std::endl;
 		return 0;
 	}
@@ -142,7 +76,7 @@ int main(int argc, char* args[]) {
 
 	bool running = true;
 
-	int numMeshes = sceneData.meshCount;
+	int numMeshes = scene.numMeshes;
 
 	std::vector<VAO> vaos;
 	std::vector<VBO> vbos;
@@ -151,7 +85,7 @@ int main(int argc, char* args[]) {
 	vbos.resize(numMeshes);
 
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
-		Mesh mesh = sceneData.meshes[meshId];
+		Mesh mesh = scene.meshes[meshId];
 
 		VAO vao;
 		vao.bind();
@@ -176,7 +110,6 @@ int main(int argc, char* args[]) {
 
 	ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
 
-	// glm::vec3 camPos(0, 0, 0);
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
 	shaderProgram.setMat4("projection", proj);
@@ -185,7 +118,6 @@ int main(int argc, char* args[]) {
 
 	shaderProgram.setInt("texUnit", 0);
 
-	// const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
 	Texture texture(texFilePath, 0);
 
@@ -196,7 +128,6 @@ int main(int argc, char* args[]) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	// ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("ext\\imgui\\fonts\\Roboto-Medium.ttf", 16.0f);
 	float fontSize = 16.0f;
 	io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
@@ -220,12 +151,9 @@ int main(int argc, char* args[]) {
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		// ImGui::PushFont(robotoFont);
-
 		float speed = 0.01f;
 		camPos.x = cos(i * speed) * radius;
 		camPos.z = sin(i * speed) * radius;
-		// camPos.y = -150;
 		camPos.y = 10;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
@@ -233,15 +161,16 @@ int main(int argc, char* args[]) {
 
 		texture.bind();
 
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
-			Mesh& mesh = sceneData.meshes[meshId];
+			Mesh& mesh = scene.meshes[meshId];
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
 			glm::mat4 rotation = getRotationMatrix(mesh.rotation);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.scale);
 
 			glm::mat4 model = translation * rotation * scale;
 
+			/*
 			line.shaderProgram.setMat4("model", model);
 			for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
 				Vertex& vert = mesh.vertices[vertexIdx];
@@ -259,6 +188,7 @@ int main(int argc, char* args[]) {
 				line.render();
 
 			}
+			*/
 
 			shaderProgram.setMat4("model", model);
 			shaderProgram.bind();
@@ -267,7 +197,6 @@ int main(int argc, char* args[]) {
 			vaos[meshId].unbind();
 			shaderProgram.unbind();
 		}
-
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		ImGui::Begin("camPos");
@@ -282,7 +211,7 @@ int main(int argc, char* args[]) {
 
 		ImGui::End();
 
-		ImGui::ShowDemoWindow();
+		// ImGui::ShowDemoWindow();
 		// ImGui::PopFont();
 
 		ImGui::Render();

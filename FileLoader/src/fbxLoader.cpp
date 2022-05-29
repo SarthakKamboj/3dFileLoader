@@ -6,51 +6,49 @@
 #include "glm/glm.hpp"
 #include <vector>
 
-Mesh getNodeData(FbxNode* node);
+Mesh addMeshToScene(Scene& scene, FbxNode* node);
 
-SceneData loadFbx(const char* fbxFilePath) {
+Scene loadFbx(const char* fbxFilePath) {
 	FbxManager* fbxManager = FbxManager::Create();
 	FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
 	fbxManager->SetIOSettings(ioSettings);
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
-	SceneData sceneData = {};
+	Scene scene = {};
 
 	if (!fbxImporter->Initialize(fbxFilePath, -1, fbxManager->GetIOSettings())) {
 		std::cout << "fbx import failed" << std::endl;
 		std::cout << "ERROR: " << fbxImporter->GetStatus().GetErrorString() << std::endl;
-		sceneData.meshCount = -1;
-		sceneData.meshes = NULL;
-		return sceneData;
+		scene.numMeshes = -1;
+		return scene;
 	}
-	FbxScene* scene = FbxScene::Create(fbxManager, "scene");
+	FbxScene* fbxScene = FbxScene::Create(fbxManager, "scene");
 
-	fbxImporter->Import(scene);
+	fbxImporter->Import(fbxScene);
 	fbxImporter->Destroy();
 
 	std::cout << "successfully loaded FBX" << std::endl;
 
-	FbxNode* rootNode = scene->GetRootNode();
-	Mesh* meshes = new Mesh[rootNode->GetChildCount()];
-	sceneData.meshes = meshes;
-	sceneData.meshCount = rootNode->GetChildCount();
+	int nodeCount = fbxScene->GetNodeCount();
+	int numMeshes = nodeCount - 1;
+
+	FbxNode* rootNode = fbxScene->GetRootNode();
+
 	if (rootNode) {
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
 			FbxNode* childNode = rootNode->GetChild(i);
-			Mesh mesh = getNodeData(childNode);
-			if (mesh.vertices == NULL) {
-				sceneData.meshCount = -1;
-				sceneData.meshes = NULL;
-				return sceneData;
-			}
-			meshes[i] = mesh;
+			addMeshToScene(scene, childNode);
+			scene.numMeshes = scene.meshes.size();
 		}
+	}
+	else {
+		scene.numMeshes = -1;
+		return scene;
 	}
 
 	fbxManager->Destroy();
 
-	return sceneData;
-
+	return scene;
 }
 
 float randNum() {
@@ -63,7 +61,7 @@ struct NormalData {
 	int numCoords;
 };
 
-Mesh getNodeData(FbxNode* node) {
+Mesh addMeshToScene(Scene& scene, FbxNode* node) {
 	Mesh mesh = {};
 
 	const char* nodeName = node->GetName();
@@ -81,6 +79,7 @@ Mesh getNodeData(FbxNode* node) {
 	for (int nodeAttrIdx = 0; nodeAttrIdx < node->GetNodeAttributeCount(); nodeAttrIdx++) {
 		FbxNodeAttribute* nodeAttribute = node->GetNodeAttributeByIndex(nodeAttrIdx);
 		const char* nodeAttributeName = nodeAttribute->GetName();
+		mesh.name = std::string(nodeAttributeName);
 		if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh) {
 			FbxMesh* fbxMesh = (FbxMesh*)nodeAttribute;
 
@@ -141,13 +140,11 @@ Mesh getNodeData(FbxNode* node) {
 						break;
 						// mapping per vertex per polygon
 					case FbxGeometryElement::eByPolygonVertex: {
-						FbxVector2 uv;
-						int idx;
 						switch (uvRefMode) {
 						case FbxGeometryElement::eDirect:
 						case FbxGeometryElement::eIndexToDirect: {
 							int uvIdx = fbxMesh->GetTextureUVIndex(polygonId, polyVertIdx);
-							uv = uvElement->GetDirectArray().GetAt(uvIdx);
+							FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIdx);
 
 							vertex.uvs[0] = uv[0];
 							vertex.uvs[1] = uv[1];
@@ -230,13 +227,16 @@ Mesh getNodeData(FbxNode* node) {
 				vertices[i].avgNormal[2] = avgNormalForPos.z;
 			}
 
+			scene.meshes.push_back(mesh);
 		}
 	}
 
 
 	int childCount = node->GetChildCount();
+	mesh.numChildren = childCount;
 	for (int i = 0; i < childCount; i++) {
-		getNodeData(node->GetChild(i));
+		Mesh childMesh = addMeshToScene(scene, node->GetChild(i));
+		mesh.childMeshes.push_back(childMesh);
 	}
 
 	return mesh;
