@@ -7,6 +7,8 @@ struct Vertex {
 	float color[3];
 	float uvs[2];
 	float normal[3];
+	float avgNormal[3];
+	int positionId;
 };
 
 struct Mesh {

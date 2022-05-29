@@ -6,7 +6,7 @@
 class VAO {
 public:
 	VAO();
-	void attachVBO(VBO& vbo, GLuint index, int numFloatsPerDescriptor, int numFloatsPerVertex, int offsetInBytes);
+	void attachVBO(VBO& vbo, GLuint index, int numFloatsPerDescriptor, int stride, int offsetInBytes);
 	void bind();
 	void unbind();
 

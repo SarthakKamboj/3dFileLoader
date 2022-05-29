@@ -60,6 +60,9 @@
     <ClCompile Include="src\renderer\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer\line.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h">
@@ -80,9 +83,14 @@
     <ClInclude Include="src\renderer\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer\line.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\vertexShader.vert" />
     <None Include="src\shaders\fragmentShader.frag" />
+    <None Include="src\shaders\line.vert" />
+    <None Include="src\shaders\line.frag" />
   </ItemGroup>
 </Project>

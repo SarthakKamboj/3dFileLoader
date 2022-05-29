@@ -17,6 +17,7 @@
 #include "imgui_impl_sdl.h"
 #include "stb_image.h"
 #include "renderer/texture.h"
+#include "renderer/line.h"
 
 /*
 static float vertices[] = {
@@ -95,8 +96,11 @@ glm::mat4 getRotationMatrix(glm::vec3 rot) {
 int main(int argc, char* args[]) {
 
 	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cube.fbx";
 	SceneData sceneData = loadFbx(fbxFilePath);
 
 	if (sceneData.meshCount == -1 || !sceneData.meshes) {
@@ -161,14 +165,14 @@ int main(int argc, char* args[]) {
 
 		// vao.attachVBO(vbo, 0, 3, 6, 0);
 		// vao.attachVBO(vbo, 1, 3, 6, 3 * sizeof(float));
-		int posOffset = offsetof(Vertex, position);
-		int colorOffset = offsetof(Vertex, color);
-		int uvOffset = offsetof(Vertex, uvs);
+
 		int numFloats = sizeof(Vertex) / sizeof(float);
-		vao.attachVBO(vbo, 0, 3, numFloats, offsetof(Vertex, position));
-		vao.attachVBO(vbo, 1, 3, numFloats, offsetof(Vertex, color));
-		vao.attachVBO(vbo, 2, 2, numFloats, offsetof(Vertex, uvs));
-		vao.attachVBO(vbo, 3, 3, numFloats, offsetof(Vertex, normal));
+		// int numFloats = 11;
+		vao.attachVBO(vbo, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
+		vao.attachVBO(vbo, 1, 3, sizeof(Vertex), offsetof(Vertex, color));
+		vao.attachVBO(vbo, 2, 2, sizeof(Vertex), offsetof(Vertex, uvs));
+		// vao.attachVBO(vbo, 3, 3, numFloats, offsetof(Vertex, normal));
+		vao.attachVBO(vbo, 3, 3, sizeof(Vertex), offsetof(Vertex, avgNormal));
 
 		// EBO ebo;
 		// ebo.setData(mesh.indicies, mesh.indexCount * sizeof(mesh.indicies[0]), GL_STATIC_DRAW);
@@ -197,12 +201,15 @@ int main(int argc, char* args[]) {
 
 	float radius = 2000.0f;
 
-
 	shaderProgram.setInt("texUnit", 0);
 
 	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	Texture texture(texFilePath, 0);
 
+	Line line;
+	line.shaderProgram.setMat4("projection", proj);
+
+	glEnable(GL_DEPTH_TEST);
 	while (running) {
 		glViewport(0, 0, width, height);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -224,16 +231,14 @@ int main(int argc, char* args[]) {
 		float speed = 0.01f;
 		camPos.x = cos(i * speed) * radius;
 		camPos.z = sin(i * speed) * radius;
-		camPos.y = 0;
+		camPos.y = -150;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
+		line.shaderProgram.setMat4("view", view);
 
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, texture);
 		texture.bind();
-		glEnable(GL_DEPTH_TEST);
 
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			Mesh& mesh = sceneData.meshes[meshId];
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
@@ -241,6 +246,24 @@ int main(int argc, char* args[]) {
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.scale);
 
 			glm::mat4 model = translation * rotation * scale;
+
+			line.shaderProgram.setMat4("model", model);
+			for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
+				Vertex& vert = mesh.vertices[vertexIdx];
+				glm::vec3 startPoint(vert.position[0], vert.position[1], vert.position[2]);
+				glm::vec3 endPoint = startPoint + glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
+				glm::vec3 avgEndPoint = startPoint + 1.25f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
+				line.setStartPoint(startPoint);
+
+				line.setColor(glm::vec3(1, 0, 0));
+				line.setEndPoint(endPoint);
+				line.render();
+
+				line.setColor(glm::vec3(0, 0, 1));
+				line.setEndPoint(avgEndPoint);
+				line.render();
+
+			}
 
 			shaderProgram.setMat4("model", model);
 			shaderProgram.bind();
@@ -250,7 +273,7 @@ int main(int argc, char* args[]) {
 			shaderProgram.unbind();
 		}
 
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		ImGui::Begin("camPos");
 

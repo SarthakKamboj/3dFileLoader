@@ -43,6 +43,14 @@ void ShaderProgram::setMat4(const char* varName, glm::mat4& mat) {
 	unbind();
 }
 
+void ShaderProgram::setVec3(const char* varName, glm::vec3 vec3) {
+	if (programId == -1) return;
+	bind();
+	GLint loc = glGetUniformLocation(programId, varName);
+	glUniform3fv(loc, 1, glm::value_ptr(vec3));
+	unbind();
+}
+
 void ShaderProgram::setInt(const char* varName, int val) {
 	if (programId == -1) return;
 	bind();

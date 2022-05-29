@@ -4,10 +4,10 @@ VAO::VAO() {
 	glGenVertexArrays(1, &vao);
 }
 
-void VAO::attachVBO(VBO& vbo, GLuint index, int numFloatsPerDescriptor, int numFloatsPerVertex, int offsetInBytes) {
+void VAO::attachVBO(VBO& vbo, GLuint index, int numFloatsPerDescriptor, int stride, int offsetInBytes) {
 	glEnableVertexAttribArray(index);
 	vbo.bind();
-	glVertexAttribPointer(index, numFloatsPerDescriptor, GL_FLOAT, GL_FALSE, numFloatsPerVertex * sizeof(float), (void*)offsetInBytes);
+	glVertexAttribPointer(index, numFloatsPerDescriptor, GL_FLOAT, GL_FALSE, stride, (void*)offsetInBytes);
 	vbo.unbind();
 }
 
