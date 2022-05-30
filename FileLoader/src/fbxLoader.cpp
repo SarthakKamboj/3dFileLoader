@@ -113,7 +113,6 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	FbxGeometryElement::EMappingMode normalsMappingMode = normalsElement->GetMappingMode();
 	FbxGeometryElement::EReferenceMode normalsRefMode = normalsElement->GetReferenceMode();
 
-	// num positions
 	int numPositions = fbxMesh->GetControlPointsCount();
 
 	NormalData* normalData = new NormalData[numPositions];
@@ -268,8 +267,6 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 			scene.meshes[curMeshIdx].childMeshIdxs.push_back(childMeshIdx);
 			scene.meshes[curMeshIdx].numChildren += 1;
 		}
-		// addFbxNodeToScene(scene, node->GetChild(i));
-		// mesh.childMeshes.push_back(childMesh);
 	}
 
 	return curMeshIdx;

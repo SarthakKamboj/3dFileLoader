@@ -44,7 +44,6 @@ struct Mesh {
 	Transform transform;
 
 	int numChildren;
-	// std::vector<Mesh> childMeshes;
 	std::vector<int> childMeshIdxs;
 
 	std::string name;
@@ -60,26 +59,6 @@ struct Light {
 	Light();
 	Transform transform;
 };
-
-/*
-typedef enum NodeType {
-	NODE_MESH, NODE_CAMERA, NODE_LIGHT
-} NodeType;
-
-struct Node {
-	NodeType nodeType;
-
-	Camera camera;
-	Mesh mesh;
-	Light light;
-
-	std::string name;
-	Transform transform;
-
-	int numChildren;
-	std::vector<Node> childrenNodes;
-};
-*/
 
 struct Scene {
 	std::vector<Mesh> meshes;
