@@ -29,7 +29,8 @@ glm::mat4 getRotationMatrix(glm::vec3 rot) {
 
 int main(int argc, char* args[]) {
 
-	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
@@ -62,17 +63,10 @@ int main(int argc, char* args[]) {
 	SDL_GL_MakeCurrent(window, context);
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
 
-	/*
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	*/
-
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
@@ -132,8 +126,6 @@ int main(int argc, char* args[]) {
 
 	shaderProgram.setMat4("projection", proj);
 
-	int i = 0;
-
 	shaderProgram.setInt("texUnit", 0);
 
 	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
@@ -142,7 +134,7 @@ int main(int argc, char* args[]) {
 	Line line;
 	line.shaderProgram.setMat4("projection", proj);
 
-	glm::vec3 camPos(500.0f, 0, 500.0f);
+	// glm::vec3 camPos(500.0f, 0, 500.0f);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -150,7 +142,8 @@ int main(int argc, char* args[]) {
 	io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
 
-	float radius = 2000.0f;
+	float radius = 500.0f;
+	glm::vec3 camPos(radius, 10.0f, radius);
 	bool open = true;
 	while (running) {
 		glViewport(0, 0, width, height);
@@ -204,15 +197,7 @@ int main(int argc, char* args[]) {
 		}
 
 		ImGui::Begin("camPos");
-
-		ImGui::SliderFloat("cam x", &radius, -4000, 4000);
-
-		/*
-		ImGui::SliderFloat("cam x", &camPos.x, -4000, 4000);
-		ImGui::SliderFloat("cam y", &camPos.y, -4000, 4000);
-		ImGui::SliderFloat("cam z", &camPos.z, -4000, 4000);
-		*/
-
+		ImGui::DragFloat3("cam pos", &camPos.x, 10, -4000, 4000);
 		ImGui::End();
 
 		ImGui::ShowDemoWindow();
@@ -244,9 +229,9 @@ int main(int argc, char* args[]) {
 		glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
 
 		float speed = 0.01f;
-		camPos.x = cos(i * speed) * radius;
-		camPos.z = sin(i * speed) * radius;
-		camPos.y = 10;
+		// camPos.x = cos(i * speed) * radius;
+		// camPos.z = sin(i * speed) * radius;
+		// camPos.y = 10;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("view", view);
@@ -256,9 +241,9 @@ int main(int argc, char* args[]) {
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			Mesh& mesh = scene.meshes[meshId];
-			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
-			glm::mat4 rotation = getRotationMatrix(mesh.rotation);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.scale);
+			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.transform.position);
+			glm::mat4 rotation = getRotationMatrix(mesh.transform.rotation);
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.transform.scale);
 
 			glm::mat4 model = translation * rotation * scale;
 
@@ -301,8 +286,6 @@ int main(int argc, char* args[]) {
 		}
 
 		SDL_GL_SwapWindow(window);
-
-		i += 1;
 	}
 
 	return -1;
