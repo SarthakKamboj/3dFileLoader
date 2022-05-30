@@ -86,8 +86,8 @@ int main(int argc, char* args[]) {
 	}
 
 	ImGui_ImplSDL2_InitForOpenGL(window, context);
-	const char* glsl_version = "#version 330";
-	ImGui_ImplOpenGL3_Init(glsl_version);
+	const char* glslVersion = "#version 330";
+	ImGui_ImplOpenGL3_Init(glslVersion);
 
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -151,6 +151,7 @@ int main(int argc, char* args[]) {
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
 
 	float radius = 2000.0f;
+	bool open = true;
 	while (running) {
 		glViewport(0, 0, width, height);
 		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -172,6 +173,76 @@ int main(int argc, char* args[]) {
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
+		if (open) {
+			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
+
+			ImGuiWindowFlags_;
+
+			windowFlags |= ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
+
+			ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(mainViewport->WorkPos);
+			ImGui::SetNextWindowSize(ImVec2(mainViewport->WorkSize.x, mainViewport->WorkSize.y));
+			ImGui::SetNextWindowViewport(mainViewport->ID);
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Test", NULL, windowFlags);
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+				ImGuiID id = ImGui::GetID("Dock");
+				ImGui::DockSpace(id, ImVec2(0, 0), dockspaceFlags);
+			}
+
+			ImGui::End();
+			ImGui::PopStyleVar(3);
+		}
+
+		ImGui::Begin("camPos");
+
+		ImGui::SliderFloat("cam x", &radius, -4000, 4000);
+
+		/*
+		ImGui::SliderFloat("cam x", &camPos.x, -4000, 4000);
+		ImGui::SliderFloat("cam y", &camPos.y, -4000, 4000);
+		ImGui::SliderFloat("cam z", &camPos.z, -4000, 4000);
+		*/
+
+		ImGui::End();
+
+		ImGui::ShowDemoWindow();
+
+		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
+
+		ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowViewport(mainViewport->ID);
+
+		ImVec2 sceneViewWinPadding(0.0f, 5.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, sceneViewWinPadding);
+		ImGui::Begin("World view window", NULL, worldViewWinFlags);
+
+		// imgui window is relative from top left and increases going down
+		// opengl is relative from bottom left and increases going up
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImVec2 windowSize = ImGui::GetWindowSize();
+
+		glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - windowSize.y);
+
+		ImGui::End();
+		ImGui::PopStyleVar();
+
+		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
+
 		float speed = 0.01f;
 		camPos.x = cos(i * speed) * radius;
 		camPos.z = sin(i * speed) * radius;
@@ -182,7 +253,7 @@ int main(int argc, char* args[]) {
 
 		texture.bind();
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			Mesh& mesh = scene.meshes[meshId];
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.position);
@@ -218,25 +289,7 @@ int main(int argc, char* args[]) {
 			vaos[meshId].unbind();
 			shaderProgram.unbind();
 		}
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		ImGui::Begin("camPos");
-
-		ImGui::SliderFloat("cam x", &radius, -4000, 4000);
-
-		/*
-		ImGui::SliderFloat("cam x", &camPos.x, -4000, 4000);
-		ImGui::SliderFloat("cam y", &camPos.y, -4000, 4000);
-		ImGui::SliderFloat("cam z", &camPos.z, -4000, 4000);
-		*/
-
-		ImGui::End();
-
-		ImGui::ShowDemoWindow();
-		// ImGui::PopFont();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
