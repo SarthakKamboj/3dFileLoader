@@ -92,5 +92,7 @@
     <None Include="src\shaders\fragmentShader.frag" />
     <None Include="src\shaders\line.vert" />
     <None Include="src\shaders\line.frag" />
+    <None Include="src\shaders\quad.vert" />
+    <None Include="src\shaders\quad.frag" />
   </ItemGroup>
 </Project>

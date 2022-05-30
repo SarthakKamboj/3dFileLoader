@@ -19,6 +19,12 @@
 #include "renderer/texture.h"
 #include "renderer/line.h"
 
+int width = 800, height = 800;
+
+void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
+	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
+}
+
 glm::mat4 getRotationMatrix(glm::vec3 rot) {
 	glm::mat4 rotMatrix(1.0f);
 	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.x), glm::vec3(1, 0, 0));
@@ -27,10 +33,21 @@ glm::mat4 getRotationMatrix(glm::vec3 rot) {
 	return rotMatrix;
 }
 
+float quadVertices[] = {
+	// positions   // texCoords
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f,  0.0f, 0.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	 1.0f,  1.0f,  1.0f, 1.0f
+};
+
 int main(int argc, char* args[]) {
 
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
-	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
@@ -48,7 +65,6 @@ int main(int argc, char* args[]) {
 		return 0;
 	}
 
-	int width = 800, height = 800;
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -82,6 +98,19 @@ int main(int argc, char* args[]) {
 	ImGui_ImplSDL2_InitForOpenGL(window, context);
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
+
+	VAO quadVao;
+	quadVao.bind();
+	VBO quadVbo;
+	quadVbo.setData(quadVertices, sizeof(quadVertices), GL_STATIC_DRAW);
+	quadVao.attachVBO(quadVbo, 0, 2, 4 * sizeof(float), 0);
+	quadVao.attachVBO(quadVbo, 1, 2, 4 * sizeof(float), 2 * sizeof(float));
+	quadVao.unbind();
+
+	const char* quadVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\quad.vert";
+	const char* quadFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\quad.frag";
+	ShaderProgram quadProgram(quadVert, quadFrag);
+	quadProgram.setInt("texUnit", 0);
 
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -145,7 +174,41 @@ int main(int argc, char* args[]) {
 	float radius = 500.0f;
 	glm::vec3 camPos(radius, 10.0f, radius);
 	bool open = true;
+
+	unsigned int fbo;
+	glGenFramebuffers(1, &fbo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	unsigned int frameBufferTex;
+	glGenTextures(1, &frameBufferTex);
+
+	glBindTexture(GL_TEXTURE_2D, frameBufferTex);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTex, 0);
+
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status == GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "framebuffer good to go" << std::endl;
+	}
+	else {
+		std::cout << "not good to go" << std::endl;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	while (running) {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, width, height);
 		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 		glClearStencil(0);
@@ -207,10 +270,15 @@ int main(int argc, char* args[]) {
 		ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowViewport(mainViewport->ID);
 
-		ImVec2 sceneViewWinPadding(0.0f, 5.0f);
+		ImVec2 sceneViewWinPadding(5.0f, 5.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, sceneViewWinPadding);
-		ImGui::Begin("World view window", NULL, worldViewWinFlags);
 
+		ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
+
+		ImGui::Begin("World view window", NULL, worldViewWinFlags);
+		ImVec2 winSize = ImGui::GetWindowSize();
+		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
+		ImGui::Image((ImTextureID)frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
 		// imgui window is relative from top left and increases going down
 		// opengl is relative from bottom left and increases going up
 		ImVec2 windowPos = ImGui::GetWindowPos();
@@ -226,7 +294,11 @@ int main(int argc, char* args[]) {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
+		// glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		glClearStencil(0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		float speed = 0.01f;
 		// camPos.x = cos(i * speed) * radius;
@@ -275,6 +347,20 @@ int main(int argc, char* args[]) {
 			shaderProgram.unbind();
 		}
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, frameBufferTex);
+
+		glDisable(GL_DEPTH_TEST);
+		quadProgram.bind();
+		quadVao.bind();
+		// glDrawArrays(GL_TRIANGLES, 0, sizeof(quadVertices) / (4 * sizeof(float)));
+		quadVao.unbind();
+		quadProgram.unbind();
+		glEnable(GL_DEPTH_TEST);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
