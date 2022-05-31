@@ -11,6 +11,7 @@
 #include "renderer/vao.h"
 #include "renderer/vbo.h"
 #include "renderer/ebo.h"
+#include "renderer/meshRenderer.h"
 #include <vector>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -20,6 +21,7 @@
 #include "renderer/line.h"
 
 int width = 800, height = 800;
+Line* linePtr;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -99,54 +101,10 @@ int main(int argc, char* args[]) {
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
 
-	/*
-	VAO quadVao;
-	quadVao.bind();
-	VBO quadVbo;
-	quadVbo.setData(quadVertices, sizeof(quadVertices), GL_STATIC_DRAW);
-	quadVao.attachVBO(quadVbo, 0, 2, 4 * sizeof(float), 0);
-	quadVao.attachVBO(quadVbo, 1, 2, 4 * sizeof(float), 2 * sizeof(float));
-	quadVao.unbind();
-
-	const char* quadVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\quad.vert";
-	const char* quadFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\quad.frag";
-	ShaderProgram quadProgram(quadVert, quadFrag);
-	quadProgram.setInt("texUnit", 0);
-	*/
-
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	bool running = true;
-
-	int numMeshes = scene.numMeshes;
-
-	std::vector<VAO> vaos;
-	std::vector<VBO> vbos;
-
-	vaos.resize(numMeshes);
-	vbos.resize(numMeshes);
-
-	for (int meshId = 0; meshId < numMeshes; meshId++) {
-		Mesh mesh = scene.meshes[meshId];
-
-		VAO vao;
-		vao.bind();
-
-		VBO vbo;
-		vbo.setData((float*)&mesh.vertices[0], mesh.vertexCount * sizeof(Vertex), GL_STATIC_DRAW);
-
-		vao.attachVBO(vbo, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
-		vao.attachVBO(vbo, 1, 3, sizeof(Vertex), offsetof(Vertex, color));
-		vao.attachVBO(vbo, 2, 2, sizeof(Vertex), offsetof(Vertex, uvs));
-		vao.attachVBO(vbo, 3, 3, sizeof(Vertex), offsetof(Vertex, avgNormal));
-
-		vao.unbind();
-		vbo.unbind();
-
-		vaos[meshId] = vao;
-		vbos[meshId] = vbo;
-	}
 
 	const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
 	const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
@@ -159,13 +117,23 @@ int main(int argc, char* args[]) {
 
 	shaderProgram.setInt("texUnit", 0);
 
+	int numMeshes = scene.numMeshes;
+
+	std::vector<MeshRenderer> meshRenderers;
+	meshRenderers.resize(numMeshes);
+
+	for (int meshId = 0; meshId < numMeshes; meshId++) {
+		Mesh& mesh = scene.meshes[meshId];
+		meshRenderers[meshId] = MeshRenderer(mesh, shaderProgram);
+
+	}
+
 	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
 	Texture texture(texFilePath, 0);
 
 	Line line;
 	line.shaderProgram.setMat4("projection", proj);
-
-	// glm::vec3 camPos(500.0f, 0, 500.0f);
+	linePtr = &line;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -173,10 +141,7 @@ int main(int argc, char* args[]) {
 	io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
 
-	float radius = 500.0f;
-	glm::vec3 camPos(radius, 10.0f, radius);
 	bool open = true;
-
 
 	unsigned int fbo;
 	glGenFramebuffers(1, &fbo);
@@ -205,6 +170,9 @@ int main(int argc, char* args[]) {
 	}
 
 	while (running) {
+
+		uint32_t curTime = SDL_GetTicks();
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, width, height);
 		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -226,6 +194,7 @@ int main(int argc, char* args[]) {
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
+		glm::vec3 camPos;
 		if (open) {
 			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
 
@@ -293,15 +262,16 @@ int main(int argc, char* args[]) {
 
 		glViewport(0, 0, width, height);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClearStencil(0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
-		// camPos.x = cos(i * speed) * radius;
-		// camPos.z = sin(i * speed) * radius;
-		// camPos.y = 10;
+		float radius = 1000.0f;
+		camPos.x = cos(curTime * 0.05f * speed) * radius;
+		camPos.z = sin(curTime * 0.05f * speed) * radius;
+		camPos.y = 0;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("view", view);
@@ -309,40 +279,7 @@ int main(int argc, char* args[]) {
 		texture.bind();
 
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
-			Mesh& mesh = scene.meshes[meshId];
-
-			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.transform.position);
-			glm::mat4 rotation = getRotationMatrix(mesh.transform.rotation);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.transform.scale);
-
-			glm::mat4 model = translation * rotation * scale;
-
-			/*
-			line.shaderProgram.setMat4("model", model);
-			for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
-				Vertex& vert = mesh.vertices[vertexIdx];
-				glm::vec3 startPoint(vert.position[0], vert.position[1], vert.position[2]);
-				glm::vec3 endPoint = startPoint + 100.0f * glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
-				glm::vec3 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
-				line.setStartPoint(startPoint);
-
-				line.setColor(glm::vec3(1, 0, 0));
-				line.setEndPoint(endPoint);
-				line.render();
-
-				line.setColor(glm::vec3(0, 0, 1));
-				line.setEndPoint(avgEndPoint);
-				line.render();
-
-			}
-			*/
-
-			shaderProgram.setMat4("model", model);
-			shaderProgram.bind();
-			vaos[meshId].bind();
-			glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
-			vaos[meshId].unbind();
-			shaderProgram.unbind();
+			meshRenderers[meshId].render();
 		}
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

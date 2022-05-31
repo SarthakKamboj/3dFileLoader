@@ -1,8 +1,10 @@
 #include "meshRenderer.h"
+#include "line.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
+extern Line* linePtr;
 
 MeshRenderer::MeshRenderer(Mesh _mesh, ShaderProgram _shaderProgram) {
 	mesh = _mesh;
@@ -29,25 +31,29 @@ void MeshRenderer::render() {
 
 	glm::mat4 model = translation * rotation * scale;
 
-	/*
-	line.shaderProgram.setMat4("model", model);
-	for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
-		Vertex& vert = mesh.vertices[vertexIdx];
-		glm::vec3 startPoint(vert.position[0], vert.position[1], vert.position[2]);
-		glm::vec3 endPoint = startPoint + 100.0f * glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
-		glm::vec3 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
-		line.setStartPoint(startPoint);
+	if (displayNormals | displaySplitNormals) {
+		linePtr->shaderProgram.setMat4("model", model);
+		for (int vertexIdx = 0; vertexIdx < mesh.vertexCount; vertexIdx++) {
+			Vertex& vert = mesh.vertices[vertexIdx];
+			glm::vec3 startPoint(vert.position[0], vert.position[1], vert.position[2]);
+			glm::vec3 endPoint = startPoint + 100.0f * glm::vec3(vert.normal[0], vert.normal[1], vert.normal[2]);
+			glm::vec3 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec3(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2]);
+			linePtr->setStartPoint(startPoint);
 
-		line.setColor(glm::vec3(1, 0, 0));
-		line.setEndPoint(endPoint);
-		line.render();
+			if (displaySplitNormals) {
+				linePtr->setColor(glm::vec3(1, 0, 0));
+				linePtr->setEndPoint(endPoint);
+				linePtr->render();
+			}
 
-		line.setColor(glm::vec3(0, 0, 1));
-		line.setEndPoint(avgEndPoint);
-		line.render();
+			if (displayNormals) {
+				linePtr->setColor(glm::vec3(0, 0, 1));
+				linePtr->setEndPoint(avgEndPoint);
+				linePtr->render();
+			}
 
+		}
 	}
-	*/
 
 	shaderProgram.setMat4("model", model);
 	shaderProgram.bind();

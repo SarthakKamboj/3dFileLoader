@@ -7,9 +7,11 @@
 
 class MeshRenderer {
 public:
+	MeshRenderer() {}
 	MeshRenderer(Mesh mesh, ShaderProgram shaderProgram);
 	void render();
 
+	bool displaySplitNormals = false;
 	bool displayNormals = false;
 
 private:
