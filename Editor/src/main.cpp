@@ -16,16 +16,20 @@
 #include "renderer/texture.h"
 #include "renderer/line.h"
 #include "panels/meshRendererSettingsPanel.h"
+#include "panels/sceneHierarchyPanel.h"
 #include <vector>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
 #include "stb_image.h"
 
+
 int width = 800, height = 800;
 Line* linePtr;
 ImFont* openSansBold;
 ImFont* openSansLight;
+std::vector<MeshRenderer> meshRenderers;
+MeshRendererSettingsPanel* meshRenPanelPtr;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -123,7 +127,7 @@ int main(int argc, char* args[]) {
 
 	int numMeshes = scene.numMeshes;
 
-	std::vector<MeshRenderer> meshRenderers;
+	// std::vector<MeshRenderer> meshRenderers;
 	meshRenderers.resize(numMeshes);
 
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
@@ -150,6 +154,9 @@ int main(int argc, char* args[]) {
 	FrameBuffer sceneFbo;
 	MeshRendererSettingsPanel meshRenPanel;
 	meshRenPanel.curMeshRenderer = meshRenderers[0];
+	meshRenPanelPtr = &meshRenPanel;
+
+	SceneHierarchyPanel sceneHierarchyPanel(scene);
 
 	while (running) {
 
@@ -211,6 +218,7 @@ int main(int argc, char* args[]) {
 		*/
 
 		meshRenPanel.render();
+		sceneHierarchyPanel.render();
 
 		ImGui::ShowDemoWindow();
 

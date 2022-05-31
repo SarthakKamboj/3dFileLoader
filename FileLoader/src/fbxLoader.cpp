@@ -48,7 +48,8 @@ Scene loadFbx(const char* fbxFilePath) {
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
 			FbxNode* childNode = rootNode->GetChild(i);
 			if (nodeStoresMesh(childNode)) {
-				addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
+				int topLevelMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
+				scene.topLevelMeshIdxs.push_back(topLevelMeshIdx);
 			}
 		}
 		scene.numMeshes = scene.meshes.size();

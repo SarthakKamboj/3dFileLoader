@@ -63,6 +63,7 @@ struct Light {
 struct Scene {
 	std::vector<Mesh> meshes;
 	int numMeshes;
+	std::vector<int> topLevelMeshIdxs;
 };
 
 Scene loadFbx(const char* fbxFilePath);

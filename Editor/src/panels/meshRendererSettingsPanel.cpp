@@ -9,8 +9,10 @@ void MeshRendererSettingsPanel::render() {
 	Mesh& mesh = curMeshRenderer.mesh;
 	std::string meshNameStr = std::string("Name: ") + mesh.name;
 	ImGui::Text(meshNameStr.c_str());
+	ImGui::Separator();
 	std::string vertexCountStr = std::string("Number of imported vertices: ") + std::to_string(mesh.vertexCount);
 	ImGui::Text(vertexCountStr.c_str());
+	ImGui::Separator();
 	ImGui::Text("Imported Transform");
 	glm::vec3& pos = mesh.transform.position;
 	glm::vec3& rot = mesh.transform.rotation;
@@ -22,6 +24,7 @@ void MeshRendererSettingsPanel::render() {
 	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", scale.x, scale.y, scale.z);
 	ImGui::PopFont();
 
+	ImGui::Separator();
 	ImGui::Text("Current Shader Program");
 	ImGui::Button("Open Shader Editor");
 
