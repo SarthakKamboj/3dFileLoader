@@ -175,27 +175,27 @@ int main(int argc, char* args[]) {
 	glm::vec3 camPos(radius, 10.0f, radius);
 	bool open = true;
 
+
+	// framebuffer configuration
+	// -------------------------
 	unsigned int fbo;
 	glGenFramebuffers(1, &fbo);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
+	// create a color attachment texture
 	unsigned int frameBufferTex;
 	glGenTextures(1, &frameBufferTex);
-
 	glBindTexture(GL_TEXTURE_2D, frameBufferTex);
-
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTex, 0);
 
+	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status == GL_FRAMEBUFFER_COMPLETE) {
@@ -205,8 +205,6 @@ int main(int argc, char* args[]) {
 		std::cout << "not good to go" << std::endl;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	while (running) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, width, height);
@@ -284,7 +282,7 @@ int main(int argc, char* args[]) {
 		ImVec2 windowPos = ImGui::GetWindowPos();
 		ImVec2 windowSize = ImGui::GetWindowSize();
 
-		glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - windowSize.y);
+		glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - height);
 
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -295,10 +293,12 @@ int main(int argc, char* args[]) {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		// glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
+		glViewport(0, 0, width, height);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-		glClearStencil(0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
+		// glClearStencil(0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
 		// camPos.x = cos(i * speed) * radius;
@@ -309,6 +309,8 @@ int main(int argc, char* args[]) {
 		line.shaderProgram.setMat4("view", view);
 
 		texture.bind();
+
+		// glViewport(openGlPos.x, openGlPos.y, width, height);
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
@@ -346,19 +348,19 @@ int main(int argc, char* args[]) {
 			vaos[meshId].unbind();
 			shaderProgram.unbind();
 		}
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, frameBufferTex);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, frameBufferTex);
+		// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glDisable(GL_DEPTH_TEST);
+		// glDisable(GL_DEPTH_TEST);
 		quadProgram.bind();
 		quadVao.bind();
 		// glDrawArrays(GL_TRIANGLES, 0, sizeof(quadVertices) / (4 * sizeof(float)));
 		quadVao.unbind();
 		quadProgram.unbind();
-		glEnable(GL_DEPTH_TEST);
+		// glEnable(GL_DEPTH_TEST);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -372,7 +374,7 @@ int main(int argc, char* args[]) {
 		}
 
 		SDL_GL_SwapWindow(window);
-	}
+		}
 
 	return -1;
-}
+	}

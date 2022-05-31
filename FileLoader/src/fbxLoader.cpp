@@ -13,6 +13,8 @@ int meshIdx = 0;
 Scene loadFbx(const char* fbxFilePath) {
 	FbxManager* fbxManager = FbxManager::Create();
 	FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
+	ioSettings->SetBoolProp(IMP_ANIMATION, false);
+	ioSettings->SetBoolProp(IOSN_TRIANGULATE, true);
 	fbxManager->SetIOSettings(ioSettings);
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
@@ -36,8 +38,6 @@ Scene loadFbx(const char* fbxFilePath) {
 	}
 
 	fbxImporter->Destroy();
-
-	std::cout << "successfully loaded FBX" << std::endl;
 
 	int maxPossibleMeshes = fbxScene->GetNodeCount() - 1;
 	scene.meshes.resize(maxPossibleMeshes);
