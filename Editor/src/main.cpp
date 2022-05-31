@@ -99,6 +99,7 @@ int main(int argc, char* args[]) {
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
 
+	/*
 	VAO quadVao;
 	quadVao.bind();
 	VBO quadVbo;
@@ -111,6 +112,7 @@ int main(int argc, char* args[]) {
 	const char* quadFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\quad.frag";
 	ShaderProgram quadProgram(quadVert, quadFrag);
 	quadProgram.setInt("texUnit", 0);
+	*/
 
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -176,12 +178,10 @@ int main(int argc, char* args[]) {
 	bool open = true;
 
 
-	// framebuffer configuration
-	// -------------------------
 	unsigned int fbo;
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	// create a color attachment texture
+
 	unsigned int frameBufferTex;
 	glGenTextures(1, &frameBufferTex);
 	glBindTexture(GL_TEXTURE_2D, frameBufferTex);
@@ -190,7 +190,6 @@ int main(int argc, char* args[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTex, 0);
 
-	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -292,12 +291,11 @@ int main(int argc, char* args[]) {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		// glViewport(openGlPos.x, openGlPos.y, windowSize.x, windowSize.y - fontSize - sceneViewWinPadding.y);
 		glViewport(0, 0, width, height);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
-		// glClearStencil(0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearStencil(0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
@@ -310,11 +308,9 @@ int main(int argc, char* args[]) {
 
 		texture.bind();
 
-		// glViewport(openGlPos.x, openGlPos.y, width, height);
-
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			Mesh& mesh = scene.meshes[meshId];
+
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh.transform.position);
 			glm::mat4 rotation = getRotationMatrix(mesh.transform.rotation);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh.transform.scale);
@@ -348,21 +344,6 @@ int main(int argc, char* args[]) {
 			vaos[meshId].unbind();
 			shaderProgram.unbind();
 		}
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, frameBufferTex);
-		// glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// glDisable(GL_DEPTH_TEST);
-		quadProgram.bind();
-		quadVao.bind();
-		// glDrawArrays(GL_TRIANGLES, 0, sizeof(quadVertices) / (4 * sizeof(float)));
-		quadVao.unbind();
-		quadProgram.unbind();
-		// glEnable(GL_DEPTH_TEST);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
@@ -374,7 +355,7 @@ int main(int argc, char* args[]) {
 		}
 
 		SDL_GL_SwapWindow(window);
-		}
+	}
 
 	return -1;
-	}
+}
