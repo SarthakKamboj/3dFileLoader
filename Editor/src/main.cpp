@@ -13,16 +13,19 @@
 #include "renderer/ebo.h"
 #include "renderer/meshRenderer.h"
 #include "renderer/frameBuffer.h"
+#include "renderer/texture.h"
+#include "renderer/line.h"
+#include "panels/meshRendererSettingsPanel.h"
 #include <vector>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
 #include "stb_image.h"
-#include "renderer/texture.h"
-#include "renderer/line.h"
 
 int width = 800, height = 800;
 Line* linePtr;
+ImFont* openSansBold;
+ImFont* openSansLight;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -139,11 +142,14 @@ int main(int argc, char* args[]) {
 	glEnable(GL_DEPTH_TEST);
 
 	float fontSize = 16.0f;
-	io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
+	openSansBold = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
+	openSansLight = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Light.ttf", fontSize);
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
 
 	bool open = true;
 	FrameBuffer sceneFbo;
+	MeshRendererSettingsPanel meshRenPanel;
+	meshRenPanel.curMeshRenderer = meshRenderers[0];
 
 	while (running) {
 
@@ -198,9 +204,13 @@ int main(int argc, char* args[]) {
 			ImGui::PopStyleVar(3);
 		}
 
+		/*
 		ImGui::Begin("camPos");
 		ImGui::DragFloat3("cam pos", &camPos.x, 10, -4000, 4000);
 		ImGui::End();
+		*/
+
+		meshRenPanel.render();
 
 		ImGui::ShowDemoWindow();
 

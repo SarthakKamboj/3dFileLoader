@@ -14,8 +14,9 @@ public:
 	bool displaySplitNormals = false;
 	bool displayNormals = false;
 
-private:
 	Mesh mesh;
+
+private:
 	ShaderProgram shaderProgram;
 	VAO vao;
 	VBO vbo;

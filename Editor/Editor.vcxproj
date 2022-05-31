@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,6 +162,7 @@
     <ClCompile Include="ext\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="ext\stb\stb_image.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
     <ClCompile Include="src\renderer\frameBuffer.cpp" />
     <ClCompile Include="src\renderer\line.cpp" />
@@ -173,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
+    <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\renderer\ebo.h" />
     <ClInclude Include="src\renderer\frameBuffer.h" />
     <ClInclude Include="src\renderer\line.h" />
