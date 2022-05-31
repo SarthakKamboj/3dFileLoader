@@ -30,6 +30,7 @@ ImFont* openSansBold;
 ImFont* openSansLight;
 std::vector<MeshRenderer> meshRenderers;
 MeshRendererSettingsPanel* meshRenPanelPtr;
+Scene* scenePtr;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -56,14 +57,17 @@ float quadVertices[] = {
 
 int main(int argc, char* args[]) {
 
-	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cube.fbx";
+	// const char* fbxFilePath = "..\\assets\\3d\\parentTest.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\parentTest.fbx";
 	Scene scene = loadFbx(fbxFilePath);
+	scenePtr = &scene;
 
 	if (scene.numMeshes == -1) {
 		std::cout << "scene data not valid" << std::endl;
@@ -257,7 +261,7 @@ int main(int argc, char* args[]) {
 		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
-		float radius = 1000.0f;
+		float radius = 3000.0f;
 		camPos.x = cos(curTime * 0.05f * speed) * radius;
 		camPos.z = sin(curTime * 0.05f * speed) * radius;
 		camPos.y = 0;

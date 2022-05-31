@@ -1,8 +1,10 @@
 #include "meshRendererSettingsPanel.h"
 #include "imgui.h"
 #include <string>
+#include "fbxLoader.h"
 
 extern ImFont* openSansLight;
+extern Scene* scenePtr;
 
 void MeshRendererSettingsPanel::render() {
 	ImGui::Begin("Mesh Rendering Settings");
@@ -22,6 +24,15 @@ void MeshRendererSettingsPanel::render() {
 	ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
 	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", rot.x, rot.y, rot.z);
 	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", scale.x, scale.y, scale.z);
+	ImGui::PopFont();
+
+	ImGui::Separator();
+	ImGui::Text("Num children: %i", mesh.numChildren);
+	ImGui::PushFont(openSansLight);
+	for (int childNumIdx = 0; childNumIdx < mesh.numChildren; childNumIdx++) {
+		int childIdx = mesh.childMeshIdxs[childNumIdx];
+		ImGui::Text(scenePtr->meshes[childIdx].name.c_str());
+	}
 	ImGui::PopFont();
 
 	ImGui::Separator();
