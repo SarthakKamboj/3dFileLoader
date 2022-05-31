@@ -12,6 +12,7 @@
 #include "renderer/vbo.h"
 #include "renderer/ebo.h"
 #include "renderer/meshRenderer.h"
+#include "renderer/frameBuffer.h"
 #include <vector>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -143,6 +144,7 @@ int main(int argc, char* args[]) {
 
 	bool open = true;
 
+	/*
 	unsigned int fbo;
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -168,16 +170,16 @@ int main(int argc, char* args[]) {
 	else {
 		std::cout << "not good to go" << std::endl;
 	}
+	*/
+
+	FrameBuffer sceneFbo;
 
 	while (running) {
 
 		uint32_t curTime = SDL_GetTicks();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		FrameBuffer::ClearBuffers();
 		glViewport(0, 0, width, height);
-		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-		glClearStencil(0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -244,7 +246,7 @@ int main(int argc, char* args[]) {
 		ImGui::Begin("World view window", NULL, worldViewWinFlags);
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
-		ImGui::Image((ImTextureID)frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)sceneFbo.frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
 		// imgui window is relative from top left and increases going down
 		// opengl is relative from bottom left and increases going up
 		ImVec2 windowPos = ImGui::GetWindowPos();
@@ -261,10 +263,9 @@ int main(int argc, char* args[]) {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glViewport(0, 0, width, height);
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glClearColor(0, 0, 0, 1.0f);
-		glClearStencil(0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		// glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		sceneFbo.bind();
+		FrameBuffer::ClearBuffers();
 		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
@@ -281,6 +282,8 @@ int main(int argc, char* args[]) {
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			meshRenderers[meshId].render();
 		}
+
+		sceneFbo.unbind();
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{

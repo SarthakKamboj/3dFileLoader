@@ -163,6 +163,7 @@
     <ClCompile Include="ext\stb\stb_image.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
+    <ClCompile Include="src\renderer\frameBuffer.cpp" />
     <ClCompile Include="src\renderer\line.cpp" />
     <ClCompile Include="src\renderer\meshRenderer.cpp" />
     <ClCompile Include="src\renderer\shaderProgram.cpp" />
@@ -173,6 +174,7 @@
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
     <ClInclude Include="src\renderer\ebo.h" />
+    <ClInclude Include="src\renderer\frameBuffer.h" />
     <ClInclude Include="src\renderer\line.h" />
     <ClInclude Include="src\renderer\meshRenderer.h" />
     <ClInclude Include="src\renderer\shaderProgram.h" />
