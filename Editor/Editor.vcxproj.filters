@@ -75,6 +75,15 @@
     <ClCompile Include="src\panels\sceneHierarchy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\panels\dockspace.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\panels\dockspace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\panels\cameraPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h">
@@ -111,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\panels\shaderEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\panels\cameraPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

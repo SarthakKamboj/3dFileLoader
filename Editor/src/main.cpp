@@ -22,6 +22,8 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
 #include "stb_image.h"
+#include "panels/dockspace.h"
+#include "panels/cameraPanel.h"
 
 
 int width = 800, height = 800;
@@ -98,8 +100,8 @@ int main(int argc, char* args[]) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	ImGui::StyleColorsDark();
@@ -119,26 +121,15 @@ int main(int argc, char* args[]) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	bool running = true;
-
-	// const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
-	// const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
-
-	// ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
-
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
-
-
-	// shaderProgram.setInt("texUnit", 0);
+	// glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
 	int numMeshes = scene.numMeshes;
-
-	// std::vector<MeshRenderer> meshRenderers;
 	meshRenderers.resize(numMeshes);
 
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
 		Mesh& mesh = scene.meshes[meshId];
-		meshRenderers[meshId] = MeshRenderer(mesh);
-		meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
+		meshRenderers[meshId] = MeshRenderer(&mesh);
+		// meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
 
 	}
 
@@ -146,7 +137,7 @@ int main(int argc, char* args[]) {
 	Texture texture(texFilePath, 0);
 
 	Line line;
-	line.shaderProgram.setMat4("projection", proj);
+	// line.shaderProgram.setMat4("projection", proj);
 	linePtr = &line;
 
 	glEnable(GL_DEPTH_TEST);
@@ -156,13 +147,14 @@ int main(int argc, char* args[]) {
 	openSansLight = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Light.ttf", fontSize);
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
 
-	bool open = true;
 	FrameBuffer sceneFbo;
 	MeshRendererSettingsPanel meshRenPanel;
-	// meshRenPanel.curMeshRenderer = meshRenderers[0];
 	meshRenPanelPtr = &meshRenPanel;
 
 	SceneHierarchyPanel sceneHierarchyPanel(scene);
+	CameraPanel cameraPanel;
+	cameraPanel.pov = 45.0f;
+	cameraPanel.transform.position = glm::vec3(500, 0, 500);
 
 	while (running) {
 
@@ -187,46 +179,13 @@ int main(int argc, char* args[]) {
 		ImGui::NewFrame();
 
 		glm::vec3 camPos;
-		if (open) {
-			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
-
-			ImGuiWindowFlags_;
-
-			windowFlags |= ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoTitleBar;
-
-			ImGuiViewport* mainViewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(mainViewport->WorkPos);
-			ImGui::SetNextWindowSize(ImVec2(mainViewport->WorkSize.x, mainViewport->WorkSize.y));
-			ImGui::SetNextWindowViewport(mainViewport->ID);
-
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-			ImGui::Begin("Test", NULL, windowFlags);
-
-			ImGuiIO& io = ImGui::GetIO();
-			ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
-			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-				ImGuiID id = ImGui::GetID("Dock");
-				ImGui::DockSpace(id, ImVec2(0, 0), dockspaceFlags);
-			}
-
-			ImGui::End();
-			ImGui::PopStyleVar(3);
-		}
-
-		/*
-		ImGui::Begin("camPos");
-		ImGui::DragFloat3("cam pos", &camPos.x, 10, -4000, 4000);
-		ImGui::End();
-		*/
+		renderDockspace();
 
 		meshRenPanel.render();
 		sceneHierarchyPanel.render();
+		cameraPanel.render();
 
-		ImGui::ShowDemoWindow();
+		// ImGui::ShowDemoWindow();
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 
@@ -267,13 +226,17 @@ int main(int argc, char* args[]) {
 		camPos.x = cos(curTime * 0.05f * speed) * radius;
 		camPos.z = sin(curTime * 0.05f * speed) * radius;
 		camPos.y = 0;
-		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		// glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		glm::mat4 view = cameraPanel.getViewMat();
+		glm::mat4 proj = cameraPanel.getProjectionMat();
 		line.shaderProgram.setMat4("view", view);
+		line.shaderProgram.setMat4("projection", proj);
 
 		texture.bind();
 
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
 			meshRenderers[meshId].shaderProgram.setMat4("view", view);
+			meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
 			meshRenderers[meshId].render();
 		}
 

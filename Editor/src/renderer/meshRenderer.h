@@ -7,15 +7,15 @@
 
 class MeshRenderer {
 public:
-	MeshRenderer() {}
-	MeshRenderer(Mesh mesh);
+	MeshRenderer();
+	MeshRenderer(Mesh* mesh);
 	void render();
 
 	bool displaySplitNormals = false;
 	bool displayNormals = false;
 	bool wireframeMode = false;
 
-	Mesh mesh;
+	Mesh* mesh;
 	ShaderProgram shaderProgram;
 
 private:

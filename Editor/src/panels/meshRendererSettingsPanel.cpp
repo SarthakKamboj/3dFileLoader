@@ -15,17 +15,17 @@ void MeshRendererSettingsPanel::render() {
 		return;
 	}
 
-	Mesh& mesh = curMeshRenderer->mesh;
-	std::string meshNameStr = std::string("Name: ") + mesh.name;
+	Mesh* mesh = curMeshRenderer->mesh;
+	std::string meshNameStr = std::string("Name: ") + mesh->name;
 	ImGui::Text(meshNameStr.c_str());
 	ImGui::Separator();
-	std::string vertexCountStr = std::string("Number of imported vertices: ") + std::to_string(mesh.vertexCount);
+	std::string vertexCountStr = std::string("Number of imported vertices: ") + std::to_string(mesh->vertexCount);
 	ImGui::Text(vertexCountStr.c_str());
 	ImGui::Separator();
 	ImGui::Text("Imported Transform");
-	glm::vec3& pos = mesh.transform.position;
-	glm::vec3& rot = mesh.transform.rotation;
-	glm::vec3& scale = mesh.transform.scale;
+	glm::vec3& pos = mesh->transform.position;
+	glm::vec3& rot = mesh->transform.rotation;
+	glm::vec3& scale = mesh->transform.scale;
 
 	ImGui::PushFont(openSansLight);
 	ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
@@ -34,10 +34,10 @@ void MeshRendererSettingsPanel::render() {
 	ImGui::PopFont();
 
 	ImGui::Separator();
-	ImGui::Text("Num children: %i", mesh.numChildren);
+	ImGui::Text("Num children: %i", mesh->numChildren);
 	ImGui::PushFont(openSansLight);
-	for (int childNumIdx = 0; childNumIdx < mesh.numChildren; childNumIdx++) {
-		int childIdx = mesh.childMeshIdxs[childNumIdx];
+	for (int childNumIdx = 0; childNumIdx < mesh->numChildren; childNumIdx++) {
+		int childIdx = mesh->childMeshIdxs[childNumIdx];
 		ImGui::Text(scenePtr->meshes[childIdx].name.c_str());
 	}
 	ImGui::PopFont();

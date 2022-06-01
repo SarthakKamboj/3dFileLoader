@@ -162,6 +162,9 @@
     <ClCompile Include="ext\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="ext\stb\stb_image.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\panels\cameraPanel.cpp" />
+    <ClCompile Include="src\panels\dockspace.cpp" />
+    <ClCompile Include="src\panels\dockspace.h" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\panels\sceneHierarchy.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
@@ -175,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
+    <ClInclude Include="src\panels\cameraPanel.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />
     <ClInclude Include="src\panels\shaderEditor.h" />
