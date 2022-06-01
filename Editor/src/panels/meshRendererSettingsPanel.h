@@ -2,8 +2,7 @@
 
 #include "renderer/meshRenderer.h"
 
-class MeshRendererSettingsPanel {
-public:
+struct MeshRendererSettingsPanel {
 	void render();
 	MeshRenderer* curMeshRenderer;
 	bool renderSelected = false;

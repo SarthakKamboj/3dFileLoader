@@ -9,6 +9,7 @@ struct ShaderEditor {
 	ShaderProgram* curShaderProgram;
 	char newTexturePath[200];
 	bool open = false;
+	bool selectingNewTexturePath = false;
 
 	void updateTexturePath();
 };
