@@ -25,6 +25,7 @@
 #include "panels/dockspace.h"
 #include "panels/cameraPanel.h"
 #include "panels/shaderEditor.h"
+#include "panels/fileBrowser.h"
 
 int width = 600, height = 600;
 Line* linePtr;
@@ -34,6 +35,7 @@ std::vector<MeshRenderer> meshRenderers;
 MeshRendererSettingsPanel* meshRenPanelPtr;
 Scene* scenePtr;
 ShaderEditor* shaderEditorPtr;
+FileBrowser* fileBrowserPtr;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -156,6 +158,9 @@ int main(int argc, char* args[]) {
 	cameraPanel.angle = 0.0f;
 	cameraPanel.yPos = 10.0f;
 
+	FileBrowser fileBrowser;
+	fileBrowserPtr = &fileBrowser;
+
 	ShaderEditor shaderEditor;
 	shaderEditorPtr = &shaderEditor;
 
@@ -167,6 +172,7 @@ int main(int argc, char* args[]) {
 		glViewport(0, 0, width, height);
 
 		SDL_Event event;
+		// for some reason, this is change filebrowser state, must be something to do with stack
 		while (SDL_PollEvent(&event)) {
 			ImGui_ImplSDL2_ProcessEvent(&event);
 			if (event.type == SDL_QUIT) {
@@ -188,6 +194,7 @@ int main(int argc, char* args[]) {
 		sceneHierarchyPanel.render();
 		cameraPanel.render();
 		shaderEditor.render();
+		fileBrowser.render();
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 

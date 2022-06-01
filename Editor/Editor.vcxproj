@@ -90,6 +90,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,6 +108,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +126,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +144,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SOLUTION_DIR=R"($(SolutionDir))";SOLUTION_DIR=R"($(SolutionDir))"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)ext\SDL2\include;$(ProjectDir)ext\glad\include;$(ProejctDir)ext\glm;$(ProjectDir)ext\stb;$(SolutionDir)\FileLoader\src;$(ProjectDir)ext\imgui-docking;$(ProjectDir)ext\imgui-docking\backends;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,6 +169,7 @@
     <ClCompile Include="src\panels\cameraPanel.cpp" />
     <ClCompile Include="src\panels\dockspace.cpp" />
     <ClCompile Include="src\panels\dockspace.h" />
+    <ClCompile Include="src\panels\fileBrowser.cpp" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\panels\sceneHierarchyPanel.cpp" />
     <ClCompile Include="src\panels\shaderEditor.cpp" />
@@ -180,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
     <ClInclude Include="src\panels\cameraPanel.h" />
+    <ClInclude Include="src\panels\fileBrowser.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />
     <ClInclude Include="src\panels\shaderEditor.h" />
