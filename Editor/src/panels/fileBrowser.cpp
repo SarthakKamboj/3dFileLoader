@@ -20,6 +20,11 @@ void FileBrowser::render() {
 			if (lastIdx != -1) {
 				curFilePath[lastIdx] = 0;
 			}
+			if (curFilePath[lastIdx - 1] == ':') {
+				curFilePath[lastIdx] = '\\';
+				curFilePath[lastIdx + 1] = 0;
+			}
+			std::cout << curFilePath << std::endl;
 		}
 		ImGui::Text(curFilePath);
 
@@ -52,10 +57,13 @@ void FileBrowser::render() {
 
 			char newPath[200] = {};
 			FileBrowser::CopyBuffer(curFilePath, newPath, 200);
-			char slashBuf[2];
-			slashBuf[0] = '\\';
-			slashBuf[1] = 0;
-			FileBrowser::ConcatBuffer(newPath, slashBuf);
+			int lastSlash = FileBrowser::GetLastIndex(newPath, '\\');
+			if (lastSlash != -1 && newPath[lastSlash + 1] != 0) {
+				char slashBuf[2];
+				slashBuf[0] = '\\';
+				slashBuf[1] = 0;
+				FileBrowser::ConcatBuffer(newPath, slashBuf);
+			}
 			FileBrowser::ConcatBuffer(newPath, file);
 
 			if (fs::is_directory(newPath)) {
