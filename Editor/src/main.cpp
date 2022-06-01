@@ -123,7 +123,6 @@ int main(int argc, char* args[]) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	bool running = true;
-	// glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
 	int numMeshes = scene.numMeshes;
 	meshRenderers.resize(numMeshes);
@@ -131,15 +130,12 @@ int main(int argc, char* args[]) {
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
 		Mesh& mesh = scene.meshes[meshId];
 		meshRenderers[meshId] = MeshRenderer(&mesh);
-		// meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
-
 	}
 
 	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
 	Texture texture(texFilePath, 0);
 
 	Line line;
-	// line.shaderProgram.setMat4("projection", proj);
 	linePtr = &line;
 
 	glEnable(GL_DEPTH_TEST);
