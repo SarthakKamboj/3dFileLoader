@@ -41,6 +41,15 @@ void FileBrowser::render() {
 		}
 
 		if (ImGui::Button("Select")) {
+
+			if (selectedIdx == -1) {
+				if (ImGui::Button("Cancel")) {
+					open = false;
+				}
+				ImGui::End();
+				return;
+			}
+
 			char newPath[200] = {};
 			FileBrowser::CopyBuffer(curFilePath, newPath, 200);
 			char slashBuf[2];
@@ -52,9 +61,13 @@ void FileBrowser::render() {
 			if (fs::is_directory(newPath)) {
 				memset(curFilePath, 0, 200);
 				FileBrowser::CopyBuffer(newPath, curFilePath, 200);
+				selectedIdx = -1;
 			}
 			else {
 				if (!FileBrowser::IsImage(newPath)) {
+					if (ImGui::Button("Cancel")) {
+						open = false;
+					}
 					ImGui::End();
 					return;
 				}
