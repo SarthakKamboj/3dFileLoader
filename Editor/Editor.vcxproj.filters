@@ -72,7 +72,7 @@
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\panels\sceneHierarchy.cpp">
+    <ClCompile Include="src\panels\sceneHierarchyPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\panels\dockspace.h">
@@ -82,6 +82,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\panels\cameraPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\panels\shaderEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

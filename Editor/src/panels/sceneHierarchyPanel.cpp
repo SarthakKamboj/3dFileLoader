@@ -1,9 +1,11 @@
 #include "sceneHierarchyPanel.h"
 #include "imgui.h"
 #include "meshRendererSettingsPanel.h"
+#include "shaderEditor.h"
 
 extern MeshRendererSettingsPanel* meshRenPanelPtr;
 extern std::vector<MeshRenderer> meshRenderers;
+extern ShaderEditor* shaderEditorPtr;
 
 SceneHierarchyPanel::SceneHierarchyPanel(Scene& inScene) : scene(inScene) {
 	selectedMeshIdx = -1;
@@ -17,6 +19,8 @@ void SceneHierarchyPanel::render() {
 			MeshRenderer& selectedMeshRenderer = meshRenderers[selectedMeshIdx];
 			meshRenPanelPtr->curMeshRenderer = &selectedMeshRenderer;
 			meshRenPanelPtr->renderSelected = true;
+			shaderEditorPtr->curShaderProgram = &selectedMeshRenderer.shaderProgram;
+			shaderEditorPtr->updateTexturePath();
 		}
 	}
 	ImGui::End();

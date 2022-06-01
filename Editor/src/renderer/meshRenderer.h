@@ -4,9 +4,9 @@
 #include "shaderProgram.h"
 #include "vao.h"
 #include "vbo.h"
+#include "texture.h"
 
-class MeshRenderer {
-public:
+struct MeshRenderer {
 	MeshRenderer();
 	MeshRenderer(Mesh* mesh);
 	void render();
@@ -18,7 +18,6 @@ public:
 	Mesh* mesh;
 	ShaderProgram shaderProgram;
 
-private:
 	VAO vao;
 	VBO vbo;
 };

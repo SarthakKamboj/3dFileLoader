@@ -3,12 +3,27 @@
 #include <string>
 #include <iostream>
 
+int ShaderProgram::shaderId = 0;
+
 ShaderProgram::ShaderProgram() {
 	programId = -1;
+	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
+	ShaderProgram::shaderId += 1;
+
+	// sprintf_s(texturePath, "Texture path goes here");
+	normalDisplacement = 0;
+
+	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
+	// sprintf_s(texturePath, defaultTexPath);
+	texture = Texture(defaultTexPath, 0);
+
+	setInt("renderTexture", textureBasedColor);
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
+	normalDisplacement = 0;
 	GLuint vertexId = createShader(vertexPath, GL_VERTEX_SHADER);
+	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
 	if (vertexId == -1) {
 		programId = -1;
 		return;
@@ -25,6 +40,12 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 
 	glDeleteShader(vertexId);
 	glDeleteShader(fragmentId);
+
+	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
+	// sprintf_s(texturePath, defaultTexPath);
+	texture = Texture(defaultTexPath, 0);
+
+	setInt("renderTexture", textureBasedColor);
 }
 
 void ShaderProgram::bind() {
@@ -40,6 +61,14 @@ void ShaderProgram::setMat4(const char* varName, glm::mat4& mat) {
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
+	unbind();
+}
+
+void ShaderProgram::setFloat(const char* varName, float val) {
+	if (programId == -1) return;
+	bind();
+	GLint loc = glGetUniformLocation(programId, varName);
+	glUniform1f(loc, val);
 	unbind();
 }
 

@@ -2,10 +2,13 @@
 
 #include "renderer/shaderProgram.h"
 
-class ShaderEditor {
-public:
+struct ShaderEditor {
 	ShaderEditor();
 	void render();
 
-	ShaderProgram curShaderProgram;
+	ShaderProgram* curShaderProgram;
+	char newTexturePath[200];
+	bool open = false;
+
+	void updateTexturePath();
 };

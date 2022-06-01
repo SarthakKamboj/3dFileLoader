@@ -11,6 +11,8 @@ MeshRenderer::MeshRenderer() {
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
+	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
+	shaderProgram.setFloat("displacement", 0);
 }
 
 MeshRenderer::MeshRenderer(Mesh* _mesh) {
@@ -19,6 +21,8 @@ MeshRenderer::MeshRenderer(Mesh* _mesh) {
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
+	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
+	shaderProgram.setFloat("displacement", 0);
 
 	vao.bind();
 
@@ -72,9 +76,15 @@ void MeshRenderer::render() {
 	if (wireframeMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
+	if (shaderProgram.textureBasedColor) {
+		shaderProgram.texture.bind();
+	}
 	vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
 	vao.unbind();
+	if (shaderProgram.textureBasedColor) {
+		shaderProgram.texture.unbind();
+	}
 	if (wireframeMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}

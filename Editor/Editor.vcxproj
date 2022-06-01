@@ -166,7 +166,8 @@
     <ClCompile Include="src\panels\dockspace.cpp" />
     <ClCompile Include="src\panels\dockspace.h" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
-    <ClCompile Include="src\panels\sceneHierarchy.cpp" />
+    <ClCompile Include="src\panels\sceneHierarchyPanel.cpp" />
+    <ClCompile Include="src\panels\shaderEditor.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
     <ClCompile Include="src\renderer\frameBuffer.cpp" />
     <ClCompile Include="src\renderer\line.cpp" />

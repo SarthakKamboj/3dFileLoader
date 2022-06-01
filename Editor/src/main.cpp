@@ -24,15 +24,16 @@
 #include "stb_image.h"
 #include "panels/dockspace.h"
 #include "panels/cameraPanel.h"
+#include "panels/shaderEditor.h"
 
-
-int width = 800, height = 800;
+int width = 600, height = 600;
 Line* linePtr;
 ImFont* openSansBold;
 ImFont* openSansLight;
 std::vector<MeshRenderer> meshRenderers;
 MeshRendererSettingsPanel* meshRenPanelPtr;
 Scene* scenePtr;
+ShaderEditor* shaderEditorPtr;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -59,7 +60,8 @@ float quadVertices[] = {
 
 int main(int argc, char* args[]) {
 
-	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\texturesTest.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
@@ -89,7 +91,7 @@ int main(int argc, char* args[]) {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;// | SDL_WINDOW_MAXIMIZED;
 	SDL_Window* window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags);
 
 	SDL_GLContext context = SDL_GL_CreateContext(window);
@@ -157,13 +159,15 @@ int main(int argc, char* args[]) {
 	cameraPanel.radius = 1000.0f;
 	cameraPanel.angle = 0.0f;
 	cameraPanel.yPos = 10.0f;
-	// cameraPanel.transform.position = glm::vec3(500, 0, 500);
+
+	ShaderEditor shaderEditor;
+	shaderEditorPtr = &shaderEditor;
 
 	while (running) {
 
 		uint32_t curTime = SDL_GetTicks();
 
-		FrameBuffer::ClearBuffers();
+		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glViewport(0, 0, width, height);
 
 		SDL_Event event;
@@ -187,8 +191,7 @@ int main(int argc, char* args[]) {
 		meshRenPanel.render();
 		sceneHierarchyPanel.render();
 		cameraPanel.render();
-
-		// ImGui::ShowDemoWindow();
+		shaderEditor.render();
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 
@@ -221,7 +224,7 @@ int main(int argc, char* args[]) {
 
 		glViewport(0, 0, width, height);
 		sceneFbo.bind();
-		FrameBuffer::ClearBuffers();
+		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glEnable(GL_DEPTH_TEST);
 
 		float speed = 0.01f;
@@ -229,7 +232,7 @@ int main(int argc, char* args[]) {
 		camPos.x = cos(curTime * 0.05f * speed) * radius;
 		camPos.z = sin(curTime * 0.05f * speed) * radius;
 		camPos.y = 0;
-		// glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
 		glm::mat4 view = cameraPanel.getViewMat();
 		glm::mat4 proj = cameraPanel.getProjectionMat();
 		line.shaderProgram.setMat4("view", view);

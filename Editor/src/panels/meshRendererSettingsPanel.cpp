@@ -2,9 +2,11 @@
 #include "imgui.h"
 #include <string>
 #include "fbxLoader.h"
+#include "panels/shaderEditor.h"
 
 extern ImFont* openSansLight;
 extern Scene* scenePtr;
+extern ShaderEditor* shaderEditorPtr;
 
 void MeshRendererSettingsPanel::render() {
 	ImGui::Begin("Mesh Rendering Settings");
@@ -49,7 +51,11 @@ void MeshRendererSettingsPanel::render() {
 
 	ImGui::Separator();
 	ImGui::Text("Current Shader Program");
-	ImGui::Button("Open Shader Editor");
+	if (ImGui::Button("Open Shader Editor")) {
+		shaderEditorPtr->open = true;
+		shaderEditorPtr->curShaderProgram = &curMeshRenderer->shaderProgram;
+		shaderEditorPtr->updateTexturePath();
+	}
 
 	ImGui::End();
 }
