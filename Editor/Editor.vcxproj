@@ -165,6 +165,7 @@
     <ClCompile Include="ext\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="ext\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="ext\stb\stb_image.cpp" />
+    <ClCompile Include="src\helper.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\panels\cameraPanel.cpp" />
     <ClCompile Include="src\panels\dockspace.cpp" />
@@ -184,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
+    <ClInclude Include="src\helper.h" />
     <ClInclude Include="src\panels\cameraPanel.h" />
     <ClInclude Include="src\panels\fileBrowser.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />

@@ -36,6 +36,7 @@ MeshRendererSettingsPanel* meshRenPanelPtr;
 Scene* scenePtr;
 ShaderEditor* shaderEditorPtr;
 FileBrowser* fileBrowserPtr;
+bool enterPressed = false;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -172,14 +173,18 @@ int main(int argc, char* args[]) {
 		glViewport(0, 0, width, height);
 
 		SDL_Event event;
-		// for some reason, this is change filebrowser state, must be something to do with stack
 		while (SDL_PollEvent(&event)) {
+			enterPressed = false;
 			ImGui_ImplSDL2_ProcessEvent(&event);
 			if (event.type == SDL_QUIT) {
 				running = false;
 			}
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
 				running = false;
+			}
+			if (event.type == SDL_KEYDOWN) {
+				SDL_Keycode keyDown = event.key.keysym.sym;
+				enterPressed = (keyDown == SDLK_RETURN);
 			}
 		}
 
