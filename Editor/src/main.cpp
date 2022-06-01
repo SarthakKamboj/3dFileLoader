@@ -154,7 +154,10 @@ int main(int argc, char* args[]) {
 	SceneHierarchyPanel sceneHierarchyPanel(scene);
 	CameraPanel cameraPanel;
 	cameraPanel.pov = 45.0f;
-	cameraPanel.transform.position = glm::vec3(500, 0, 500);
+	cameraPanel.radius = 1000.0f;
+	cameraPanel.angle = 0.0f;
+	cameraPanel.yPos = 10.0f;
+	// cameraPanel.transform.position = glm::vec3(500, 0, 500);
 
 	while (running) {
 

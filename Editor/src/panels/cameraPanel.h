@@ -4,7 +4,9 @@
 #include "fbxLoader.h"
 
 struct CameraPanel {
-	Transform transform;
+	float radius;
+	float angle;
+	float yPos;
 	glm::vec3 lookAt;
 	float pov;
 
