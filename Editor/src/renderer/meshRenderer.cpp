@@ -6,9 +6,13 @@
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern Line* linePtr;
 
-MeshRenderer::MeshRenderer(Mesh _mesh, ShaderProgram _shaderProgram) {
+MeshRenderer::MeshRenderer(Mesh _mesh) {
 	mesh = _mesh;
-	shaderProgram = _shaderProgram;
+
+	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
+	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
+	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
+	// shaderProgram = _shaderProgram;
 
 	vao.bind();
 
@@ -21,6 +25,8 @@ MeshRenderer::MeshRenderer(Mesh _mesh, ShaderProgram _shaderProgram) {
 
 	vao.unbind();
 	vbo.unbind();
+
+
 }
 
 void MeshRenderer::render() {
@@ -57,8 +63,14 @@ void MeshRenderer::render() {
 
 	shaderProgram.setMat4("model", model);
 	shaderProgram.bind();
+	if (wireframeMode) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
 	vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
 	vao.unbind();
+	if (wireframeMode) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 	shaderProgram.unbind();
 }

@@ -8,7 +8,14 @@ extern Scene* scenePtr;
 
 void MeshRendererSettingsPanel::render() {
 	ImGui::Begin("Mesh Rendering Settings");
-	Mesh& mesh = curMeshRenderer.mesh;
+
+	if (!renderSelected) {
+		ImGui::Text("Please select an object");
+		ImGui::End();
+		return;
+	}
+
+	Mesh& mesh = curMeshRenderer->mesh;
 	std::string meshNameStr = std::string("Name: ") + mesh.name;
 	ImGui::Text(meshNameStr.c_str());
 	ImGui::Separator();
@@ -34,6 +41,11 @@ void MeshRendererSettingsPanel::render() {
 		ImGui::Text(scenePtr->meshes[childIdx].name.c_str());
 	}
 	ImGui::PopFont();
+
+	ImGui::Separator();
+	ImGui::Checkbox("Display normals", &curMeshRenderer->displayNormals);
+	ImGui::Checkbox("Display split normals", &curMeshRenderer->displaySplitNormals);
+	ImGui::Checkbox("Wireframe mode", &curMeshRenderer->wireframeMode);
 
 	ImGui::Separator();
 	ImGui::Text("Current Shader Program");

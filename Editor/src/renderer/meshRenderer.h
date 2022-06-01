@@ -8,16 +8,17 @@
 class MeshRenderer {
 public:
 	MeshRenderer() {}
-	MeshRenderer(Mesh mesh, ShaderProgram shaderProgram);
+	MeshRenderer(Mesh mesh);
 	void render();
 
 	bool displaySplitNormals = false;
 	bool displayNormals = false;
+	bool wireframeMode = false;
 
 	Mesh mesh;
+	ShaderProgram shaderProgram;
 
 private:
-	ShaderProgram shaderProgram;
 	VAO vao;
 	VBO vbo;
 };

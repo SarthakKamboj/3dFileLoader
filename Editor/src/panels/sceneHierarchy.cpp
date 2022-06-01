@@ -14,8 +14,9 @@ void SceneHierarchyPanel::render() {
 	for (int meshIdx = 0; meshIdx < scene.numMeshes; meshIdx++) {
 		if (ImGui::Selectable(scene.meshes[meshIdx].name.c_str(), meshIdx == selectedMeshIdx)) {
 			selectedMeshIdx = meshIdx;
-			MeshRenderer selectedMeshRenderer = meshRenderers[selectedMeshIdx];
-			meshRenPanelPtr->curMeshRenderer = selectedMeshRenderer;
+			MeshRenderer& selectedMeshRenderer = meshRenderers[selectedMeshIdx];
+			meshRenPanelPtr->curMeshRenderer = &selectedMeshRenderer;
+			meshRenPanelPtr->renderSelected = true;
 		}
 	}
 	ImGui::End();

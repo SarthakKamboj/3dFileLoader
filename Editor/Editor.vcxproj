@@ -177,6 +177,7 @@
     <ClInclude Include="ext\stb\stb_image.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />
+    <ClInclude Include="src\panels\shaderEditor.h" />
     <ClInclude Include="src\renderer\ebo.h" />
     <ClInclude Include="src\renderer\frameBuffer.h" />
     <ClInclude Include="src\renderer\line.h" />
@@ -187,6 +188,8 @@
     <ClInclude Include="src\renderer\vbo.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\default.frag" />
+    <None Include="src\shaders\default.vert" />
     <None Include="src\shaders\fragmentShader.frag" />
     <None Include="src\shaders\line.frag" />
     <None Include="src\shaders\line.vert" />

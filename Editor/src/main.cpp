@@ -57,7 +57,7 @@ float quadVertices[] = {
 
 int main(int argc, char* args[]) {
 
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
+	const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
@@ -65,7 +65,7 @@ int main(int argc, char* args[]) {
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cube.fbx";
 	// const char* fbxFilePath = "..\\assets\\3d\\parentTest.fbx";
-	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\parentTest.fbx";
+	// const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\parentTest.fbx";
 	Scene scene = loadFbx(fbxFilePath);
 	scenePtr = &scene;
 
@@ -87,7 +87,9 @@ int main(int argc, char* args[]) {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	SDL_Window* window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+	SDL_Window* window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags);
+
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
 	SDL_GL_MakeCurrent(window, context);
@@ -118,16 +120,15 @@ int main(int argc, char* args[]) {
 
 	bool running = true;
 
-	const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
-	const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
+	// const char* vertexFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\vertexShader.vert";
+	// const char* fragmentFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\fragmentShader.frag";
 
-	ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
+	// ShaderProgram shaderProgram(vertexFilePath, fragmentFilePath);
 
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), ((float)width) / height, 10.0f, 5000.0f);
 
-	shaderProgram.setMat4("projection", proj);
 
-	shaderProgram.setInt("texUnit", 0);
+	// shaderProgram.setInt("texUnit", 0);
 
 	int numMeshes = scene.numMeshes;
 
@@ -136,7 +137,8 @@ int main(int argc, char* args[]) {
 
 	for (int meshId = 0; meshId < numMeshes; meshId++) {
 		Mesh& mesh = scene.meshes[meshId];
-		meshRenderers[meshId] = MeshRenderer(mesh, shaderProgram);
+		meshRenderers[meshId] = MeshRenderer(mesh);
+		meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
 
 	}
 
@@ -157,7 +159,7 @@ int main(int argc, char* args[]) {
 	bool open = true;
 	FrameBuffer sceneFbo;
 	MeshRendererSettingsPanel meshRenPanel;
-	meshRenPanel.curMeshRenderer = meshRenderers[0];
+	// meshRenPanel.curMeshRenderer = meshRenderers[0];
 	meshRenPanelPtr = &meshRenPanel;
 
 	SceneHierarchyPanel sceneHierarchyPanel(scene);
@@ -266,12 +268,12 @@ int main(int argc, char* args[]) {
 		camPos.z = sin(curTime * 0.05f * speed) * radius;
 		camPos.y = 0;
 		glm::mat4 view = glm::lookAt(camPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-		shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("view", view);
 
 		texture.bind();
 
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
+			meshRenderers[meshId].shaderProgram.setMat4("view", view);
 			meshRenderers[meshId].render();
 		}
 

@@ -5,5 +5,6 @@
 class MeshRendererSettingsPanel {
 public:
 	void render();
-	MeshRenderer curMeshRenderer;
+	MeshRenderer* curMeshRenderer;
+	bool renderSelected = false;
 };
