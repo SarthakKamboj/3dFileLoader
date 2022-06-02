@@ -296,8 +296,12 @@ int main(int argc, char* args[]) {
 		texture.bind();
 
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
-			meshRenderers[meshId].shaderProgram.setMat4("view", view);
-			meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
+			// trying out something
+			// this should cause errors when ShaderRegistry's shaders vector gets resized because ptrs change
+			// since the ShaderProgram objects get copied over
+			int shaderIdx = meshRenderers[meshId].shaderIdx;
+			shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+			shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
 			meshRenderers[meshId].render();
 		}
 

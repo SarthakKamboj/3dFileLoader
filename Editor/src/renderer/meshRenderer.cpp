@@ -10,24 +10,10 @@ extern ShaderRegistry* shaderRegistryPtr;
 
 MeshRenderer::MeshRenderer() {
 	mesh = NULL;
-	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
-	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
-	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
-	shaderRegistryPtr->addShader(&shaderProgram);
-	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
-	shaderProgram.setFloat("displacement", 0);
 }
 
 MeshRenderer::MeshRenderer(Mesh* _mesh) {
 	mesh = _mesh;
-
-	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
-	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
-	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
-	shaderRegistryPtr->addShader(&shaderProgram);
-	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
-	shaderProgram.setFloat("displacement", 0);
-
 	vao.bind();
 
 	vbo.setData((float*)&mesh->vertices[0], mesh->vertexCount * sizeof(Vertex), GL_STATIC_DRAW);
@@ -73,22 +59,22 @@ void MeshRenderer::render() {
 		}
 	}
 
-	shaderProgram.setMat4("model", model);
-	shaderProgram.bind();
+	shaderRegistryPtr->shaders[shaderIdx].setMat4("model", model);
+	shaderRegistryPtr->shaders[shaderIdx].bind();
 	if (wireframeMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-	if (shaderProgram.textureBasedColor) {
-		shaderProgram.texture.bind();
+	if (shaderRegistryPtr->shaders[shaderIdx].textureBasedColor) {
+		shaderRegistryPtr->shaders[shaderIdx].texture.bind();
 	}
 	vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
 	vao.unbind();
-	if (shaderProgram.textureBasedColor) {
-		shaderProgram.texture.unbind();
+	if (shaderRegistryPtr->shaders[shaderIdx].textureBasedColor) {
+		shaderRegistryPtr->shaders[shaderIdx].texture.unbind();
 	}
 	if (wireframeMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	shaderProgram.unbind();
+	shaderRegistryPtr->shaders[shaderIdx].unbind();
 }

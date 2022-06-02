@@ -7,20 +7,19 @@ int ShaderProgram::shaderId = 0;
 
 ShaderProgram::ShaderProgram() {
 	programId = -1;
-	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
 	ShaderProgram::shaderId += 1;
 
-	// sprintf_s(texturePath, "Texture path goes here");
 	normalDisplacement = 0;
 
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
-	// sprintf_s(texturePath, defaultTexPath);
 	texture = Texture(defaultTexPath, 0);
 
 	setInt("renderTexture", textureBasedColor);
+	setVec3("color", glm::vec3(1, 1, 1));
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
+
 	normalDisplacement = 0;
 	GLuint vertexId = createShader(vertexPath, GL_VERTEX_SHADER);
 	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
@@ -42,10 +41,10 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	glDeleteShader(fragmentId);
 
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
-	// sprintf_s(texturePath, defaultTexPath);
 	texture = Texture(defaultTexPath, 0);
 
 	setInt("renderTexture", textureBasedColor);
+	setVec3("color", glm::vec3(1, 1, 1));
 }
 
 void ShaderProgram::bind() {

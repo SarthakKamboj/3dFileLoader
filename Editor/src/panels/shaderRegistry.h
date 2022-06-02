@@ -4,10 +4,13 @@
 #include <vector>
 
 struct ShaderRegistry {
-	void addShader(ShaderProgram* shaderPtr);
-	std::vector<ShaderProgram*> shaders;
+	ShaderRegistry();
+	int addShader(ShaderProgram newShader);
+	std::vector<ShaderProgram> shaders;
 	int numShaders = 0;
 	int selectedIdx = -1;
 	void render();
 	bool open = true;
+	// static bool definedDefaultShaderProg;
+	ShaderProgram defaultShaderProgram;
 };
