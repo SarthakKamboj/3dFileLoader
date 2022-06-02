@@ -16,7 +16,8 @@ struct MeshRenderer {
 	bool wireframeMode = false;
 
 	Mesh* mesh;
-	ShaderProgram shaderProgram;
+	// ShaderProgram* shaderProgram;
+	int shaderIdx = 0;
 
 	VAO vao;
 	VBO vbo;

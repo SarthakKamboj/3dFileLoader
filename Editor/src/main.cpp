@@ -26,6 +26,7 @@
 #include "panels/cameraPanel.h"
 #include "panels/shaderEditor.h"
 #include "panels/fileBrowser.h"
+#include "panels/shaderRegistry.h"
 
 int width = 600, height = 600;
 Line* linePtr;
@@ -36,6 +37,7 @@ MeshRendererSettingsPanel* meshRenPanelPtr;
 Scene* scenePtr;
 ShaderEditor* shaderEditorPtr;
 FileBrowser* fileBrowserPtr;
+ShaderRegistry* shaderRegistryPtr;
 bool enterPressed = false;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
@@ -61,7 +63,48 @@ float quadVertices[] = {
 	 1.0f,  1.0f,  1.0f, 1.0f
 };
 
+/*
+struct Test {
+
+	Test() {
+		x = 0;
+		y = 0;
+		std::cout << "this: " << this << std::endl;
+		std::cout << "&x: " << &this->x << std::endl;
+		std::cout << "&y: " << &this->y << std::endl;
+	}
+
+	Test(int _x, int _y) {
+		x = _x;
+		y = _y;
+		std::cout << "this: " << this << std::endl;
+		std::cout << "&x: " << &this->x << std::endl;
+		std::cout << "&y: " << &this->y << std::endl;
+	}
+
+	int x;
+	int y;
+};
+*/
+
 int main(int argc, char* args[]) {
+
+	/*
+	Test t;
+	std::cout << "&t: " << &t << std::endl;
+	std::cout << "&t.x " << &t.x << std::endl;
+	std::cout << "&t.y " << &t.y << std::endl;
+	int p1 = 5;
+	int p2 = 5;
+	std::cout << "&p1: " << &p1 << std::endl;
+	std::cout << "&p2: " << &p2 << std::endl;
+	Test newT = Test(p1, p2);
+	std::cout << "&newT: " << &newT << std::endl;
+	t = newT;
+	std::cout << "&t: " << &t << std::endl;
+	std::cout << "&t.x " << &t.x << std::endl;
+	std::cout << "&t.y " << &t.y << std::endl;
+	*/
 
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
 	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\texturesTest.fbx";
@@ -121,6 +164,9 @@ int main(int argc, char* args[]) {
 	ImGui_ImplSDL2_InitForOpenGL(window, context);
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
+
+	ShaderRegistry shaderRegistry;
+	shaderRegistryPtr = &shaderRegistry;
 
 	glDepthFunc(GL_LESS);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -200,6 +246,7 @@ int main(int argc, char* args[]) {
 		cameraPanel.render();
 		shaderEditor.render();
 		fileBrowser.render();
+		shaderRegistry.render();
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 
@@ -249,8 +296,12 @@ int main(int argc, char* args[]) {
 		texture.bind();
 
 		for (int meshId = 0; meshId < numMeshes; meshId++) {
-			meshRenderers[meshId].shaderProgram.setMat4("view", view);
-			meshRenderers[meshId].shaderProgram.setMat4("projection", proj);
+			// trying out something
+			// this should cause errors when ShaderRegistry's shaders vector gets resized because ptrs change
+			// since the ShaderProgram objects get copied over
+			int shaderIdx = meshRenderers[meshId].shaderIdx;
+			shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+			shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
 			meshRenderers[meshId].render();
 		}
 
