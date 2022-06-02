@@ -2,15 +2,18 @@
 #include "line.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "panels/shaderRegistry.h"
 
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern Line* linePtr;
+extern ShaderRegistry* shaderRegistryPtr;
 
 MeshRenderer::MeshRenderer() {
 	mesh = NULL;
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
+	shaderRegistryPtr->addShader(&shaderProgram);
 	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
 	shaderProgram.setFloat("displacement", 0);
 }
@@ -21,6 +24,7 @@ MeshRenderer::MeshRenderer(Mesh* _mesh) {
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 	shaderProgram = ShaderProgram(defaultVert, defaultFrag);
+	shaderRegistryPtr->addShader(&shaderProgram);
 	shaderProgram.setVec3("color", glm::vec3(1, 1, 1));
 	shaderProgram.setFloat("displacement", 0);
 
@@ -35,8 +39,6 @@ MeshRenderer::MeshRenderer(Mesh* _mesh) {
 
 	vao.unbind();
 	vbo.unbind();
-
-
 }
 
 void MeshRenderer::render() {
