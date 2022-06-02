@@ -3,12 +3,24 @@
 #include "fbxLoader.h"
 #include <iostream>
 #include "helper.h"
+#include "panels/meshRendererSettingsPanel.h"
 
 // extern Scene* scenePtr;
 // extern std::vector<MeshRenderer> meshRenderers;
+extern MeshRendererSettingsPanel* meshRenPanelPtr;
 
 void SceneList::render() {
 	ImGui::Begin("Scene List");
+	if (curSceneIdx < 0) {
+		ImGui::Text("Select a scene");
+	}
+	else {
+		char buffer[200] = {};
+		Helper::CopyBuffer("Active scene: ", buffer, 200);
+		Helper::ConcatBuffer(buffer, scenes[curSceneIdx].name);
+		ImGui::Text(buffer);
+	}
+	ImGui::Separator();
 	for (int i = 0; i < numScenes; i++) {
 		if (ImGui::Selectable(scenes[i].name, selectedSceneIdx == i)) {
 			selectedSceneIdx = i;
@@ -23,6 +35,8 @@ void SceneList::render() {
 		// scenePtr = &scenes[selectedSceneIdx];
 		curSceneIdx = selectedSceneIdx;
 		// meshRenderers = meshRenderLists[selectedSceneIdx];
+
+		resetEditorState();
 		selectedSceneIdx = -1;
 	}
 	ImGui::End();
@@ -56,5 +70,12 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 	meshRenderLists.push_back(meshRenderers);
 	// scene = sceneList.scenes[sceneList.numScenes - 1];
 	curSceneIdx = numScenes - 1;
+	resetEditorState();
 	return numScenes - 1;
+}
+
+void SceneList::resetEditorState() {
+	selectedSceneIdx = -1;
+	meshRenPanelPtr->curMeshRenderer = NULL;
+	meshRenPanelPtr->renderSelected = false;
 }

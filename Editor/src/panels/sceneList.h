@@ -13,4 +13,5 @@ struct SceneList {
 	int curSceneIdx = -1;
 
 	int loadSceneFromFbxFile(const char* filePath);
+	void resetEditorState();
 };
