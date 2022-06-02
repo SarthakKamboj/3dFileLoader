@@ -12,6 +12,7 @@ extern ShaderEditor* shaderEditorPtr;
 extern ShaderRegistry* shaderRegistryPtr;
 
 void MeshRendererSettingsPanel::render() {
+	ImGui::ShowDemoWindow();
 	ImGui::Begin("Mesh Rendering Settings");
 
 	if (!renderSelected) {

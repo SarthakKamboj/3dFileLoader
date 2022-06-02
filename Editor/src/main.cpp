@@ -63,48 +63,7 @@ float quadVertices[] = {
 	 1.0f,  1.0f,  1.0f, 1.0f
 };
 
-/*
-struct Test {
-
-	Test() {
-		x = 0;
-		y = 0;
-		std::cout << "this: " << this << std::endl;
-		std::cout << "&x: " << &this->x << std::endl;
-		std::cout << "&y: " << &this->y << std::endl;
-	}
-
-	Test(int _x, int _y) {
-		x = _x;
-		y = _y;
-		std::cout << "this: " << this << std::endl;
-		std::cout << "&x: " << &this->x << std::endl;
-		std::cout << "&y: " << &this->y << std::endl;
-	}
-
-	int x;
-	int y;
-};
-*/
-
 int main(int argc, char* args[]) {
-
-	/*
-	Test t;
-	std::cout << "&t: " << &t << std::endl;
-	std::cout << "&t.x " << &t.x << std::endl;
-	std::cout << "&t.y " << &t.y << std::endl;
-	int p1 = 5;
-	int p2 = 5;
-	std::cout << "&p1: " << &p1 << std::endl;
-	std::cout << "&p2: " << &p2 << std::endl;
-	Test newT = Test(p1, p2);
-	std::cout << "&newT: " << &newT << std::endl;
-	t = newT;
-	std::cout << "&t: " << &t << std::endl;
-	std::cout << "&t.x " << &t.x << std::endl;
-	std::cout << "&t.y " << &t.y << std::endl;
-	*/
 
 	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
 	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\texturesTest.fbx";
@@ -237,6 +196,15 @@ int main(int argc, char* args[]) {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
+
+		if (ImGui::BeginMainMenuBar()) {
+
+			if (ImGui::BeginMenu("File")) {
+				ImGui::MenuItem("Open fbx file");
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
 
 		glm::vec3 camPos;
 		renderDockspace();
