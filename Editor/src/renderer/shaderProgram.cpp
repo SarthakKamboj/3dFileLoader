@@ -40,7 +40,7 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	glDeleteShader(vertexId);
 	glDeleteShader(fragmentId);
 
-	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
+	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
 	texture = Texture(defaultTexPath, 0);
 
 	setInt("renderTexture", textureBasedColor);
