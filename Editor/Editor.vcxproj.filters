@@ -96,7 +96,7 @@
     <ClCompile Include="src\panels\shaderRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\panels\sceneLoader.cpp">
+    <ClCompile Include="src\panels\sceneList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,7 +149,7 @@
     <ClInclude Include="src\panels\shaderRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\panels\sceneLoader.h">
+    <ClInclude Include="src\panels\sceneList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

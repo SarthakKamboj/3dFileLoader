@@ -1,12 +1,17 @@
 #pragma once
 
+typedef enum FileBrowserLoadMode {
+	IMAGE, SCENE
+} FileBrowserLoadMode;
+
 struct FileBrowser {
 	FileBrowser();
 	void render();
 	char* resultBuffer;
 	char file[100];
-	char curFilePath[200];
+	char curFolderPath[200];
 	bool open = false;
 	int selectedIdx = -1;
+	FileBrowserLoadMode loadMode;
 };
 

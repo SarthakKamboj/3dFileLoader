@@ -35,7 +35,7 @@ struct Mesh {
 	Vertex* vertices;
 	int vertexCount;
 
-	/* not having indicies for now b / c mapping over vertices by polygon,
+	/* not having indicies for now b/c mapping over vertices by polygon,
 	which means number of vertices will be the same as indicies
 	*/
 	// unsigned int* indicies;
@@ -62,8 +62,9 @@ struct Light {
 
 struct Scene {
 	std::vector<Mesh> meshes;
-	int numMeshes;
+	int numMeshes = 0;
 	std::vector<int> topLevelMeshIdxs;
+	char name[150];
 };
 
 Scene loadFbx(const char* fbxFilePath);

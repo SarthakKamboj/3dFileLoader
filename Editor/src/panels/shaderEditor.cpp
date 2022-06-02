@@ -50,8 +50,9 @@ void ShaderEditor::render() {
 
 		if (ImGui::Button("Update texture")) {
 			int lastIdx = Helper::GetLastIndex(curShaderProgram->texture.filePath, '\\');
-			memset(fileBrowserPtr->curFilePath, 0, 200);
-			Helper::CopyBuffer(curShaderProgram->texture.filePath, fileBrowserPtr->curFilePath, lastIdx);
+			memset(fileBrowserPtr->curFolderPath, 0, 200);
+			Helper::CopyBuffer(curShaderProgram->texture.filePath, fileBrowserPtr->curFolderPath, lastIdx);
+			fileBrowserPtr->loadMode = FileBrowserLoadMode::IMAGE;
 			fileBrowserPtr->resultBuffer = newTexturePath;
 			fileBrowserPtr->open = true;
 			selectingNewTexturePath = true;

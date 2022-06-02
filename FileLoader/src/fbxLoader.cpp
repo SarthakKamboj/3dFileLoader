@@ -43,6 +43,7 @@ Scene loadFbx(const char* fbxFilePath) {
 	scene.meshes.resize(maxPossibleMeshes);
 
 	FbxNode* rootNode = fbxScene->GetRootNode();
+	meshIdx = 0;
 
 	if (rootNode) {
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
