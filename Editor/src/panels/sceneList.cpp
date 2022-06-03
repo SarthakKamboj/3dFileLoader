@@ -27,17 +27,22 @@ void SceneList::render() {
 		}
 		ImGui::Text("Number of meshes: %i", scenes[i].numMeshes);
 	}
-	if (ImGui::Button("Open scene")) {
-		if (selectedSceneIdx < 0 || selectedSceneIdx >= numScenes) {
-			ImGui::End();
-			return;
-		}
-		// scenePtr = &scenes[selectedSceneIdx];
-		curSceneIdx = selectedSceneIdx;
-		// meshRenderers = meshRenderLists[selectedSceneIdx];
+	if (numScenes > 0) {
+		if (ImGui::Button("Open scene")) {
+			if (selectedSceneIdx < 0 || selectedSceneIdx >= numScenes) {
+				ImGui::End();
+				return;
+			}
+			// scenePtr = &scenes[selectedSceneIdx];
+			curSceneIdx = selectedSceneIdx;
+			// meshRenderers = meshRenderLists[selectedSceneIdx];
 
-		resetEditorState();
-		selectedSceneIdx = -1;
+			resetEditorState();
+			selectedSceneIdx = -1;
+		}
+	}
+	else {
+		ImGui::Text("Load in a scene");
 	}
 	ImGui::End();
 }
