@@ -295,7 +295,6 @@ int main(int argc, char* args[]) {
 		line.shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("projection", proj);
 
-		// scene = *scenePtr;
 		if (sceneList.curSceneIdx > -1) {
 			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
 			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
