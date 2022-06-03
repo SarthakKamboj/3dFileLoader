@@ -3,17 +3,27 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "panels/shaderRegistry.h"
+#include "fbxLoader.h"
+#include "panels/sceneList.h"
 
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern Line* linePtr;
 extern ShaderRegistry* shaderRegistryPtr;
+// extern Scene* scenePtr;
+extern SceneList* sceneListPtr;
 
 MeshRenderer::MeshRenderer() {
-	mesh = NULL;
+	// mesh = NULL;
+	meshIdx = -1;
 }
 
-MeshRenderer::MeshRenderer(Mesh* _mesh) {
-	mesh = _mesh;
+// MeshRenderer::MeshRenderer(Mesh* _mesh) {
+MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
+	// mesh = _mesh;
+	meshIdx = _meshIdx;
+	// Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
+	Mesh* mesh = &_mesh;
+
 	vao.bind();
 
 	vbo.setData((float*)&mesh->vertices[0], mesh->vertexCount * sizeof(Vertex), GL_STATIC_DRAW);
@@ -29,6 +39,10 @@ MeshRenderer::MeshRenderer(Mesh* _mesh) {
 
 void MeshRenderer::render() {
 
+	if (sceneListPtr->curSceneIdx < 0) return;
+
+	Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
+	Mesh* mesh = &scenePtr->meshes[meshIdx];
 	glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
 	glm::mat4 rotation = getRotationMatrix(mesh->transform.rotation);
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh->transform.scale);

@@ -27,17 +27,20 @@
 #include "panels/shaderEditor.h"
 #include "panels/fileBrowser.h"
 #include "panels/shaderRegistry.h"
+#include "helper.h"
+#include "panels/sceneList.h"
 
 int width = 600, height = 600;
 Line* linePtr;
 ImFont* openSansBold;
 ImFont* openSansLight;
-std::vector<MeshRenderer> meshRenderers;
+// std::vector<MeshRenderer> meshRenderers;
 MeshRendererSettingsPanel* meshRenPanelPtr;
-Scene* scenePtr;
+// Scene* scenePtr;
 ShaderEditor* shaderEditorPtr;
 FileBrowser* fileBrowserPtr;
 ShaderRegistry* shaderRegistryPtr;
+SceneList* sceneListPtr;
 bool enterPressed = false;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
@@ -63,31 +66,36 @@ float quadVertices[] = {
 	 1.0f,  1.0f,  1.0f, 1.0f
 };
 
-int main(int argc, char* args[]) {
-
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\arrow.fbx";
-	const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\texturesTest.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\scene.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cone.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\pyramid.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\monkey.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\triangle.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\product_anim\\arrow\\cube.fbx";
-	// const char* fbxFilePath = "..\\assets\\3d\\parentTest.fbx";
-	// const char* fbxFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d\\parentTest.fbx";
-	Scene scene = loadFbx(fbxFilePath);
-	scenePtr = &scene;
+/*
+void extractDataFromScene(Scene& scene) {
+	// Scene scene = loadFbx(fbxFilePath);
+	// scenePtr = &scene;
 
 	if (scene.numMeshes == -1) {
 		std::cout << "scene data not valid" << std::endl;
-		return 0;
+		return;
 	}
+
+	meshRenderers.clear();
+
+	int numMeshes = scene.numMeshes;
+	meshRenderers.resize(numMeshes);
+
+	for (int meshId = 0; meshId < numMeshes; meshId++) {
+		// Mesh& mesh = scene.meshes[meshId];
+		// meshRenderers[meshId] = MeshRenderer(&mesh);
+		meshRenderers[meshId] = MeshRenderer(meshId);
+	}
+
+}
+*/
+
+int main(int argc, char* args[]) {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		std::cout << "sdl gave error" << std::endl;
 		return 0;
 	}
-
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -124,6 +132,9 @@ int main(int argc, char* args[]) {
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
 
+	// Scene scene;
+	// scenePtr = &scene;
+
 	ShaderRegistry shaderRegistry;
 	shaderRegistryPtr = &shaderRegistry;
 
@@ -131,17 +142,6 @@ int main(int argc, char* args[]) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	bool running = true;
-
-	int numMeshes = scene.numMeshes;
-	meshRenderers.resize(numMeshes);
-
-	for (int meshId = 0; meshId < numMeshes; meshId++) {
-		Mesh& mesh = scene.meshes[meshId];
-		meshRenderers[meshId] = MeshRenderer(&mesh);
-	}
-
-	const char* texFilePath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\arrow.png";
-	Texture texture(texFilePath, 0);
 
 	Line line;
 	linePtr = &line;
@@ -157,7 +157,8 @@ int main(int argc, char* args[]) {
 	MeshRendererSettingsPanel meshRenPanel;
 	meshRenPanelPtr = &meshRenPanel;
 
-	SceneHierarchyPanel sceneHierarchyPanel(scene);
+	// SceneHierarchyPanel sceneHierarchyPanel(scene);
+	SceneHierarchyPanel sceneHierarchyPanel;
 	CameraPanel cameraPanel;
 	cameraPanel.pov = 45.0f;
 	cameraPanel.radius = 1000.0f;
@@ -170,6 +171,11 @@ int main(int argc, char* args[]) {
 	ShaderEditor shaderEditor;
 	shaderEditorPtr = &shaderEditor;
 
+	SceneList sceneList;
+	sceneListPtr = &sceneList;
+
+	char fbxToLoadPath[300] = {};
+	bool selectingFbxToLoad = false;
 	while (running) {
 
 		uint32_t curTime = SDL_GetTicks();
@@ -200,10 +206,37 @@ int main(int argc, char* args[]) {
 		if (ImGui::BeginMainMenuBar()) {
 
 			if (ImGui::BeginMenu("File")) {
-				ImGui::MenuItem("Open fbx file");
+				if (ImGui::MenuItem("Open fbx file")) {
+					fileBrowser.open = true;
+					fileBrowser.resultBuffer = fbxToLoadPath;
+					fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
+					memset(fileBrowser.curFolderPath, 0, 200);
+					// later change default filebrowser path
+					Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
+					selectingFbxToLoad = true;
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMainMenuBar();
+		}
+
+		if (selectingFbxToLoad && !fileBrowser.open) {
+			selectingFbxToLoad = false;
+			/*
+			Scene newScene = loadFbx(fbxToLoadPath);
+			scenePtr = &newScene;
+			extractDataFromScene(newScene);
+			int slashIdx = Helper::GetLastIndex(fbxToLoadPath, '\\');
+			int dotIdx = Helper::GetLastIndex(fbxToLoadPath, '.');
+			memset(newScene.name, 0, 150);
+			Helper::CopyBuffer(fbxToLoadPath + slashIdx + 1, newScene.name, dotIdx - slashIdx - 1);
+			sceneList.numScenes += 1;
+			sceneList.scenes.push_back(newScene);
+			sceneList.meshRenderLists.push_back(meshRenderers);
+			scene = sceneList.scenes[sceneList.numScenes - 1];
+			scenePtr = &scene;
+			*/
+			sceneList.loadSceneFromFbxFile(fbxToLoadPath);
 		}
 
 		glm::vec3 camPos;
@@ -215,6 +248,7 @@ int main(int argc, char* args[]) {
 		shaderEditor.render();
 		fileBrowser.render();
 		shaderRegistry.render();
+		sceneList.render();
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 
@@ -261,16 +295,15 @@ int main(int argc, char* args[]) {
 		line.shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("projection", proj);
 
-		texture.bind();
-
-		for (int meshId = 0; meshId < numMeshes; meshId++) {
-			// trying out something
-			// this should cause errors when ShaderRegistry's shaders vector gets resized because ptrs change
-			// since the ShaderProgram objects get copied over
-			int shaderIdx = meshRenderers[meshId].shaderIdx;
-			shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-			shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-			meshRenderers[meshId].render();
+		if (sceneList.curSceneIdx > -1) {
+			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+				int shaderIdx = meshRenderers[meshId].shaderIdx;
+				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+				meshRenderers[meshId].render();
+			}
 		}
 
 		sceneFbo.unbind();

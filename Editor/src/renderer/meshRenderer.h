@@ -8,14 +8,16 @@
 
 struct MeshRenderer {
 	MeshRenderer();
-	MeshRenderer(Mesh* mesh);
+	// MeshRenderer(Mesh* mesh);
+	MeshRenderer(Mesh& mesh, int _meshIdx);
 	void render();
 
 	bool displaySplitNormals = false;
 	bool displayNormals = false;
 	bool wireframeMode = false;
 
-	Mesh* mesh;
+	// Mesh* mesh;
+	int meshIdx;
 	// ShaderProgram* shaderProgram;
 	int shaderIdx = 0;
 
