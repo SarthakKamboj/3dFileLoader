@@ -20,6 +20,12 @@ namespace Helper {
 		return IsSameString(filePath + lastDot + 1, "png") || IsSameString(filePath + lastDot + 1, "jpg");
 	}
 
+	bool Is3dScene(const char* filePath) {
+		int lastDot = GetLastIndex(filePath, '.');
+		if (lastDot == -1) return false;
+		return IsSameString(filePath + lastDot + 1, "fbx");
+	}
+
 	void CopyBuffer(const char* srcBuffer, char* destBuffer, int size) {
 		for (int i = 0; i < size; i++) {
 			destBuffer[i] = srcBuffer[i];

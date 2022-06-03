@@ -5,15 +5,23 @@
 #include "panels/shaderEditor.h"
 #include "panels/shaderRegistry.h"
 #include "helper.h"
+#include "panels/sceneList.h"
 
 extern ImFont* openSansLight;
-extern Scene* scenePtr;
+// extern Scene* scenePtr;
 extern ShaderEditor* shaderEditorPtr;
 extern ShaderRegistry* shaderRegistryPtr;
+extern SceneList* sceneListPtr;
 
 void MeshRendererSettingsPanel::render() {
 	ImGui::ShowDemoWindow();
 	ImGui::Begin("Mesh Rendering Settings");
+
+	if (sceneListPtr->curSceneIdx < 0) {
+		ImGui::Text("Please select a scene");
+		ImGui::End();
+		return;
+	}
 
 	if (!renderSelected) {
 		ImGui::Text("Please select an object");
@@ -21,7 +29,8 @@ void MeshRendererSettingsPanel::render() {
 		return;
 	}
 
-	Mesh* mesh = curMeshRenderer->mesh;
+	Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
+	Mesh* mesh = &scenePtr->meshes[curMeshRenderer->meshIdx];
 	std::string meshNameStr = std::string("Name: ") + mesh->name;
 	ImGui::Text(meshNameStr.c_str());
 	ImGui::Separator();
@@ -58,21 +67,6 @@ void MeshRendererSettingsPanel::render() {
 	Helper::CopyBuffer("Current Shader Program: ", shaderProgText, 200);
 	Helper::ConcatBuffer(shaderProgText, shaderRegistryPtr->shaders[curMeshRenderer->shaderIdx].name);
 	ImGui::Text(shaderProgText);
-	if (ImGui::Button("Open Shader Editor")) {
-		shaderEditorPtr->open = true;
-		shaderEditorPtr->curShaderProgram = &shaderRegistryPtr->shaders[curMeshRenderer->shaderIdx];
-		shaderEditorPtr->updateTexturePath();
-	}
-
-	if (ImGui::Button("Create new shader")) {
-		const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
-		const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
-		ShaderProgram shaderProgram(defaultVert, defaultFrag);
-		int newShaderIdx = shaderRegistryPtr->addShader(shaderProgram);
-		curMeshRenderer->shaderIdx = newShaderIdx;
-		shaderEditorPtr->open = true;
-		shaderEditorPtr->curShaderProgram = &shaderRegistryPtr->shaders[curMeshRenderer->shaderIdx];
-	}
 
 	char options[400] = {};
 	char buffer[1];
@@ -85,6 +79,25 @@ void MeshRendererSettingsPanel::render() {
 		runningBuffer++;
 	}
 	ImGui::Combo("Attached shader", &curMeshRenderer->shaderIdx, options);
+
+	ImGui::Separator();
+	if (ImGui::Button("Open Shader Editor")) {
+		shaderEditorPtr->open = true;
+		shaderEditorPtr->curShaderProgram = &shaderRegistryPtr->shaders[curMeshRenderer->shaderIdx];
+		shaderEditorPtr->updateTexturePath();
+	}
+
+
+
+	if (ImGui::Button("Create new shader")) {
+		const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
+		const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
+		ShaderProgram shaderProgram(defaultVert, defaultFrag);
+		int newShaderIdx = shaderRegistryPtr->addShader(shaderProgram);
+		curMeshRenderer->shaderIdx = newShaderIdx;
+		shaderEditorPtr->open = true;
+		shaderEditorPtr->curShaderProgram = &shaderRegistryPtr->shaders[curMeshRenderer->shaderIdx];
+	}
 
 	ImGui::End();
 }

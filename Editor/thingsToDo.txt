@@ -1,6 +1,6 @@
 things to implement
 -------------------
-0. ability to load in scene
+0. ability to load in scene - done
 1. code refactor
 2. fbx animation loading
 3. editor animation playback

@@ -173,7 +173,7 @@
     <ClCompile Include="src\panels\fileBrowser.cpp" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\panels\sceneHierarchyPanel.cpp" />
-    <ClCompile Include="src\panels\sceneLoader.cpp" />
+    <ClCompile Include="src\panels\sceneList.cpp" />
     <ClCompile Include="src\panels\shaderEditor.cpp" />
     <ClCompile Include="src\panels\shaderRegistry.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
@@ -192,7 +192,7 @@
     <ClInclude Include="src\panels\fileBrowser.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />
-    <ClInclude Include="src\panels\sceneLoader.h" />
+    <ClInclude Include="src\panels\sceneList.h" />
     <ClInclude Include="src\panels\shaderEditor.h" />
     <ClInclude Include="src\panels\shaderRegistry.h" />
     <ClInclude Include="src\renderer\ebo.h" />

@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 extern bool enterPressed;
 
 FileBrowser::FileBrowser() {
-	memset(curFilePath, 0, 200);
+	memset(curFolderPath, 0, 200);
 	memset(file, 0, 100);
 	resultBuffer = NULL;
 }
@@ -19,19 +19,20 @@ void FileBrowser::render() {
 	if (open) {
 		ImGui::Begin("File Browser", &open);
 		if (ImGui::Button("Back")) {
-			int lastIdx = Helper::GetLastIndex(curFilePath, '\\');
+			int lastIdx = Helper::GetLastIndex(curFolderPath, '\\');
 			if (lastIdx != -1) {
-				curFilePath[lastIdx] = 0;
+				curFolderPath[lastIdx] = 0;
 			}
-			if (curFilePath[lastIdx - 1] == ':') {
-				curFilePath[lastIdx] = '\\';
-				curFilePath[lastIdx + 1] = 0;
+			if (curFolderPath[lastIdx - 1] == ':') {
+				curFolderPath[lastIdx] = '\\';
+				curFolderPath[lastIdx + 1] = 0;
 			}
 			selectedIdx = -1;
 		}
-		ImGui::Text(curFilePath);
+		ImGui::Text(curFolderPath);
+		ImGui::Separator();
 
-		std::string path(curFilePath);
+		std::string path(curFolderPath);
 		static bool once = true;
 		int i = 0;
 		for (const auto& entry : fs::directory_iterator(path)) {
@@ -59,7 +60,7 @@ void FileBrowser::render() {
 			}
 
 			char newPath[200] = {};
-			Helper::CopyBuffer(curFilePath, newPath, 200);
+			Helper::CopyBuffer(curFolderPath, newPath, 200);
 			int lastSlash = Helper::GetLastIndex(newPath, '\\');
 			if (lastSlash != -1 && newPath[lastSlash + 1] != 0) {
 				char slashBuf[2];
@@ -70,12 +71,19 @@ void FileBrowser::render() {
 			Helper::ConcatBuffer(newPath, file);
 
 			if (fs::is_directory(newPath)) {
-				memset(curFilePath, 0, 200);
-				Helper::CopyBuffer(newPath, curFilePath, 200);
+				memset(curFolderPath, 0, 200);
+				Helper::CopyBuffer(newPath, curFolderPath, 200);
 				selectedIdx = -1;
 			}
 			else {
-				if (!Helper::IsImage(newPath)) {
+				if (loadMode == FileBrowserLoadMode::IMAGE && !Helper::IsImage(newPath)) {
+					if (ImGui::Button("Cancel")) {
+						open = false;
+					}
+					ImGui::End();
+					return;
+				}
+				if (loadMode == FileBrowserLoadMode::SCENE && !Helper::Is3dScene(newPath)) {
 					if (ImGui::Button("Cancel")) {
 						open = false;
 					}
