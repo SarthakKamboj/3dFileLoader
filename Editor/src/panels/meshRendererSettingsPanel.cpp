@@ -94,6 +94,9 @@ void MeshRendererSettingsPanel::render() {
 		const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 		const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 		ShaderProgram shaderProgram(defaultVert, defaultFrag);
+		shaderProgram.setInt("renderTexture", 0);
+		shaderProgram.setInt("material.diffuse", 0);
+		shaderProgram.setVec3("color", glm::vec3(0, 1, 0));
 		int newShaderIdx = shaderRegistryPtr->addShader(shaderProgram);
 		curMeshRenderer->shaderIdx = newShaderIdx;
 		shaderEditorPtr->open = true;

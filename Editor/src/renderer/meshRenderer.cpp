@@ -9,19 +9,14 @@
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern Line* linePtr;
 extern ShaderRegistry* shaderRegistryPtr;
-// extern Scene* scenePtr;
 extern SceneList* sceneListPtr;
 
 MeshRenderer::MeshRenderer() {
-	// mesh = NULL;
 	meshIdx = -1;
 }
 
-// MeshRenderer::MeshRenderer(Mesh* _mesh) {
 MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
-	// mesh = _mesh;
 	meshIdx = _meshIdx;
-	// Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
 	Mesh* mesh = &_mesh;
 
 	vao.bind();

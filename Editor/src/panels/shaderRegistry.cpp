@@ -12,6 +12,7 @@ ShaderRegistry::ShaderRegistry() {
 	memset(defaultShaderProgram.name, 0, 50);
 	Helper::CopyBuffer("Default shader", defaultShaderProgram.name, 50);
 	shaders.push_back(defaultShaderProgram);
+	defaultShaderProgram.setVec3("color", glm::vec3(1, 1, 1));
 	numShaders++;
 }
 

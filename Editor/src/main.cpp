@@ -36,9 +36,7 @@ int width = 600, height = 600;
 Line* linePtr;
 ImFont* openSansBold;
 ImFont* openSansLight;
-// std::vector<MeshRenderer> meshRenderers;
 MeshRendererSettingsPanel* meshRenPanelPtr;
-// Scene* scenePtr;
 ShaderEditor* shaderEditorPtr;
 FileBrowser* fileBrowserPtr;
 ShaderRegistry* shaderRegistryPtr;
@@ -67,30 +65,6 @@ float quadVertices[] = {
 	 1.0f, -1.0f,  1.0f, 0.0f,
 	 1.0f,  1.0f,  1.0f, 1.0f
 };
-
-/*
-void extractDataFromScene(Scene& scene) {
-	// Scene scene = loadFbx(fbxFilePath);
-	// scenePtr = &scene;
-
-	if (scene.numMeshes == -1) {
-		std::cout << "scene data not valid" << std::endl;
-		return;
-	}
-
-	meshRenderers.clear();
-
-	int numMeshes = scene.numMeshes;
-	meshRenderers.resize(numMeshes);
-
-	for (int meshId = 0; meshId < numMeshes; meshId++) {
-		// Mesh& mesh = scene.meshes[meshId];
-		// meshRenderers[meshId] = MeshRenderer(&mesh);
-		meshRenderers[meshId] = MeshRenderer(meshId);
-	}
-
-}
-*/
 
 int main(int argc, char* args[]) {
 
@@ -134,9 +108,6 @@ int main(int argc, char* args[]) {
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
 
-	// Scene scene;
-	// scenePtr = &scene;
-
 	ShaderRegistry shaderRegistry;
 	shaderRegistryPtr = &shaderRegistry;
 
@@ -151,9 +122,9 @@ int main(int argc, char* args[]) {
 	glEnable(GL_DEPTH_TEST);
 
 	float fontSize = 16.0f;
-	openSansBold = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Bold.ttf", fontSize);
-	openSansLight = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Light.ttf", fontSize);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/OpenSans-Regular.ttf", fontSize);
+	openSansBold = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Bold.ttf", fontSize);
+	openSansLight = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Light.ttf", fontSize);
+	io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Regular.ttf", fontSize);
 
 	FrameBuffer sceneFbo;
 	MeshRendererSettingsPanel meshRenPanel;
@@ -185,6 +156,7 @@ int main(int argc, char* args[]) {
 	light.specularFactor = 0.2f;
 	light.pos = glm::vec3(0, 100, 0);
 	light.lightColor = glm::vec3(0, 1, 0);
+	light.shininess = 32.0f;
 
 	while (running) {
 
@@ -274,8 +246,8 @@ int main(int argc, char* args[]) {
 		ImGui::DragFloat3("Light pos", &light.pos.x);
 		ImGui::ColorPicker3("Light color", &light.lightColor.r);
 		ImGui::DragFloat("Ambient light factor", &light.ambientFactor, .01, 0, 1);
-		ImGui::ColorPicker3("Ambient light color", &light.ambientColor.r);
 		ImGui::DragFloat("Specular light factor", &light.specularFactor, .01, 0, 1);
+		ImGui::DragFloat("Specular shininess", &light.shininess, 0.5, 5, 64);
 		ImGui::End();
 
 		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -301,13 +273,16 @@ int main(int argc, char* args[]) {
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
 				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-				shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.ambientColor);
-				shaderRegistry.shaders[shaderIdx].setFloat("ambientFactor", light.ambientFactor);
-				shaderRegistry.shaders[shaderIdx].setVec3("diffuseColor", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("lightPos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
+				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
+
 				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-				shaderRegistry.shaders[shaderIdx].setVec3("specularColor", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setFloat("specularStrength", light.specularFactor);
+
 				meshRenderers[meshId].render();
 			}
 

@@ -8,4 +8,5 @@ typedef struct Light {
 	glm::vec3 ambientColor;
 	float specularFactor;
 	glm::vec3 pos;
+	float shininess;
 } Light;
