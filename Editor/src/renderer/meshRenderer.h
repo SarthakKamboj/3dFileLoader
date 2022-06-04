@@ -15,6 +15,7 @@ struct MeshRenderer {
 	bool displaySplitNormals = false;
 	bool displayNormals = false;
 	bool wireframeMode = false;
+	bool useNormals = false;
 
 	// Mesh* mesh;
 	int meshIdx;

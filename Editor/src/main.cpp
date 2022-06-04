@@ -29,6 +29,8 @@
 #include "panels/shaderRegistry.h"
 #include "helper.h"
 #include "panels/sceneList.h"
+#include "renderer/light.h"
+#include "primitives/cube.h"
 
 int width = 600, height = 600;
 Line* linePtr;
@@ -176,6 +178,17 @@ int main(int argc, char* args[]) {
 
 	char fbxToLoadPath[300] = {};
 	bool selectingFbxToLoad = false;
+
+	Light light = {};
+	Cube cube;
+	light.ambientColor = glm::vec3(1, 0, 0);
+	light.ambientFactor = 0.2f;
+	light.diffuseColor = glm::vec3(0, 1, 0);
+	light.specularFactor = 0.2f;
+	light.specularColor = glm::vec3(0, 0, 1);
+	light.pos = glm::vec3(0, 100, 0);
+	light.lightColor = glm::vec3(0, 1, 0);
+
 	while (running) {
 
 		uint32_t curTime = SDL_GetTicks();
@@ -274,6 +287,16 @@ int main(int argc, char* args[]) {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		ImGui::Begin("Light editor");
+		ImGui::DragFloat3("Light pos", &light.pos.x);
+		ImGui::ColorPicker3("Light color", &light.lightColor.r);
+		ImGui::DragFloat("Ambient light factor", &light.ambientFactor, .01, 0, 1);
+		ImGui::ColorPicker3("Ambient light color", &light.ambientColor.r);
+		ImGui::ColorPicker3("Diffuse light color", &light.diffuseColor.r);
+		ImGui::DragFloat("Specular light factor", &light.specularFactor, .01, 0, 1);
+		ImGui::ColorPicker3("Specular light color", &light.specularColor.r);
+		ImGui::End();
+
 		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 
 		ImGui::Render();
@@ -284,11 +307,13 @@ int main(int argc, char* args[]) {
 		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glEnable(GL_DEPTH_TEST);
 
+		/*
 		float speed = 0.01f;
 		float radius = 3000.0f;
 		camPos.x = cos(curTime * 0.05f * speed) * radius;
 		camPos.z = sin(curTime * 0.05f * speed) * radius;
 		camPos.y = 0;
+		*/
 
 		glm::mat4 view = cameraPanel.getViewMat();
 		glm::mat4 proj = cameraPanel.getProjectionMat();
@@ -298,12 +323,35 @@ int main(int argc, char* args[]) {
 		if (sceneList.curSceneIdx > -1) {
 			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
 			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
 				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+				// shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.ambientColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setFloat("ambientFactor", light.ambientFactor);
+				// shaderRegistry.shaders[shaderIdx].setVec3("diffuseColor", light.diffuseColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("diffuseColor", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("lightPos", light.pos);
+				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
+				// shaderRegistry.shaders[shaderIdx].setVec3("specularColor", light.specularColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("specularColor", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setFloat("specularStrength", light.specularFactor);
 				meshRenderers[meshId].render();
 			}
+
+			cube.shaderProgram.setVec3("color", light.diffuseColor);
+			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
+			glm::mat4 rotation(1.0f);
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+
+			glm::mat4 lightModel = translation * rotation * scale;
+			cube.shaderProgram.setVec3("color", light.lightColor);
+			cube.shaderProgram.setMat4("model", lightModel);
+			cube.shaderProgram.setMat4("view", view);
+			cube.shaderProgram.setMat4("projection", proj);
+			cube.render();
 		}
 
 		sceneFbo.unbind();

@@ -55,10 +55,12 @@ struct Camera {
 	Transform transform;
 };
 
+/*
 struct Light {
 	Light();
 	Transform transform;
 };
+*/
 
 struct Scene {
 	std::vector<Mesh> meshes;
