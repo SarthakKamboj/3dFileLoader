@@ -14,8 +14,8 @@ ShaderProgram::ShaderProgram() {
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	texture = Texture(defaultTexPath, 0);
 
-	setInt("renderTexture", textureBasedColor);
-	setVec3("color", glm::vec3(1, 1, 1));
+	// setInt("renderTexture", textureBasedColor);
+	// setVec3("color", glm::vec3(1, 1, 1));
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
@@ -43,8 +43,8 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
 	texture = Texture(defaultTexPath, 0);
 
-	setInt("renderTexture", textureBasedColor);
-	setVec3("color", glm::vec3(1, 1, 1));
+	// setInt("renderTexture", textureBasedColor);
+	// setVec3("color", glm::vec3(1, 1, 1));
 }
 
 void ShaderProgram::bind() {
@@ -59,6 +59,9 @@ void ShaderProgram::setMat4(const char* varName, glm::mat4& mat) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
+	if (loc == -1) {
+		std::cout << varName << " doesn't exist" << std::endl;
+	}
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 	unbind();
 }
@@ -67,6 +70,9 @@ void ShaderProgram::setFloat(const char* varName, float val) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
+	if (loc == -1) {
+		std::cout << varName << " doesn't exist" << std::endl;
+	}
 	glUniform1f(loc, val);
 	unbind();
 }
@@ -75,6 +81,9 @@ void ShaderProgram::setVec3(const char* varName, glm::vec3 vec3) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
+	if (loc == -1) {
+		std::cout << varName << " doesn't exist" << std::endl;
+	}
 	glUniform3fv(loc, 1, glm::value_ptr(vec3));
 	unbind();
 }
@@ -83,6 +92,9 @@ void ShaderProgram::setInt(const char* varName, int val) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
+	if (loc == -1) {
+		std::cout << varName << " doesn't exist" << std::endl;
+	}
 	glUniform1i(loc, val);
 	unbind();
 }
