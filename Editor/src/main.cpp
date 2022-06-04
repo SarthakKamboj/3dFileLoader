@@ -159,7 +159,6 @@ int main(int argc, char* args[]) {
 	MeshRendererSettingsPanel meshRenPanel;
 	meshRenPanelPtr = &meshRenPanel;
 
-	// SceneHierarchyPanel sceneHierarchyPanel(scene);
 	SceneHierarchyPanel sceneHierarchyPanel;
 	CameraPanel cameraPanel;
 	cameraPanel.pov = 45.0f;
@@ -183,9 +182,7 @@ int main(int argc, char* args[]) {
 	Cube cube;
 	light.ambientColor = glm::vec3(1, 0, 0);
 	light.ambientFactor = 0.2f;
-	light.diffuseColor = glm::vec3(0, 1, 0);
 	light.specularFactor = 0.2f;
-	light.specularColor = glm::vec3(0, 0, 1);
 	light.pos = glm::vec3(0, 100, 0);
 	light.lightColor = glm::vec3(0, 1, 0);
 
@@ -235,20 +232,6 @@ int main(int argc, char* args[]) {
 
 		if (selectingFbxToLoad && !fileBrowser.open) {
 			selectingFbxToLoad = false;
-			/*
-			Scene newScene = loadFbx(fbxToLoadPath);
-			scenePtr = &newScene;
-			extractDataFromScene(newScene);
-			int slashIdx = Helper::GetLastIndex(fbxToLoadPath, '\\');
-			int dotIdx = Helper::GetLastIndex(fbxToLoadPath, '.');
-			memset(newScene.name, 0, 150);
-			Helper::CopyBuffer(fbxToLoadPath + slashIdx + 1, newScene.name, dotIdx - slashIdx - 1);
-			sceneList.numScenes += 1;
-			sceneList.scenes.push_back(newScene);
-			sceneList.meshRenderLists.push_back(meshRenderers);
-			scene = sceneList.scenes[sceneList.numScenes - 1];
-			scenePtr = &scene;
-			*/
 			sceneList.loadSceneFromFbxFile(fbxToLoadPath);
 		}
 
@@ -292,9 +275,7 @@ int main(int argc, char* args[]) {
 		ImGui::ColorPicker3("Light color", &light.lightColor.r);
 		ImGui::DragFloat("Ambient light factor", &light.ambientFactor, .01, 0, 1);
 		ImGui::ColorPicker3("Ambient light color", &light.ambientColor.r);
-		ImGui::ColorPicker3("Diffuse light color", &light.diffuseColor.r);
 		ImGui::DragFloat("Specular light factor", &light.specularFactor, .01, 0, 1);
-		ImGui::ColorPicker3("Specular light color", &light.specularColor.r);
 		ImGui::End();
 
 		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -306,14 +287,6 @@ int main(int argc, char* args[]) {
 		sceneFbo.bind();
 		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glEnable(GL_DEPTH_TEST);
-
-		/*
-		float speed = 0.01f;
-		float radius = 3000.0f;
-		camPos.x = cos(curTime * 0.05f * speed) * radius;
-		camPos.z = sin(curTime * 0.05f * speed) * radius;
-		camPos.y = 0;
-		*/
 
 		glm::mat4 view = cameraPanel.getViewMat();
 		glm::mat4 proj = cameraPanel.getProjectionMat();
@@ -328,20 +301,17 @@ int main(int argc, char* args[]) {
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
 				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-				// shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.ambientColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("ambientColor", light.ambientColor);
 				shaderRegistry.shaders[shaderIdx].setFloat("ambientFactor", light.ambientFactor);
-				// shaderRegistry.shaders[shaderIdx].setVec3("diffuseColor", light.diffuseColor);
 				shaderRegistry.shaders[shaderIdx].setVec3("diffuseColor", light.lightColor);
 				shaderRegistry.shaders[shaderIdx].setVec3("lightPos", light.pos);
 				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-				// shaderRegistry.shaders[shaderIdx].setVec3("specularColor", light.specularColor);
 				shaderRegistry.shaders[shaderIdx].setVec3("specularColor", light.lightColor);
 				shaderRegistry.shaders[shaderIdx].setFloat("specularStrength", light.specularFactor);
 				meshRenderers[meshId].render();
 			}
 
-			cube.shaderProgram.setVec3("color", light.diffuseColor);
+			cube.shaderProgram.setVec3("color", light.lightColor);
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
 			glm::mat4 rotation(1.0f);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));

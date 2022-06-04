@@ -44,7 +44,7 @@ void MeshRendererSettingsPanel::render() {
 
 	ImGui::PushFont(openSansLight);
 	ImGui::DragFloat3("Position: ", &pos.x, 0.1);
-	ImGui::DragFloat3("Rotation: ", &rot.x, 0.1, -180, 180);
+	ImGui::DragFloat3("Rotation: ", &rot.x, 1, -180, 180);
 	ImGui::DragFloat3("Scale:", &scale.x, 0.1, 0, 10);
 	ImGui::PopFont();
 
