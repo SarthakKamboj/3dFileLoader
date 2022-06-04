@@ -32,6 +32,7 @@ MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
 	vao.attachVBO(vbo, 1, 3, sizeof(Vertex), offsetof(Vertex, color));
 	vao.attachVBO(vbo, 2, 2, sizeof(Vertex), offsetof(Vertex, uvs));
 	vao.attachVBO(vbo, 3, 3, sizeof(Vertex), offsetof(Vertex, avgNormal));
+	vao.attachVBO(vbo, 4, 3, sizeof(Vertex), offsetof(Vertex, normal));
 
 	vao.unbind();
 	vbo.unbind();
@@ -74,6 +75,7 @@ void MeshRenderer::render() {
 	}
 
 	shaderRegistryPtr->shaders[shaderIdx].setMat4("model", model);
+	shaderRegistryPtr->shaders[shaderIdx].setInt("useSplit", !useNormals);
 	shaderRegistryPtr->shaders[shaderIdx].bind();
 	if (wireframeMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

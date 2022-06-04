@@ -43,9 +43,9 @@ void MeshRendererSettingsPanel::render() {
 	glm::vec3& scale = mesh->transform.scale;
 
 	ImGui::PushFont(openSansLight);
-	ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", rot.x, rot.y, rot.z);
-	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", scale.x, scale.y, scale.z);
+	ImGui::DragFloat3("Position: ", &pos.x, 0.1);
+	ImGui::DragFloat3("Rotation: ", &rot.x, 1, -180, 180);
+	ImGui::DragFloat3("Scale:", &scale.x, 0.1, 0, 10);
 	ImGui::PopFont();
 
 	ImGui::Separator();
@@ -79,6 +79,7 @@ void MeshRendererSettingsPanel::render() {
 		runningBuffer++;
 	}
 	ImGui::Combo("Attached shader", &curMeshRenderer->shaderIdx, options);
+	ImGui::Checkbox("Smooth shading", &curMeshRenderer->useNormals);
 
 	ImGui::Separator();
 	if (ImGui::Button("Open Shader Editor")) {

@@ -10,7 +10,6 @@ struct ShaderRegistry {
 	int numShaders = 0;
 	int selectedIdx = -1;
 	void render();
-	bool open = true;
-	// static bool definedDefaultShaderProg;
+	bool open = false;
 	ShaderProgram defaultShaderProgram;
 };
