@@ -2,8 +2,7 @@
 
 #include "glm/glm.hpp"
 
-class FrameBuffer {
-public:
+struct FrameBuffer {
 	FrameBuffer();
 	void bind();
 	void unbind();
@@ -12,6 +11,5 @@ public:
 
 	unsigned int frameBufferTex;
 
-private:
 	unsigned int fbo;
 };

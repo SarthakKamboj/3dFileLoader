@@ -102,6 +102,9 @@
     <ClCompile Include="src\primitives\cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer\lightFrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h">
@@ -161,6 +164,9 @@
     <ClInclude Include="src\primitives\cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer\lightFrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\vertexShader.vert" />
@@ -173,5 +179,7 @@
     <None Include="src\shaders\default.frag" />
     <None Include="src\shaders\cube.vert" />
     <None Include="src\shaders\cube.frag" />
+    <None Include="src\shaders\depth.vert" />
+    <None Include="src\shaders\depth.frag" />
   </ItemGroup>
 </Project>

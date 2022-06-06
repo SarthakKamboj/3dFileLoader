@@ -1,6 +1,7 @@
 #include "frameBuffer.h"
 #include "glad/glad.h"
 #include <iostream>
+#include "helper.h"
 
 extern int width, height;
 
@@ -28,6 +29,7 @@ FrameBuffer::FrameBuffer() {
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
+	/*
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status == GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "framebuffer good to go" << std::endl;
@@ -35,6 +37,8 @@ FrameBuffer::FrameBuffer() {
 	else {
 		std::cout << "not good to go" << std::endl;
 	}
+	*/
+	Helper::CheckFrameBufferStatus();
 
 }
 
@@ -45,3 +49,4 @@ void FrameBuffer::bind() {
 void FrameBuffer::unbind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+

@@ -1,4 +1,6 @@
 #include "helper.h"
+#include "glad/glad.h"
+#include <iostream>
 
 namespace Helper {
 	int GetLastIndex(const char* buffer, char c) {
@@ -53,5 +55,23 @@ namespace Helper {
 			buffer2++;
 		}
 		return false;
+	}
+
+	void CheckFrameBufferStatus() {
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		switch (status) {
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: {
+			std::cout << "one of more of the framebuffer attachment points are framebuffer incomplete" << std::endl;
+		}
+												 break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: {
+			std::cout << "framebuffer does not have at least one image attached to it" << std::endl;
+		}
+														 break;
+		case GL_FRAMEBUFFER_COMPLETE: {
+			std::cout << "framebuffer good to go" << std::endl;
+		}
+									break;
+		}
 	}
 }

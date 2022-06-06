@@ -31,6 +31,7 @@
 #include "panels/sceneList.h"
 #include "renderer/light.h"
 #include "primitives/cube.h"
+#include "renderer/lightFrameBuffer.h"
 
 int width = 600, height = 600;
 Line* linePtr;
@@ -127,13 +128,14 @@ int main(int argc, char* args[]) {
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Regular.ttf", fontSize);
 
 	FrameBuffer sceneFbo;
+
 	MeshRendererSettingsPanel meshRenPanel;
 	meshRenPanelPtr = &meshRenPanel;
 
 	SceneHierarchyPanel sceneHierarchyPanel;
 	CameraPanel cameraPanel;
 	cameraPanel.pov = 45.0f;
-	cameraPanel.radius = 1000.0f;
+	cameraPanel.radius = 2500.0f;
 	cameraPanel.angle = 0.0f;
 	cameraPanel.yPos = 10.0f;
 
@@ -149,17 +151,36 @@ int main(int argc, char* args[]) {
 	char fbxToLoadPath[300] = {};
 	bool selectingFbxToLoad = false;
 
+	Cube lightCube;
+
 	Light light = {};
-	Cube cube;
 	light.ambientColor = glm::vec3(1, 0, 0);
 	light.ambientFactor = 0.2f;
 	light.specularFactor = 0.2f;
-	light.pos = glm::vec3(0, 100, 0);
+	light.pos = glm::vec3(10, 700, 900);
 	light.lightColor = glm::vec3(0, 1, 0);
 	light.shininess = 32.0f;
 
+	LightFrameBuffer lightFrameBuffer;
+	lightFrameBuffer.light = &light;
+
+	VAO depthVAO;
+	VBO depthVBO;
+	depthVBO.bind();
+	depthVBO.setData(quadVertices, sizeof(quadVertices), GL_STATIC_DRAW);
+	depthVAO.bind();
+	depthVAO.attachVBO(depthVBO, 0, 2, 4 * sizeof(float), 0);
+	depthVAO.attachVBO(depthVBO, 1, 2, 4 * sizeof(float), 2 * sizeof(float));
+	depthVBO.unbind();
+
+	const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
+	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
+	ShaderProgram depthShader(depthVert, depthFrag);
+	depthShader.setInt("depthTexUnit", 1);
+
 	while (running) {
 
+		glEnable(GL_DEPTH_TEST);
 		uint32_t curTime = SDL_GetTicks();
 
 		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
@@ -175,6 +196,12 @@ int main(int argc, char* args[]) {
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
 				running = false;
 			}
+			if (event.type == SDL_WINDOWEVENT) {
+				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+					// width = event.window.data1;
+					// height = event.window.data2;
+				}
+			}
 			if (event.type == SDL_KEYDOWN) {
 				SDL_Keycode keyDown = event.key.keysym.sym;
 				enterPressed = (keyDown == SDLK_RETURN);
@@ -184,6 +211,112 @@ int main(int argc, char* args[]) {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
+
+		glm::mat4 view = cameraPanel.getViewMat();
+		glm::mat4 proj = cameraPanel.getProjectionMat();
+		line.shaderProgram.setMat4("view", view);
+		line.shaderProgram.setMat4("projection", proj);
+
+		glViewport(0, 0, width, height);
+
+		sceneFbo.bind();
+		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
+		glEnable(GL_DEPTH_TEST);
+
+		if (sceneList.curSceneIdx > -1) {
+			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
+			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+				int shaderIdx = meshRenderers[meshId].shaderIdx;
+				// glActiveTexture(GL_TEXTURE1);
+				// glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
+				// shaderRegistry.shaders[shaderIdx].setInt("depthTexture", 1);
+				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
+				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
+
+				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
+
+				meshRenderers[meshId].render();
+			}
+
+			lightCube.shaderProgram.setVec3("color", light.lightColor);
+			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
+			glm::mat4 rotation(1.0f);
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+
+			glm::mat4 lightModel = translation * rotation * scale;
+			lightCube.shaderProgram.setVec3("color", light.lightColor);
+			lightCube.shaderProgram.setMat4("model", lightModel);
+			lightCube.shaderProgram.setMat4("view", view);
+			lightCube.shaderProgram.setMat4("projection", proj);
+			lightCube.render();
+		}
+
+		sceneFbo.unbind();
+
+		lightFrameBuffer.bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
+
+#define LIGHT_PERS 1 
+
+#if LIGHT_PERS == 1
+		view = glm::lookAt(lightFrameBuffer.light->pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+#endif
+
+		line.shaderProgram.setMat4("view", view);
+		line.shaderProgram.setMat4("projection", proj);
+
+		if (sceneList.curSceneIdx > -1) {
+			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
+			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+
+				int shaderIdx = meshRenderers[meshId].shaderIdx;
+				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
+				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
+
+				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
+
+				meshRenderers[meshId].render();
+			}
+
+			/*
+			lightCube.shaderProgram.setVec3("color", light.lightColor);
+			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
+			glm::mat4 rotation(1.0f);
+			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+
+			glm::mat4 lightModel = translation * rotation * scale;
+			lightCube.shaderProgram.setVec3("color", light.lightColor);
+			lightCube.shaderProgram.setMat4("model", lightModel);
+			lightCube.shaderProgram.setMat4("view", view);
+			lightCube.shaderProgram.setMat4("projection", proj);
+			lightCube.render();
+			*/
+		}
+
+		lightFrameBuffer.unbind();
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		if (ImGui::BeginMainMenuBar()) {
 
@@ -229,16 +362,49 @@ int main(int argc, char* args[]) {
 		ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
 
 		ImGui::Begin("World view window", NULL, worldViewWinFlags);
-		ImVec2 winSize = ImGui::GetWindowSize();
-		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
-		ImGui::Image((ImTextureID)sceneFbo.frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
-		// imgui window is relative from top left and increases going down
-		// opengl is relative from bottom left and increases going up
-		ImVec2 windowPos = ImGui::GetWindowPos();
-		ImVec2 windowSize = ImGui::GetWindowSize();
+		{
+			ImVec2 winSize = ImGui::GetWindowSize();
+			ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
+			ImGui::Image((ImTextureID)sceneFbo.frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
+			// ImGui::Image((ImTextureID)lightFrameBuffer.colorTexture, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
+			// imgui window is relative from top left and increases going down and to the right
+			// opengl is relative from bottom left and increases going up and to the right
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 windowSize = ImGui::GetWindowSize();
 
-		glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - height);
+			glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - height);
+		}
 
+		ImGui::End();
+		ImGui::PopStyleVar();
+
+		int windowWidth, windowHeight;
+		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+
+		ImGui::SetNextWindowViewport(mainViewport->ID);
+		ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		ImGui::SetWindowPos(ImVec2(0, 0));
+		glm::vec4 openGlViewportLightWin;
+		ImGui::Begin("Light depth texture");
+		{
+			ImVec2 lightDepTexWindowSize = ImGui::GetWindowSize();
+			ImVec2 lightDepTexWindowPos = ImGui::GetWindowPos();
+			ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+			ImVec2 realWinCoord;
+			realWinCoord.x = lightDepTexWindowPos.x - mainViewport->WorkPos.x;
+			realWinCoord.y = lightDepTexWindowPos.y - mainViewport->WorkPos.y;
+			openGlViewportLightWin = glm::vec4(realWinCoord.x, windowHeight - realWinCoord.y - lightDepTexWindowSize.y - fontSize, lightDepTexWindowSize.x, lightDepTexWindowSize.y - (2 * fontSize));
+			/*
+			if (ImGui::IsWindowHovered()) {
+				std::cout << "openGlViewportLightWin: " << openGlViewportLightWin.x << ", " << openGlViewportLightWin.y << " " << openGlViewportLightWin.z << " " << openGlViewportLightWin.w << std::endl;
+			}
+			*/
+			// glViewport(openGlViewport.x, openGlViewport.y, openGlViewport.z, openGlViewport.w);
+			// glViewport(100, 100, 400, 400);
+			// ImGui::Image((ImTextureID)lightFrameBuffer.depthTexture, winSize, ImVec2(0, 1), ImVec2(1, 0));
+			// ImGui::Image((ImTextureID)sceneFbo.frameBufferTex, winSize, ImVec2(0, 1), ImVec2(1, 0));
+		}
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -255,51 +421,16 @@ int main(int argc, char* args[]) {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glViewport(0, 0, width, height);
-		sceneFbo.bind();
-		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
-		glEnable(GL_DEPTH_TEST);
-
-		glm::mat4 view = cameraPanel.getViewMat();
-		glm::mat4 proj = cameraPanel.getProjectionMat();
-		line.shaderProgram.setMat4("view", view);
-		line.shaderProgram.setMat4("projection", proj);
-
-		if (sceneList.curSceneIdx > -1) {
-			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
-			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
-			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
-				int shaderIdx = meshRenderers[meshId].shaderIdx;
-				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
-				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
-
-				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-
-				meshRenderers[meshId].render();
-			}
-
-			cube.shaderProgram.setVec3("color", light.lightColor);
-			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
-			glm::mat4 rotation(1.0f);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
-
-			glm::mat4 lightModel = translation * rotation * scale;
-			cube.shaderProgram.setVec3("color", light.lightColor);
-			cube.shaderProgram.setMat4("model", lightModel);
-			cube.shaderProgram.setMat4("view", view);
-			cube.shaderProgram.setMat4("projection", proj);
-			cube.render();
-		}
-
-		sceneFbo.unbind();
+		glDisable(GL_DEPTH_TEST);
+		glViewport(openGlViewportLightWin.x, openGlViewportLightWin.y, openGlViewportLightWin.z, openGlViewportLightWin.w);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
+		depthShader.bind();
+		depthVAO.bind();
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		depthVAO.unbind();
+		depthShader.unbind();
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{

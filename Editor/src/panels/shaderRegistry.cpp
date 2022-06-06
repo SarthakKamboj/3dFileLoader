@@ -4,6 +4,7 @@
 #include "shaderEditor.h"
 
 extern ShaderEditor* shaderEditorPtr;
+extern int width, height;
 
 ShaderRegistry::ShaderRegistry() {
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
@@ -13,6 +14,9 @@ ShaderRegistry::ShaderRegistry() {
 	Helper::CopyBuffer("Default shader", defaultShaderProgram.name, 50);
 	shaders.push_back(defaultShaderProgram);
 	defaultShaderProgram.setVec3("color", glm::vec3(1, 1, 1));
+	// defaultShaderProgram.setInt("depthTexture", 1);
+	// defaultShaderProgram.setInt("windowWidth", width);
+	// defaultShaderProgram.setInt("windowHeight", height);
 	numShaders++;
 }
 
