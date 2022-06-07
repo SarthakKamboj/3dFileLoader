@@ -9,12 +9,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec3 color;
-out vec2 texCoords;
-
 void main() {
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
-	color = aColor;
-	color = (aNormal * 0.5) + 0.5;
-	texCoords = aTexCoords;
 }

@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include <iostream>
 #include "helper.h"
+#include "glm/gtc/type_ptr.hpp"
 
 extern int width, height;
 
@@ -40,4 +41,8 @@ void LightFrameBuffer::bind() {
 
 void LightFrameBuffer::unbind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+glm::mat4 LightFrameBuffer::getLightViewMat() {
+	return glm::lookAt(light->pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }

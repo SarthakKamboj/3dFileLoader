@@ -216,12 +216,12 @@
     <None Include="src\shaders\default.vert" />
     <None Include="src\shaders\depth.frag" />
     <None Include="src\shaders\depth.vert" />
-    <None Include="src\shaders\fragmentShader.frag" />
+    <None Include="src\shaders\lightPass.frag" />
+    <None Include="src\shaders\lightPass.vert" />
     <None Include="src\shaders\line.frag" />
     <None Include="src\shaders\line.vert" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\quad.vert" />
-    <None Include="src\shaders\vertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileLoader\FileLoader.vcxproj">

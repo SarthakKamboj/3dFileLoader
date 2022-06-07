@@ -15,13 +15,13 @@ uniform bool useSplit;
 uniform float displacement;
 
 out vec2 texCoords;
-out vec3 worldPos;
+out vec4 worldPos;
 out vec3 normal;
 
 void main() {
 	vec3 pos = aPos + (displacement * aNormal);
 	gl_Position = projection * view * model * vec4(pos, 1.0);
-	worldPos = (model * vec4(pos, 1.0)).xyz;
+	worldPos = model * vec4(pos, 1.0);
 	if (useSplit) {
 		normal = aSplitNormal;
 	} else {

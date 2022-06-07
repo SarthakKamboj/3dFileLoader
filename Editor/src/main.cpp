@@ -32,6 +32,7 @@
 #include "renderer/light.h"
 #include "primitives/cube.h"
 #include "renderer/lightFrameBuffer.h"
+#include "glm/gtc/type_ptr.hpp"
 
 int width = 600, height = 600;
 Line* linePtr;
@@ -43,6 +44,8 @@ FileBrowser* fileBrowserPtr;
 ShaderRegistry* shaderRegistryPtr;
 SceneList* sceneListPtr;
 bool enterPressed = false;
+
+extern float nearPlane, farPlane;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
 	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
@@ -177,14 +180,17 @@ int main(int argc, char* args[]) {
 	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
 	ShaderProgram depthShader(depthVert, depthFrag);
 	depthShader.setInt("depthTexUnit", 1);
+	bool extraVisible = true;
+	depthShader.setInt("extraVisible", extraVisible);
+
+	const char* lightPassVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.vert";
+	const char* lightPassFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.frag";
+	ShaderProgram lightPassShader(lightPassVert, lightPassFrag);
 
 	while (running) {
 
 		glEnable(GL_DEPTH_TEST);
 		uint32_t curTime = SDL_GetTicks();
-
-		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
-		glViewport(0, 0, width, height);
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -212,8 +218,106 @@ int main(int argc, char* args[]) {
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		glm::mat4 view = cameraPanel.getViewMat();
+		/*
+			LIGHT CALCULATIONS
+		*/
+		lightFrameBuffer.bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glViewport(0, 0, width, height);
+		glm::mat4 view = lightFrameBuffer.getLightViewMat();
 		glm::mat4 proj = cameraPanel.getProjectionMat();
+
+		// line.shaderProgram.setMat4("view", view);
+		// line.shaderProgram.setMat4("projection", proj);
+
+		lightPassShader.setMat4("view", view);
+		lightPassShader.setMat4("projection", proj);
+		lightPassShader.bind();
+		if (sceneList.curSceneIdx > -1) {
+			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
+			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+				/*
+				int shaderIdx = meshRenderers[meshId].shaderIdx;
+				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
+				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
+
+				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
+
+				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
+				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
+				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
+				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
+				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
+
+				meshRenderers[meshId].render();
+				*/
+
+#define ORIG 0
+
+#if ORIG == 1
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
+
+				int shaderIdx = meshRenderers[meshId].shaderIdx;
+				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
+				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
+				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
+				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
+				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
+
+				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
+				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
+
+				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
+				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
+
+				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
+
+				meshRenderers[meshId].render();
+#else
+				Mesh* mesh = &scene.meshes[meshRenderers[meshId].meshIdx];
+				glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
+				glm::mat4 rotation = getRotationMatrix(mesh->transform.rotation);
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh->transform.scale);
+
+				glm::mat4 model = translation * rotation * scale;
+				lightPassShader.setMat4("model", model);
+
+				lightPassShader.bind();
+				meshRenderers[meshId].vao.bind();
+				glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
+				meshRenderers[meshId].vao.unbind();
+#endif
+			}
+		}
+
+		lightPassShader.unbind();
+		lightFrameBuffer.unbind();
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		/*
+			SCENE FBO RENDERING
+		*/
+
+		view = cameraPanel.getViewMat();
 		line.shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("projection", proj);
 
@@ -222,16 +326,26 @@ int main(int argc, char* args[]) {
 		sceneFbo.bind();
 		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glEnable(GL_DEPTH_TEST);
+		glViewport(0, 0, width, height);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
 
 		if (sceneList.curSceneIdx > -1) {
 			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
 			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
 			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
-				// glActiveTexture(GL_TEXTURE1);
-				// glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
-				// shaderRegistry.shaders[shaderIdx].setInt("depthTexture", 1);
+				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
+				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
+				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
+				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
+				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
+				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
+
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
 				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
 
@@ -262,61 +376,12 @@ int main(int argc, char* args[]) {
 
 		sceneFbo.unbind();
 
-		lightFrameBuffer.bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
+		/*
+			IMGUI RENDERING
+		*/
 
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
-
-#define LIGHT_PERS 1 
-
-#if LIGHT_PERS == 1
-		view = glm::lookAt(lightFrameBuffer.light->pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-#endif
-
-		line.shaderProgram.setMat4("view", view);
-		line.shaderProgram.setMat4("projection", proj);
-
-		if (sceneList.curSceneIdx > -1) {
-			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
-			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
-			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
-
-				int shaderIdx = meshRenderers[meshId].shaderIdx;
-				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
-				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
-
-				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-
-				meshRenderers[meshId].render();
-			}
-
-			/*
-			lightCube.shaderProgram.setVec3("color", light.lightColor);
-			glm::mat4 translation = glm::translate(glm::mat4(1.0f), light.pos);
-			glm::mat4 rotation(1.0f);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
-
-			glm::mat4 lightModel = translation * rotation * scale;
-			lightCube.shaderProgram.setVec3("color", light.lightColor);
-			lightCube.shaderProgram.setMat4("model", lightModel);
-			lightCube.shaderProgram.setMat4("view", view);
-			lightCube.shaderProgram.setMat4("projection", proj);
-			lightCube.render();
-			*/
-		}
-
-		lightFrameBuffer.unbind();
-		glBindTexture(GL_TEXTURE_2D, 0);
+		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
+		glViewport(0, 0, width, height);
 
 		if (ImGui::BeginMainMenuBar()) {
 
@@ -395,21 +460,17 @@ int main(int argc, char* args[]) {
 			realWinCoord.x = lightDepTexWindowPos.x - mainViewport->WorkPos.x;
 			realWinCoord.y = lightDepTexWindowPos.y - mainViewport->WorkPos.y;
 			openGlViewportLightWin = glm::vec4(realWinCoord.x, windowHeight - realWinCoord.y - lightDepTexWindowSize.y - fontSize, lightDepTexWindowSize.x, lightDepTexWindowSize.y - (2 * fontSize));
-			/*
-			if (ImGui::IsWindowHovered()) {
-				std::cout << "openGlViewportLightWin: " << openGlViewportLightWin.x << ", " << openGlViewportLightWin.y << " " << openGlViewportLightWin.z << " " << openGlViewportLightWin.w << std::endl;
-			}
-			*/
-			// glViewport(openGlViewport.x, openGlViewport.y, openGlViewport.z, openGlViewport.w);
-			// glViewport(100, 100, 400, 400);
-			// ImGui::Image((ImTextureID)lightFrameBuffer.depthTexture, winSize, ImVec2(0, 1), ImVec2(1, 0));
-			// ImGui::Image((ImTextureID)sceneFbo.frameBufferTex, winSize, ImVec2(0, 1), ImVec2(1, 0));
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
 
 		ImGui::Begin("Light editor");
-		ImGui::DragFloat3("Light pos", &light.pos.x);
+		ImGui::DragFloat3("Light pos", &light.pos.x, 10);
+		bool prev = extraVisible;
+		ImGui::Checkbox("Light depth buffer extra visible", &extraVisible);
+		if (prev != extraVisible) {
+			depthShader.setInt("extraVisible", extraVisible);
+		}
 		ImGui::ColorPicker3("Light color", &light.lightColor.r);
 		ImGui::DragFloat("Ambient light factor", &light.ambientFactor, .01, 0, 1);
 		ImGui::DragFloat("Specular light factor", &light.specularFactor, .01, 0, 1);
