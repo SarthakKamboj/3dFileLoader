@@ -225,74 +225,17 @@ int main(int argc, char* args[]) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, width, height);
-		glm::mat4 view = lightFrameBuffer.getLightViewMat();
+		glm::mat4 lightView = lightFrameBuffer.getLightViewMat();
 		glm::mat4 proj = cameraPanel.getProjectionMat();
 
-		// line.shaderProgram.setMat4("view", view);
-		// line.shaderProgram.setMat4("projection", proj);
-
-		lightPassShader.setMat4("view", view);
-		lightPassShader.setMat4("projection", proj);
+		lightPassShader.setMat4("lightView", lightView);
+		lightPassShader.setMat4("lightProj", proj);
 		lightPassShader.bind();
 		if (sceneList.curSceneIdx > -1) {
 			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
 			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
 			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
-				/*
-				int shaderIdx = meshRenderers[meshId].shaderIdx;
-				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
-				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
-
-				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-
-				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
-				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
-				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
-				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
-				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
-
-				meshRenderers[meshId].render();
-				*/
-
-#define ORIG 0
-
-#if ORIG == 1
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
-
-				int shaderIdx = meshRenderers[meshId].shaderIdx;
-				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
-				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
-				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
-				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
-				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
-
-				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
-				shaderRegistry.shaders[shaderIdx].setVec3("light.pos", light.pos);
-
-				shaderRegistry.shaders[shaderIdx].setFloat("material.specularStrength", light.specularFactor);
-				shaderRegistry.shaders[shaderIdx].setFloat("material.shininess", light.shininess);
-
-				shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
-
-				meshRenderers[meshId].render();
-#else
 				Mesh* mesh = &scene.meshes[meshRenderers[meshId].meshIdx];
 				glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
 				glm::mat4 rotation = getRotationMatrix(mesh->transform.rotation);
@@ -305,7 +248,6 @@ int main(int argc, char* args[]) {
 				meshRenderers[meshId].vao.bind();
 				glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
 				meshRenderers[meshId].vao.unbind();
-#endif
 			}
 		}
 
@@ -316,8 +258,7 @@ int main(int argc, char* args[]) {
 		/*
 			SCENE FBO RENDERING
 		*/
-
-		view = cameraPanel.getViewMat();
+		glm::mat4 view = cameraPanel.getViewMat();
 		line.shaderProgram.setMat4("view", view);
 		line.shaderProgram.setMat4("projection", proj);
 
@@ -339,12 +280,10 @@ int main(int argc, char* args[]) {
 
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowWidth", width);
-				// shaderRegistry.shaders[shaderIdx].setFloat("windowHeight", height);
 				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
 				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
-				glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
-				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightViewMat);
+				// glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
+				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightView);
 
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
 				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);

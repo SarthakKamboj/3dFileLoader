@@ -64,19 +64,21 @@ void main() {
 
 	vec4 curPosRelToLight = projection * lightView * worldPos;
 	curPosRelToLight = curPosRelToLight / curPosRelToLight.w;
-	float curLightDist = -(1 - ndcToZeroToOne(curPosRelToLight.z));
+	// 1 to -1
+	// 1 to 0
+	// 0 to 1
+	// float curLightDepth = 1 - ndcToZeroToOne(curPosRelToLight.z);
+	// float curLightDepth = 1 - ndcToZeroToOne(curPosRelToLight.z);
+	float curLightDepth = ndcToZeroToOne(curPosRelToLight.z);
 	
 	vec2 tex = vec2(ndcToZeroToOne(curPosRelToLight.x), ndcToZeroToOne(curPosRelToLight.y));
 	// float closestToLightDist = linearize(texture(depthTexUnit, tex).x);
 	float closestToLightDist = texture(depthTexUnit, tex).x;
-	// if (curLightDist <= closestToLightDist) {
-	if (0.99 >= closestToLightDist) {
+	if (curLightDepth < (closestToLightDist + 0.000001)) {
+	// if (0.99 >= closestToLightDist) {
 		FragColor = objectColor * (ambient + diffuse + specular);
 	} else {
-		FragColor = vec4(1,0,0,1);
+		FragColor = objectColor * ambient;
 	}
-
-	// FragColor = vec4(tex.x, 0, 0,1);
-	// FragColor = vec4(0, tex.y, 0,1);
 
 }

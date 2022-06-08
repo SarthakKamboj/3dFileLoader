@@ -7,7 +7,6 @@ in vec2 tex;
 
 out vec4 FragColor;
 
-
 void main() {
 	float val;
 	if (extraVisible) {
