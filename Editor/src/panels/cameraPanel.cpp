@@ -3,9 +3,11 @@
 #include "imgui.h"
 
 extern int width, height;
+float nearPlane = 10.0f;
+float farPlane = 5000.0f;
 
 glm::mat4 CameraPanel::getProjectionMat() {
-	return glm::perspective(glm::radians(pov), ((float)width) / height, 10.0f, 5000.0f);
+	return glm::perspective(glm::radians(pov), ((float)width) / height, nearPlane, farPlane);
 }
 
 glm::mat4 CameraPanel::getViewMat() {
