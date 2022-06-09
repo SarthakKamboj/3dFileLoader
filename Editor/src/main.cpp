@@ -280,9 +280,6 @@ int main(int argc, char* args[]) {
 
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
-				shaderRegistry.shaders[shaderIdx].setFloat("nearPlane", nearPlane);
-				shaderRegistry.shaders[shaderIdx].setFloat("farPlane", farPlane);
-				// glm::mat4 lightViewMat = lightFrameBuffer.getLightViewMat();
 				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightView);
 
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
