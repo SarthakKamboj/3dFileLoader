@@ -187,10 +187,12 @@
     <ClCompile Include="src\renderer\texture.cpp" />
     <ClCompile Include="src\renderer\vao.cpp" />
     <ClCompile Include="src\renderer\vbo.cpp" />
+    <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\stb\stb_image.h" />
     <ClInclude Include="src\helper.h" />
+    <ClInclude Include="src\input.h" />
     <ClInclude Include="src\panels\cameraPanel.h" />
     <ClInclude Include="src\panels\fileBrowser.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
@@ -210,6 +212,7 @@
     <ClInclude Include="src\renderer\texture.h" />
     <ClInclude Include="src\renderer\vao.h" />
     <ClInclude Include="src\renderer\vbo.h" />
+    <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\cube.frag" />

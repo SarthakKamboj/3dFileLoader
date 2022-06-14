@@ -6,8 +6,9 @@
 #include "panels/shaderRegistry.h"
 #include "helper.h"
 #include "panels/sceneList.h"
+#include "window.h"
 
-extern ImFont* openSansLight;
+// extern ImFont* openSansLight;
 // extern Scene* scenePtr;
 extern ShaderEditor* shaderEditorPtr;
 extern ShaderRegistry* shaderRegistryPtr;
@@ -42,7 +43,7 @@ void MeshRendererSettingsPanel::render() {
 	glm::vec3& rot = mesh->transform.rotation;
 	glm::vec3& scale = mesh->transform.scale;
 
-	ImGui::PushFont(openSansLight);
+	ImGui::PushFont(Window::openSansLight);
 	ImGui::DragFloat3("Position: ", &pos.x, 0.1);
 	ImGui::DragFloat3("Rotation: ", &rot.x, 1, -180, 180);
 	ImGui::DragFloat3("Scale:", &scale.x, 0.1, 0, 10);
@@ -50,7 +51,7 @@ void MeshRendererSettingsPanel::render() {
 
 	ImGui::Separator();
 	ImGui::Text("Num children: %i", mesh->numChildren);
-	ImGui::PushFont(openSansLight);
+	ImGui::PushFont(Window::openSansLight);
 	for (int childNumIdx = 0; childNumIdx < mesh->numChildren; childNumIdx++) {
 		int childIdx = mesh->childMeshIdxs[childNumIdx];
 		ImGui::Text(scenePtr->meshes[childIdx].name.c_str());

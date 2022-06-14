@@ -34,13 +34,12 @@
 #include "renderer/lightFrameBuffer.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "renderer/normalRenderer.h"
+#include "window.h"
+#include "input.h"
 
 int width = 600, height = 600;
-// Line* linePtr;
 NormalRenderer* splitNormalRendererPtr;
 NormalRenderer* normalRendererPtr;
-ImFont* openSansBold;
-ImFont* openSansLight;
 MeshRendererSettingsPanel* meshRenPanelPtr;
 ShaderEditor* shaderEditorPtr;
 FileBrowser* fileBrowserPtr;
@@ -75,53 +74,11 @@ float quadVertices[] = {
 
 int main(int argc, char* args[]) {
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-		std::cout << "sdl gave error" << std::endl;
-		return 0;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;// | SDL_WINDOW_MAXIMIZED;
-	SDL_Window* window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags);
-
-	SDL_GLContext context = SDL_GL_CreateContext(window);
-
-	SDL_GL_MakeCurrent(window, context);
-	gladLoadGLLoader(SDL_GL_GetProcAddress);
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-	ImGui::StyleColorsDark();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
-
-	ImGui_ImplSDL2_InitForOpenGL(window, context);
-	const char* glslVersion = "#version 330";
-	ImGui_ImplOpenGL3_Init(glslVersion);
+	Input input;
+	Window window(&input);
 
 	ShaderRegistry shaderRegistry;
 	shaderRegistryPtr = &shaderRegistry;
-
-	glDepthFunc(GL_LESS);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	bool running = true;
 
 	NormalRenderer splitNormalRenderer;
 	splitNormalRendererPtr = &splitNormalRenderer;
@@ -131,11 +88,6 @@ int main(int argc, char* args[]) {
 	normalRendererPtr = &normalRenderer;
 
 	glEnable(GL_DEPTH_TEST);
-
-	float fontSize = 16.0f;
-	openSansBold = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Bold.ttf", fontSize);
-	openSansLight = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Light.ttf", fontSize);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Regular.ttf", fontSize);
 
 	FrameBuffer sceneFbo;
 
@@ -194,36 +146,13 @@ int main(int argc, char* args[]) {
 	const char* lightPassFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.frag";
 	ShaderProgram lightPassShader(lightPassVert, lightPassFrag);
 
-	while (running) {
+	while (window.running) {
 
 		glEnable(GL_DEPTH_TEST);
 		uint32_t curTime = SDL_GetTicks();
 
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			enterPressed = false;
-			ImGui_ImplSDL2_ProcessEvent(&event);
-			if (event.type == SDL_QUIT) {
-				running = false;
-			}
-			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
-				running = false;
-			}
-			if (event.type == SDL_WINDOWEVENT) {
-				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-					// width = event.window.data1;
-					// height = event.window.data2;
-				}
-			}
-			if (event.type == SDL_KEYDOWN) {
-				SDL_Keycode keyDown = event.key.keysym.sym;
-				enterPressed = (keyDown == SDLK_RETURN);
-			}
-		}
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
+		window.pollEvents();
+		window.initGuiForFrame();
 
 		/*
 			LIGHT CALCULATIONS
@@ -271,8 +200,6 @@ int main(int argc, char* args[]) {
 		normalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
 		splitNormalRendererPtr->shaderProgram.setMat4("view", view);
 		splitNormalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
-		// line.shaderProgram.setMat4("view", view);
-		// line.shaderProgram.setMat4("projection", proj);
 
 		glViewport(0, 0, width, height);
 
@@ -321,9 +248,6 @@ int main(int argc, char* args[]) {
 			lightCube.shaderProgram.setMat4("view", view);
 			lightCube.shaderProgram.setMat4("projection", cameraProj);
 			lightCube.render();
-
-			// normalRendererPtr->render();
-			// splitNormalRendererPtr->render();
 		}
 
 		sceneFbo.unbind();
@@ -378,6 +302,7 @@ int main(int argc, char* args[]) {
 
 		ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
 
+		float fontSize = 16.0f;
 		ImGui::Begin("World view window", NULL, worldViewWinFlags);
 		{
 			ImVec2 winSize = ImGui::GetWindowSize();
@@ -396,7 +321,7 @@ int main(int argc, char* args[]) {
 		ImGui::PopStyleVar();
 
 		int windowWidth, windowHeight;
-		SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+		SDL_GetWindowSize(window.window, &windowWidth, &windowHeight);
 
 		ImGui::SetNextWindowViewport(mainViewport->ID);
 		ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
@@ -429,10 +354,7 @@ int main(int argc, char* args[]) {
 		ImGui::DragFloat("Specular shininess", &light.shininess, 0.5, 5, 64);
 		ImGui::End();
 
-		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		window.renderGui();
 
 		glDisable(GL_DEPTH_TEST);
 		glViewport(openGlViewportLightWin.x, openGlViewportLightWin.y, openGlViewportLightWin.z, openGlViewportLightWin.w);
@@ -445,16 +367,7 @@ int main(int argc, char* args[]) {
 		depthShader.unbind();
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			SDL_Window* backupCurrentWindow = SDL_GL_GetCurrentWindow();
-			SDL_GLContext backupCurrentContext = SDL_GL_GetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			SDL_GL_MakeCurrent(backupCurrentWindow, backupCurrentContext);
-		}
-
-		SDL_GL_SwapWindow(window);
+		window.swapBuffers();
 	}
 
 	return -1;
