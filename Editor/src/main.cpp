@@ -123,9 +123,6 @@ int main(int argc, char* args[]) {
 
 	bool running = true;
 
-	// Line line;
-	// linePtr = &line;
-
 	NormalRenderer splitNormalRenderer;
 	splitNormalRendererPtr = &splitNormalRenderer;
 	splitNormalRendererPtr->setColor(glm::vec3(1, 0, 0));
