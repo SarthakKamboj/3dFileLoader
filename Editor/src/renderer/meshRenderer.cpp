@@ -5,6 +5,7 @@
 #include "panels/shaderRegistry.h"
 #include "fbxLoader.h"
 #include "panels/sceneList.h"
+#include "panels/panelsManager.h"
 #include "renderer/normalRenderer.h"
 #include <iostream>
 
@@ -12,8 +13,9 @@ extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 // extern Line* linePtr;
 extern NormalRenderer* normalRendererPtr;
 extern NormalRenderer* splitNormalRendererPtr;
-extern ShaderRegistry* shaderRegistryPtr;
-extern SceneList* sceneListPtr;
+extern PanelsManager* g_PanelsManager;
+// extern ShaderRegistry* shaderRegistryPtr;
+// extern SceneList* sceneListPtr;
 
 MeshRenderer::MeshRenderer() {
 	meshIdx = -1;
@@ -43,6 +45,7 @@ MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
 
 void MeshRenderer::render() {
 
+	SceneList* sceneListPtr = &g_PanelsManager->sceneList;
 	if (sceneListPtr->curSceneIdx < 0) return;
 
 	Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
@@ -127,6 +130,7 @@ void MeshRenderer::render() {
 
 	}
 
+	ShaderRegistry* shaderRegistryPtr = &g_PanelsManager->shaderRegistry;
 	shaderRegistryPtr->shaders[shaderIdx].setMat4("model", model);
 	shaderRegistryPtr->shaders[shaderIdx].setInt("useSplit", !useNormals);
 	shaderRegistryPtr->shaders[shaderIdx].bind();

@@ -36,16 +36,14 @@
 #include "renderer/normalRenderer.h"
 #include "window.h"
 #include "input.h"
+#include "panels/panelsManager.h"
 
 int width = 600, height = 600;
 NormalRenderer* splitNormalRendererPtr;
 NormalRenderer* normalRendererPtr;
-MeshRendererSettingsPanel* meshRenPanelPtr;
-ShaderEditor* shaderEditorPtr;
-FileBrowser* fileBrowserPtr;
-ShaderRegistry* shaderRegistryPtr;
-SceneList* sceneListPtr;
-bool enterPressed = false;
+PanelsManager* g_PanelsManager;
+Input* g_Input;
+// bool enterPressed = false;
 
 extern float nearPlane, farPlane;
 
@@ -75,10 +73,15 @@ float quadVertices[] = {
 int main(int argc, char* args[]) {
 
 	Input input;
-	Window window(&input);
+	g_Input = &input;
+	Window window(g_Input);
+	PanelsManager panelsManager;
+	g_PanelsManager = &panelsManager;
 
+	/*
 	ShaderRegistry shaderRegistry;
 	shaderRegistryPtr = &shaderRegistry;
+	*/
 
 	NormalRenderer splitNormalRenderer;
 	splitNormalRendererPtr = &splitNormalRenderer;
@@ -91,24 +94,6 @@ int main(int argc, char* args[]) {
 
 	FrameBuffer sceneFbo;
 
-	MeshRendererSettingsPanel meshRenPanel;
-	meshRenPanelPtr = &meshRenPanel;
-
-	SceneHierarchyPanel sceneHierarchyPanel;
-	CameraPanel cameraPanel;
-	cameraPanel.pov = 45.0f;
-	cameraPanel.radius = 2500.0f;
-	cameraPanel.angle = 0.0f;
-	cameraPanel.yPos = 10.0f;
-
-	FileBrowser fileBrowser;
-	fileBrowserPtr = &fileBrowser;
-
-	ShaderEditor shaderEditor;
-	shaderEditorPtr = &shaderEditor;
-
-	SceneList sceneList;
-	sceneListPtr = &sceneList;
 
 	char fbxToLoadPath[300] = {};
 	bool selectingFbxToLoad = false;
@@ -162,16 +147,16 @@ int main(int argc, char* args[]) {
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, width, height);
 		glm::mat4 lightView = lightFrameBuffer.getLightViewMat();
-		glm::mat4 lightProj = cameraPanel.getProjectionMat();
-		glm::mat4 cameraProj = cameraPanel.getProjectionMat();
+		glm::mat4 lightProj = panelsManager.cameraPanel.getProjectionMat();
+		glm::mat4 cameraProj = panelsManager.cameraPanel.getProjectionMat();
 
 		lightPassShader.setMat4("lightView", lightView);
 		lightPassShader.setMat4("lightProj", lightProj);
 		lightPassShader.bind();
-		if (sceneList.curSceneIdx > -1) {
-			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
-			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
+		if (panelsManager.sceneList.curSceneIdx > -1) {
+			Scene& scene = panelsManager.sceneList.scenes[panelsManager.sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = panelsManager.sceneList.meshRenderLists[panelsManager.sceneList.curSceneIdx];
+			glm::vec3 camPos(panelsManager.cameraPanel.radius * cos(glm::radians(panelsManager.cameraPanel.angle)), panelsManager.cameraPanel.yPos, panelsManager.cameraPanel.radius * sin(glm::radians(panelsManager.cameraPanel.angle)));
 			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
 				Mesh* mesh = &scene.meshes[meshRenderers[meshId].meshIdx];
 				glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
@@ -195,7 +180,7 @@ int main(int argc, char* args[]) {
 		/*
 			SCENE FBO RENDERING
 		*/
-		glm::mat4 view = cameraPanel.getViewMat();
+		glm::mat4 view = panelsManager.cameraPanel.getViewMat();
 		normalRendererPtr->shaderProgram.setMat4("view", view);
 		normalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
 		splitNormalRendererPtr->shaderProgram.setMat4("view", view);
@@ -211,10 +196,11 @@ int main(int argc, char* args[]) {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
 
-		if (sceneList.curSceneIdx > -1) {
-			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-			std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
-			glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
+		if (panelsManager.sceneList.curSceneIdx > -1) {
+			Scene& scene = panelsManager.sceneList.scenes[panelsManager.sceneList.curSceneIdx];
+			std::vector<MeshRenderer>& meshRenderers = panelsManager.sceneList.meshRenderLists[panelsManager.sceneList.curSceneIdx];
+			glm::vec3 camPos(panelsManager.cameraPanel.radius * cos(glm::radians(panelsManager.cameraPanel.angle)), panelsManager.cameraPanel.yPos, panelsManager.cameraPanel.radius * sin(glm::radians(panelsManager.cameraPanel.angle)));
+			ShaderRegistry& shaderRegistry = panelsManager.shaderRegistry;
 			for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
 
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
@@ -259,6 +245,7 @@ int main(int argc, char* args[]) {
 		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 		glViewport(0, 0, width, height);
 
+		FileBrowser& fileBrowser = panelsManager.fileBrowser;
 		if (ImGui::BeginMainMenuBar()) {
 
 			if (ImGui::BeginMenu("File")) {
@@ -278,12 +265,14 @@ int main(int argc, char* args[]) {
 
 		if (selectingFbxToLoad && !fileBrowser.open) {
 			selectingFbxToLoad = false;
-			sceneList.loadSceneFromFbxFile(fbxToLoadPath);
+			panelsManager.sceneList.loadSceneFromFbxFile(fbxToLoadPath);
 		}
 
 		glm::vec3 camPos;
 		renderDockspace();
 
+		panelsManager.update();
+		/*
 		meshRenPanel.render();
 		sceneHierarchyPanel.render();
 		cameraPanel.render();
@@ -291,6 +280,7 @@ int main(int argc, char* args[]) {
 		fileBrowser.render();
 		shaderRegistry.render();
 		sceneList.render();
+		*/
 
 		ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 

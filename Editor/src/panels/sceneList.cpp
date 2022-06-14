@@ -4,10 +4,12 @@
 #include <iostream>
 #include "helper.h"
 #include "panels/meshRendererSettingsPanel.h"
+#include "panels/panelsManager.h"
 
 // extern Scene* scenePtr;
 // extern std::vector<MeshRenderer> meshRenderers;
-extern MeshRendererSettingsPanel* meshRenPanelPtr;
+// extern MeshRendererSettingsPanel* meshRenPanelPtr;
+extern PanelsManager* g_PanelsManager;
 
 void SceneList::render() {
 	ImGui::Begin("Scene List");
@@ -80,6 +82,9 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 }
 
 void SceneList::resetEditorState() {
+
+	MeshRendererSettingsPanel* meshRenPanelPtr = &g_PanelsManager->meshRenPanel;
+
 	selectedSceneIdx = -1;
 	meshRenPanelPtr->curMeshRenderer = NULL;
 	meshRenPanelPtr->renderSelected = false;

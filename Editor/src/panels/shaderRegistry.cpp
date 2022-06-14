@@ -2,8 +2,10 @@
 #include "imgui.h"
 #include "helper.h"
 #include "shaderEditor.h"
+#include "panelsManager.h"
 
-extern ShaderEditor* shaderEditorPtr;
+// extern ShaderEditor* shaderEditorPtr;
+extern PanelsManager* g_PanelsManager;
 extern int width, height;
 
 ShaderRegistry::ShaderRegistry() {
@@ -26,7 +28,7 @@ void ShaderRegistry::render() {
 		for (int i = 0; i < numShaders; i++) {
 			if (ImGui::Selectable(shaders[i].name, selectedIdx == i)) {
 				selectedIdx = i;
-				shaderEditorPtr->curShaderProgram = &shaders[i];
+				g_PanelsManager->shaderEditor.curShaderProgram = &shaders[i];
 			}
 		}
 		ImGui::End();

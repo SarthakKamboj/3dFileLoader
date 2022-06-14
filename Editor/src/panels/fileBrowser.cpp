@@ -4,10 +4,12 @@
 #include <iostream>
 #include <filesystem>
 #include "helper.h"
+#include "input.h"
 
 namespace fs = std::filesystem;
 
-extern bool enterPressed;
+// extern bool enterPressed;
+extern Input* g_Input;
 
 FileBrowser::FileBrowser() {
 	memset(curFolderPath, 0, 200);
@@ -49,7 +51,7 @@ void FileBrowser::render() {
 			i++;
 		}
 
-		if (ImGui::Button("Select") || enterPressed) {
+		if (ImGui::Button("Select") || g_Input->enterPressed) {
 
 			if (selectedIdx == -1) {
 				if (ImGui::Button("Cancel")) {
