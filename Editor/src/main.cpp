@@ -33,9 +33,12 @@
 #include "primitives/cube.h"
 #include "renderer/lightFrameBuffer.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "renderer/normalRenderer.h"
 
 int width = 600, height = 600;
-Line* linePtr;
+// Line* linePtr;
+NormalRenderer* splitNormalRendererPtr;
+NormalRenderer* normalRendererPtr;
 ImFont* openSansBold;
 ImFont* openSansLight;
 MeshRendererSettingsPanel* meshRenPanelPtr;
@@ -120,8 +123,15 @@ int main(int argc, char* args[]) {
 
 	bool running = true;
 
-	Line line;
-	linePtr = &line;
+	// Line line;
+	// linePtr = &line;
+
+	NormalRenderer splitNormalRenderer;
+	splitNormalRendererPtr = &splitNormalRenderer;
+	splitNormalRendererPtr->setColor(glm::vec3(1, 0, 0));
+
+	NormalRenderer normalRenderer;
+	normalRendererPtr = &normalRenderer;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -226,10 +236,11 @@ int main(int argc, char* args[]) {
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, width, height);
 		glm::mat4 lightView = lightFrameBuffer.getLightViewMat();
-		glm::mat4 proj = cameraPanel.getProjectionMat();
+		glm::mat4 lightProj = cameraPanel.getProjectionMat();
+		glm::mat4 cameraProj = cameraPanel.getProjectionMat();
 
 		lightPassShader.setMat4("lightView", lightView);
-		lightPassShader.setMat4("lightProj", proj);
+		lightPassShader.setMat4("lightProj", lightProj);
 		lightPassShader.bind();
 		if (sceneList.curSceneIdx > -1) {
 			Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
@@ -259,8 +270,12 @@ int main(int argc, char* args[]) {
 			SCENE FBO RENDERING
 		*/
 		glm::mat4 view = cameraPanel.getViewMat();
-		line.shaderProgram.setMat4("view", view);
-		line.shaderProgram.setMat4("projection", proj);
+		normalRendererPtr->shaderProgram.setMat4("view", view);
+		normalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
+		splitNormalRendererPtr->shaderProgram.setMat4("view", view);
+		splitNormalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
+		// line.shaderProgram.setMat4("view", view);
+		// line.shaderProgram.setMat4("projection", proj);
 
 		glViewport(0, 0, width, height);
 
@@ -280,10 +295,11 @@ int main(int argc, char* args[]) {
 
 				int shaderIdx = meshRenderers[meshId].shaderIdx;
 				shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
+				shaderRegistry.shaders[shaderIdx].setMat4("lightProj", lightProj);
 				shaderRegistry.shaders[shaderIdx].setMat4("lightView", lightView);
 
 				shaderRegistry.shaders[shaderIdx].setMat4("view", view);
-				shaderRegistry.shaders[shaderIdx].setMat4("projection", proj);
+				shaderRegistry.shaders[shaderIdx].setMat4("projection", cameraProj);
 
 				shaderRegistry.shaders[shaderIdx].setFloat("light.ambientFactor", light.ambientFactor);
 				shaderRegistry.shaders[shaderIdx].setVec3("light.color", light.lightColor);
@@ -306,8 +322,11 @@ int main(int argc, char* args[]) {
 			lightCube.shaderProgram.setVec3("color", light.lightColor);
 			lightCube.shaderProgram.setMat4("model", lightModel);
 			lightCube.shaderProgram.setMat4("view", view);
-			lightCube.shaderProgram.setMat4("projection", proj);
+			lightCube.shaderProgram.setMat4("projection", cameraProj);
 			lightCube.render();
+
+			// normalRendererPtr->render();
+			// splitNormalRendererPtr->render();
 		}
 
 		sceneFbo.unbind();

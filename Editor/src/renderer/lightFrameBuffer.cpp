@@ -45,4 +45,9 @@ void LightFrameBuffer::unbind() {
 
 glm::mat4 LightFrameBuffer::getLightViewMat() {
 	return glm::lookAt(light->pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	/*
+	glm::mat4 lightView(1.0f);
+	lightView = glm::translate(lightView, -light->pos);
+	return lightView;
+	*/
 }

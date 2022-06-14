@@ -19,6 +19,8 @@ struct MeshRenderer {
 
 	// Mesh* mesh;
 	int meshIdx;
+	// int normalIdx;
+	// int splitNormalIdx;
 	// ShaderProgram* shaderProgram;
 	int shaderIdx = 0;
 

@@ -1,6 +1,6 @@
 #include "line.h"
 
-Line::Line() {
+Line_::Line_() {
 	vertices[0] = 0.0f;
 	vertices[1] = 0.0f;
 	vertices[2] = 0.0f;
@@ -14,7 +14,8 @@ Line::Line() {
 	shaderProgram = ShaderProgram(lineVert, lineFrag);
 
 	vao.bind();
-	vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
+	// vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
+	vbo.setData(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 	// vao.attachVBO(vbo, 0, 3, 3, 0);
 	vao.attachVBO(vbo, 0, 3, 3 * sizeof(float), 0);
 	vao.unbind();
@@ -22,25 +23,25 @@ Line::Line() {
 	setColor(glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
-void Line::setColor(glm::vec3 color) {
+void Line_::setColor(glm::vec3 color) {
 	shaderProgram.setVec3("color", color);
 }
 
-void Line::setStartPoint(glm::vec3 startPoint) {
+void Line_::setStartPoint(glm::vec3 startPoint) {
 	vertices[0] = startPoint.x;
 	vertices[1] = startPoint.y;
 	vertices[2] = startPoint.z;
 	vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
 }
 
-void Line::setEndPoint(glm::vec3 endPoint) {
+void Line_::setEndPoint(glm::vec3 endPoint) {
 	vertices[3] = endPoint.x;
 	vertices[4] = endPoint.y;
 	vertices[5] = endPoint.z;
 	vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
 }
 
-void Line::render() {
+void Line_::render() {
 	shaderProgram.bind();
 	vao.bind();
 	glDrawArrays(GL_LINES, 0, 2);

@@ -27,8 +27,8 @@ in vec3 normal;
 
 uniform sampler2D depthTexUnit;
 
+uniform mat4 lightProj;
 uniform mat4 lightView;
-uniform mat4 projection;
 
 float ndcToZeroToOne(float ndc) {
 	return (ndc * 0.5) + 0.5;
@@ -54,7 +54,7 @@ void main() {
 
 	vec4 ambient = vec4(light.color * light.ambientFactor, 1);
 
-	vec4 curPosRelToLight = projection * lightView * worldPos;
+	vec4 curPosRelToLight = lightProj * lightView * worldPos;
 	curPosRelToLight = curPosRelToLight / curPosRelToLight.w;
 	float curLightDepth = ndcToZeroToOne(curPosRelToLight.z);
 	
