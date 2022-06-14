@@ -3,6 +3,7 @@
 #include "input.h"
 #include "SDL.h"
 #include "imgui.h"
+#include "glm/glm.hpp"
 
 struct Window {
 	Window(Input* input);
@@ -14,6 +15,7 @@ struct Window {
 	void renderGui();
 	// Swaps window screen buffers
 	void swapBuffers();
+	glm::vec2 getWindowSize();
 
 	Input* input;
 	SDL_Window* window;

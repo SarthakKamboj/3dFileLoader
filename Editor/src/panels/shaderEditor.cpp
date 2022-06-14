@@ -4,7 +4,6 @@
 #include "helper.h"
 #include "panelsManager.h"
 
-// extern FileBrowser* fileBrowserPtr;
 extern PanelsManager* g_PanelsManager;
 
 ShaderEditor::ShaderEditor() {

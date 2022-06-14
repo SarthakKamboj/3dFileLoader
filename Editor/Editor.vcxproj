@@ -171,12 +171,14 @@
     <ClCompile Include="src\panels\dockspace.cpp" />
     <ClCompile Include="src\panels\dockspace.h" />
     <ClCompile Include="src\panels\fileBrowser.cpp" />
+    <ClCompile Include="src\panels\lightEditor.cpp" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\panels\panelsManager.cpp" />
     <ClCompile Include="src\panels\sceneHierarchyPanel.cpp" />
     <ClCompile Include="src\panels\sceneList.cpp" />
     <ClCompile Include="src\panels\shaderEditor.cpp" />
     <ClCompile Include="src\panels\shaderRegistry.cpp" />
+    <ClCompile Include="src\panels\worldView.cpp" />
     <ClCompile Include="src\primitives\cube.cpp" />
     <ClCompile Include="src\renderer\ebo.cpp" />
     <ClCompile Include="src\renderer\frameBuffer.cpp" />
@@ -188,6 +190,7 @@
     <ClCompile Include="src\renderer\texture.cpp" />
     <ClCompile Include="src\renderer\vao.cpp" />
     <ClCompile Include="src\renderer\vbo.cpp" />
+    <ClCompile Include="src\sceneRenderer.cpp" />
     <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -196,12 +199,14 @@
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\panels\cameraPanel.h" />
     <ClInclude Include="src\panels\fileBrowser.h" />
+    <ClInclude Include="src\panels\lightEditor.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\panelsManager.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />
     <ClInclude Include="src\panels\sceneList.h" />
     <ClInclude Include="src\panels\shaderEditor.h" />
     <ClInclude Include="src\panels\shaderRegistry.h" />
+    <ClInclude Include="src\panels\worldView.h" />
     <ClInclude Include="src\primitives\cube.h" />
     <ClInclude Include="src\renderer\ebo.h" />
     <ClInclude Include="src\renderer\frameBuffer.h" />
@@ -214,6 +219,7 @@
     <ClInclude Include="src\renderer\texture.h" />
     <ClInclude Include="src\renderer\vao.h" />
     <ClInclude Include="src\renderer\vbo.h" />
+    <ClInclude Include="src\sceneRenderer.h" />
     <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,8 @@
 
 extern int width, height;
 
+// clear color, depth, and stencil buffers
+// * color argument is default color to clear color buffer
 void FrameBuffer::ClearBuffers(glm::vec3 color) {
 	glClearColor(color.x, color.y, color.z, 1.0f);
 	glClearStencil(0);
@@ -29,15 +31,6 @@ FrameBuffer::FrameBuffer() {
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	/*
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "framebuffer good to go" << std::endl;
-	}
-	else {
-		std::cout << "not good to go" << std::endl;
-	}
-	*/
 	Helper::CheckFrameBufferStatus();
 
 }

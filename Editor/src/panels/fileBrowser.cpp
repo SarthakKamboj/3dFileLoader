@@ -8,7 +8,6 @@
 
 namespace fs = std::filesystem;
 
-// extern bool enterPressed;
 extern Input* g_Input;
 
 FileBrowser::FileBrowser() {

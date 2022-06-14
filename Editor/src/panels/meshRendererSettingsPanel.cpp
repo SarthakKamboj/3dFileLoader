@@ -9,12 +9,6 @@
 #include "window.h"
 #include "panels/panelsManager.h"
 
-// extern ImFont* openSansLight;
-// extern Scene* scenePtr;
-// extern ShaderEditor* shaderEditorPtr;
-// extern ShaderRegistry* shaderRegistryPtr;
-// extern SceneList* sceneListPtr;
-
 extern PanelsManager* g_PanelsManager;
 
 void MeshRendererSettingsPanel::render() {

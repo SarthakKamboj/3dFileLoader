@@ -29,6 +29,7 @@ Window::Window(Input* _input) {
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
 
 	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	IMGUI_CHECKVERSION();
@@ -107,4 +108,10 @@ void Window::swapBuffers() {
 		SDL_GL_MakeCurrent(backupCurrentWindow, backupCurrentContext);
 	}
 	SDL_GL_SwapWindow(window);
+}
+
+glm::vec2 Window::getWindowSize() {
+	int size[2];
+	SDL_GetWindowSize(window, &size[0], &size[1]);
+	return glm::vec2(size[0], size[1]);
 }

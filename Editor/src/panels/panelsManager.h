@@ -7,6 +7,8 @@
 #include "panels/sceneList.h"
 #include "panels/cameraPanel.h"
 #include "panels/sceneHierarchyPanel.h"
+#include "panels/worldView.h"
+#include "panels/lightEditor.h"
 
 struct PanelsManager {
 	PanelsManager();
@@ -19,4 +21,6 @@ struct PanelsManager {
 	SceneList sceneList;
 	CameraPanel cameraPanel;
 	SceneHierarchyPanel sceneHierarchyPanel;
+	LightEditor lightEditor;
+	WorldView worldView;
 };

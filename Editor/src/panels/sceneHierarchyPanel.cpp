@@ -6,11 +6,6 @@
 #include "sceneList.h"
 #include "panelsManager.h"
 
-// extern MeshRendererSettingsPanel* meshRenPanelPtr;
-// extern std::vector<MeshRenderer> meshRenderers;
-// extern ShaderEditor* shaderEditorPtr;
-// extern ShaderRegistry* shaderRegistryPtr;
-// extern SceneList* sceneListPtr;
 extern PanelsManager* g_PanelsManager;
 
 SceneHierarchyPanel::SceneHierarchyPanel() {
