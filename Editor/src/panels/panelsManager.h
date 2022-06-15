@@ -9,6 +9,7 @@
 #include "panels/sceneHierarchyPanel.h"
 #include "panels/worldView.h"
 #include "panels/lightEditor.h"
+#include "panels/menuBar.h"
 
 struct PanelsManager {
 	PanelsManager();
@@ -23,4 +24,5 @@ struct PanelsManager {
 	SceneHierarchyPanel sceneHierarchyPanel;
 	LightEditor lightEditor;
 	WorldView worldView;
+	MenuBar menuBar;
 };

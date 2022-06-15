@@ -6,7 +6,12 @@
 extern SceneRenderer* g_SceneRenderer;
 extern int height;
 
+WorldView::WorldView() {
+	testTexture = Texture("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\cylinderTexture.png", 0);
+}
+
 void WorldView::update() {
+
 	ImGuiWindowFlags worldViewWinFlags = ImGuiWindowFlags_None;
 
 	ImGuiViewport* mainViewport = ImGui::GetMainViewport();
@@ -23,13 +28,6 @@ void WorldView::update() {
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
 		ImGui::Image((ImTextureID)g_SceneRenderer->sceneFbo.frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
-		// ImGui::Image((ImTextureID)lightFrameBuffer.colorTexture, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
-		// imgui window is relative from top left and increases going down and to the right
-		// opengl is relative from bottom left and increases going up and to the right
-		ImVec2 windowPos = ImGui::GetWindowPos();
-		ImVec2 windowSize = ImGui::GetWindowSize();
-
-		glm::vec2 openGlPos = glm::vec2(windowPos.x - mainViewport->WorkPos.x, 800 - (windowPos.y - mainViewport->WorkPos.y) - height);
 	}
 
 	ImGui::End();

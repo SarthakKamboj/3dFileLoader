@@ -6,7 +6,7 @@ typedef enum FileBrowserLoadMode {
 
 struct FileBrowser {
 	FileBrowser();
-	void render();
+	void update();
 	char* resultBuffer;
 	char file[100];
 	char curFolderPath[200];

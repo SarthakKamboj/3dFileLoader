@@ -18,7 +18,7 @@ ShaderRegistry::ShaderRegistry() {
 	numShaders++;
 }
 
-void ShaderRegistry::render() {
+void ShaderRegistry::update() {
 	if (open) {
 		ImGui::Begin("Shader registry", &open);
 		for (int i = 0; i < numShaders; i++) {

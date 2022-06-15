@@ -1,5 +1,6 @@
 #include "sceneRenderer.h"
 #include "renderer/normalRenderer.h"
+#include "imgui.h"
 
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern PanelsManager* g_PanelsManager;
@@ -16,7 +17,6 @@ SceneRenderer::SceneRenderer(Light* light) {
 }
 
 void SceneRenderer::renderScene() {
-
 	CameraPanel& cameraPanel = g_PanelsManager->cameraPanel;
 	SceneList& sceneList = g_PanelsManager->sceneList;
 

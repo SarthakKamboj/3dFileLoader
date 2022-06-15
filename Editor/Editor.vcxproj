@@ -172,6 +172,7 @@
     <ClCompile Include="src\panels\dockspace.h" />
     <ClCompile Include="src\panels\fileBrowser.cpp" />
     <ClCompile Include="src\panels\lightEditor.cpp" />
+    <ClCompile Include="src\panels\menuBar.cpp" />
     <ClCompile Include="src\panels\meshRendererSettingsPanel.cpp" />
     <ClCompile Include="src\panels\panelsManager.cpp" />
     <ClCompile Include="src\panels\sceneHierarchyPanel.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="src\panels\cameraPanel.h" />
     <ClInclude Include="src\panels\fileBrowser.h" />
     <ClInclude Include="src\panels\lightEditor.h" />
+    <ClInclude Include="src\panels\menuBar.h" />
     <ClInclude Include="src\panels\meshRendererSettingsPanel.h" />
     <ClInclude Include="src\panels\panelsManager.h" />
     <ClInclude Include="src\panels\sceneHierarchyPanel.h" />

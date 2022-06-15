@@ -3,11 +3,8 @@
 #include "fbxLoader.h"
 
 struct SceneHierarchyPanel {
-	// SceneHierarchyPanel(Scene& inScene);
-	// SceneHierarchyPanel();
 	SceneHierarchyPanel();
-	void render();
+	void update();
 
 	int selectedMeshIdx;
-	// Scene& scene;
 };

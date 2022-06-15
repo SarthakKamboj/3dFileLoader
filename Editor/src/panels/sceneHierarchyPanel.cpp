@@ -12,7 +12,7 @@ SceneHierarchyPanel::SceneHierarchyPanel() {
 	selectedMeshIdx = -1;
 }
 
-void SceneHierarchyPanel::render() {
+void SceneHierarchyPanel::update() {
 	ImGui::Begin("Scene Hierarchy");
 	int numMeshes = 0;
 	SceneList* sceneListPtr = &g_PanelsManager->sceneList;

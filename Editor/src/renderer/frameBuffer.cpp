@@ -33,6 +33,8 @@ FrameBuffer::FrameBuffer() {
 
 	Helper::CheckFrameBufferStatus();
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void FrameBuffer::bind() {

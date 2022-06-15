@@ -11,7 +11,7 @@
 
 extern PanelsManager* g_PanelsManager;
 
-void MeshRendererSettingsPanel::render() {
+void MeshRendererSettingsPanel::update() {
 	ImGui::ShowDemoWindow();
 	ImGui::Begin("Mesh Rendering Settings");
 

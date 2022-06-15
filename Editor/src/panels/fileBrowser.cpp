@@ -16,7 +16,7 @@ FileBrowser::FileBrowser() {
 	resultBuffer = NULL;
 }
 
-void FileBrowser::render() {
+void FileBrowser::update() {
 	if (open) {
 		ImGui::Begin("File Browser", &open);
 		if (ImGui::Button("Back")) {

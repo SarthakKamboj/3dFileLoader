@@ -3,7 +3,7 @@
 #include "renderer/meshRenderer.h"
 
 struct MeshRendererSettingsPanel {
-	void render();
+	void update();
 	MeshRenderer* curMeshRenderer;
 	bool renderSelected = false;
 };

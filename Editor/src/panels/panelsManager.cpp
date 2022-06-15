@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "sceneRenderer.h"
 #include "window.h"
+#include "dockspace.h"
 
 extern int width, height;
 extern SceneRenderer* g_SceneRenderer;
@@ -19,13 +20,19 @@ PanelsManager::PanelsManager() {
 }
 
 void PanelsManager::update() {
-	meshRenPanel.render();
-	sceneHierarchyPanel.render();
-	cameraPanel.render();
-	shaderEditor.render();
-	fileBrowser.render();
-	shaderRegistry.render();
-	sceneList.render();
+
+	FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
+	glViewport(0, 0, width, height);
+
+	renderDockspace();
+	meshRenPanel.update();
+	sceneHierarchyPanel.update();
+	cameraPanel.update();
+	shaderEditor.update();
+	fileBrowser.update();
+	shaderRegistry.update();
+	sceneList.update();
 	worldView.update();
 	lightEditor.update();
+	menuBar.update();
 }

@@ -1,34 +1,5 @@
 #include <iostream>
-#include "SDL.h"
-#include "glad/glad.h"
-#include "stb_image.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "fbxLoader.h"
-#include <fstream>
-#include <string>
-#include "renderer/shaderProgram.h"
-#include "renderer/vao.h"
-#include "renderer/vbo.h"
-#include "renderer/ebo.h"
-#include "renderer/meshRenderer.h"
-#include "renderer/frameBuffer.h"
-#include "renderer/texture.h"
-#include "renderer/line.h"
-#include "panels/meshRendererSettingsPanel.h"
-#include "panels/sceneHierarchyPanel.h"
-#include <vector>
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl.h"
-#include "stb_image.h"
-#include "panels/dockspace.h"
-#include "panels/cameraPanel.h"
-#include "panels/shaderEditor.h"
-#include "panels/fileBrowser.h"
-#include "panels/shaderRegistry.h"
 #include "helper.h"
-#include "panels/sceneList.h"
 #include "renderer/light.h"
 #include "primitives/cube.h"
 #include "renderer/lightFrameBuffer.h"
@@ -48,7 +19,6 @@ SceneRenderer* g_SceneRenderer;
 Window* g_Window;
 
 extern float nearPlane, farPlane;
-
 
 glm::mat4 getRotationMatrix(glm::vec3 rot) {
 	glm::mat4 rotMatrix(1.0f);
@@ -88,9 +58,6 @@ int main(int argc, char* args[]) {
 
 	panelsManager.lightEditor.light = &light;
 
-	char fbxToLoadPath[300] = {};
-	bool selectingFbxToLoad = false;
-
 	const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
 	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
 	ShaderProgram depthShader(depthVert, depthFrag);
@@ -111,40 +78,7 @@ int main(int argc, char* args[]) {
 		window.initGuiForFrame();
 
 		sceneRenderer.renderScene();
-
-		/*
-			IMGUI RENDERING
-		*/
-		FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
-		glViewport(0, 0, width, height);
-
-		FileBrowser& fileBrowser = panelsManager.fileBrowser;
-		if (ImGui::BeginMainMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::MenuItem("Open fbx file")) {
-					fileBrowser.open = true;
-					fileBrowser.resultBuffer = fbxToLoadPath;
-					fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
-					memset(fileBrowser.curFolderPath, 0, 200);
-					// later change default filebrowser path
-					Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
-					selectingFbxToLoad = true;
-				}
-				ImGui::EndMenu();
-			}
-			ImGui::EndMainMenuBar();
-		}
-
-		if (selectingFbxToLoad && !fileBrowser.open) {
-			selectingFbxToLoad = false;
-			panelsManager.sceneList.loadSceneFromFbxFile(fbxToLoadPath);
-		}
-
-		glm::vec3 camPos;
-		renderDockspace();
-
 		panelsManager.update();
-
 		window.renderGui();
 
 		window.swapBuffers();

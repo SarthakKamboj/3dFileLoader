@@ -8,7 +8,7 @@
 
 extern PanelsManager* g_PanelsManager;
 
-void SceneList::render() {
+void SceneList::update() {
 	ImGui::Begin("Scene List");
 	if (curSceneIdx < 0) {
 		ImGui::Text("Select a scene");

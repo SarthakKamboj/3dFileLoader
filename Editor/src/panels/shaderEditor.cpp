@@ -15,7 +15,7 @@ void ShaderEditor::updateTexturePath() {
 	sprintf_s(newTexturePath, curShaderProgram->texture.filePath);
 }
 
-void ShaderEditor::render() {
+void ShaderEditor::update() {
 	if (!open) return;
 	ImGui::Begin("Shader Editor", &open);
 

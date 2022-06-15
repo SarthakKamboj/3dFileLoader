@@ -9,7 +9,7 @@ struct ShaderRegistry {
 	std::vector<ShaderProgram> shaders;
 	int numShaders = 0;
 	int selectedIdx = -1;
-	void render();
+	void update();
 	bool open = false;
 	ShaderProgram defaultShaderProgram;
 };
