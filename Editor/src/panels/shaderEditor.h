@@ -4,7 +4,7 @@
 
 struct ShaderEditor {
 	ShaderEditor();
-	void render();
+	void update();
 
 	ShaderProgram* curShaderProgram;
 	char newTexturePath[200];

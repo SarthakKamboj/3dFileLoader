@@ -2,8 +2,9 @@
 #include "imgui.h"
 #include "helper.h"
 #include "shaderEditor.h"
+#include "panelsManager.h"
 
-extern ShaderEditor* shaderEditorPtr;
+extern PanelsManager* g_PanelsManager;
 extern int width, height;
 
 ShaderRegistry::ShaderRegistry() {
@@ -14,19 +15,16 @@ ShaderRegistry::ShaderRegistry() {
 	Helper::CopyBuffer("Default shader", defaultShaderProgram.name, 50);
 	shaders.push_back(defaultShaderProgram);
 	defaultShaderProgram.setVec3("color", glm::vec3(1, 1, 1));
-	// defaultShaderProgram.setInt("depthTexture", 1);
-	// defaultShaderProgram.setInt("windowWidth", width);
-	// defaultShaderProgram.setInt("windowHeight", height);
 	numShaders++;
 }
 
-void ShaderRegistry::render() {
+void ShaderRegistry::update() {
 	if (open) {
 		ImGui::Begin("Shader registry", &open);
 		for (int i = 0; i < numShaders; i++) {
 			if (ImGui::Selectable(shaders[i].name, selectedIdx == i)) {
 				selectedIdx = i;
-				shaderEditorPtr->curShaderProgram = &shaders[i];
+				g_PanelsManager->shaderEditor.curShaderProgram = &shaders[i];
 			}
 		}
 		ImGui::End();

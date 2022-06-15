@@ -5,20 +5,17 @@
 #include "panels/shaderRegistry.h"
 #include "fbxLoader.h"
 #include "panels/sceneList.h"
+#include "panels/panelsManager.h"
 #include "renderer/normalRenderer.h"
 #include <iostream>
 
 extern glm::mat4 getRotationMatrix(glm::vec3 rot);
-// extern Line* linePtr;
 extern NormalRenderer* normalRendererPtr;
 extern NormalRenderer* splitNormalRendererPtr;
-extern ShaderRegistry* shaderRegistryPtr;
-extern SceneList* sceneListPtr;
+extern PanelsManager* g_PanelsManager;
 
 MeshRenderer::MeshRenderer() {
 	meshIdx = -1;
-	// normalIdx = -1;
-	// splitNormalIdx = -1;
 }
 
 MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
@@ -37,12 +34,11 @@ MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
 
 	vao.unbind();
 	vbo.unbind();
-	// normalIdx = normalRendererPtr->receiveIdx();
-	// splitNormalIdx = splitNormalRendererPtr->receiveIdx();
 }
 
 void MeshRenderer::render() {
 
+	SceneList* sceneListPtr = &g_PanelsManager->sceneList;
 	if (sceneListPtr->curSceneIdx < 0) return;
 
 	Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
@@ -53,11 +49,7 @@ void MeshRenderer::render() {
 
 	glm::mat4 model = translation * rotation * scale;
 
-	// memset(normalRendererPtr->lines, 0, NUM_LINES * sizeof(LinePoints));
-	// memset(splitNormalRendererPtr->lines, 0, NUM_LINES * sizeof(LinePoints));
 	if (displayNormals | displaySplitNormals) {
-		// linePtr->shaderProgram.setMat4("model", model);
-		// normalRendererPtr->shaderProgram.setMat4("model", model);
 
 		for (int vertexIdx = 0; vertexIdx < mesh->vertexCount; vertexIdx++) {
 			Vertex& vert = mesh->vertices[vertexIdx];
@@ -65,46 +57,12 @@ void MeshRenderer::render() {
 			glm::vec4 endPoint = startPoint + 100.0f * glm::vec4(vert.normal[0], vert.normal[1], vert.normal[2], 0.0f);
 			glm::vec4 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec4(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2], 0.0f);
 
-			// glm::vec3 startPoint = model * lclStartPoint;
-			// glm::vec3 endPoint = model * lclEndPoint;
-			// glm::vec3 avgEndPoint = model * lclAvgEndPoint;
-
-			// startPoint = glm::vec3(0, 0, 0);
-			// endPoint = glm::vec3(0, 200, 0);
-			// avgEndPoint = glm::vec3(100, 0, 0);
-
 			if (displaySplitNormals) {
-				/*
-				splitNormalRendererPtr->lines[normalIdx].start[0] = startPoint[0];
-				splitNormalRendererPtr->lines[normalIdx].start[1] = startPoint[1];
-				splitNormalRendererPtr->lines[normalIdx].start[2] = startPoint[2];
-
-				splitNormalRendererPtr->lines[normalIdx].end[0] = endPoint[0];
-				splitNormalRendererPtr->lines[normalIdx].end[1] = endPoint[1];
-				splitNormalRendererPtr->lines[normalIdx].end[2] = endPoint[2];
-				*/
-				// splitNormalRendererPtr->setStartPoint(splitNormalIdx, startPoint);
-				// splitNormalRendererPtr->setEndPoint(splitNormalIdx, endPoint);
-
-
 				splitNormalRendererPtr->setStartPoint(vertexIdx, startPoint);
 				splitNormalRendererPtr->setEndPoint(vertexIdx, endPoint);
 			}
 
 			if (displayNormals) {
-				/*
-				normalRendererPtr->lines[normalIdx].start[0] = startPoint[0];
-				normalRendererPtr->lines[normalIdx].start[1] = startPoint[1];
-				normalRendererPtr->lines[normalIdx].start[2] = startPoint[2];
-
-				normalRendererPtr->lines[normalIdx].end[0] = avgEndPoint[0];
-				normalRendererPtr->lines[normalIdx].end[1] = avgEndPoint[1];
-				normalRendererPtr->lines[normalIdx].end[2] = avgEndPoint[2];
-				*/
-				// normalRendererPtr->setStartPoint(normalIdx, startPoint);
-				// normalRendererPtr->setEndPoint(normalIdx, avgEndPoint);
-
-
 				normalRendererPtr->setStartPoint(vertexIdx, startPoint);
 				normalRendererPtr->setEndPoint(vertexIdx, avgEndPoint);
 			}
@@ -123,10 +81,9 @@ void MeshRenderer::render() {
 			std::cout << mesh->vertexCount << std::endl;
 		}
 
-
-
 	}
 
+	ShaderRegistry* shaderRegistryPtr = &g_PanelsManager->shaderRegistry;
 	shaderRegistryPtr->shaders[shaderIdx].setMat4("model", model);
 	shaderRegistryPtr->shaders[shaderIdx].setInt("useSplit", !useNormals);
 	shaderRegistryPtr->shaders[shaderIdx].bind();

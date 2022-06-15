@@ -13,13 +13,9 @@ ShaderProgram::ShaderProgram() {
 
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	texture = Texture(defaultTexPath, 0);
-
-	// setInt("renderTexture", textureBasedColor);
-	// setVec3("color", glm::vec3(1, 1, 1));
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
-
 	normalDisplacement = 0;
 	GLuint vertexId = createShader(vertexPath, GL_VERTEX_SHADER);
 	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
@@ -42,9 +38,7 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
 	texture = Texture(defaultTexPath, 0);
-
-	// setInt("renderTexture", textureBasedColor);
-	// setVec3("color", glm::vec3(1, 1, 1));
+	std::cout << "texture id: " << texture.texture << std::endl;
 }
 
 void ShaderProgram::bind() {

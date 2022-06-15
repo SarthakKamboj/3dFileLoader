@@ -13,6 +13,6 @@ struct CameraPanel {
 	glm::mat4 getProjectionMat();
 	glm::mat4 getViewMat();
 
-	void render();
+	void update();
 };
 

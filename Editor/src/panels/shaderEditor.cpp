@@ -2,8 +2,9 @@
 #include "imgui.h"
 #include "fileBrowser.h"
 #include "helper.h"
+#include "panelsManager.h"
 
-extern FileBrowser* fileBrowserPtr;
+extern PanelsManager* g_PanelsManager;
 
 ShaderEditor::ShaderEditor() {
 	curShaderProgram = NULL;
@@ -14,7 +15,7 @@ void ShaderEditor::updateTexturePath() {
 	sprintf_s(newTexturePath, curShaderProgram->texture.filePath);
 }
 
-void ShaderEditor::render() {
+void ShaderEditor::update() {
 	if (!open) return;
 	ImGui::Begin("Shader Editor", &open);
 
@@ -48,6 +49,7 @@ void ShaderEditor::render() {
 		strcat_s(texPathStr, curShaderProgram->texture.filePath);
 		ImGui::Text(texPathStr);
 
+		FileBrowser* fileBrowserPtr = &g_PanelsManager->fileBrowser;
 		if (ImGui::Button("Update texture")) {
 			int lastIdx = Helper::GetLastIndex(curShaderProgram->texture.filePath, '\\');
 			memset(fileBrowserPtr->curFolderPath, 0, 200);

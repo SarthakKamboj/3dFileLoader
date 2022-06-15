@@ -5,7 +5,7 @@
 #include "renderer/meshRenderer.h"
 
 struct SceneList {
-	void render();
+	void update();
 	std::vector<Scene> scenes;
 	std::vector<std::vector<MeshRenderer>> meshRenderLists;
 	int numScenes = 0;
