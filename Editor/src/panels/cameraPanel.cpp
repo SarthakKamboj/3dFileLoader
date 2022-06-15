@@ -15,7 +15,7 @@ glm::mat4 CameraPanel::getViewMat() {
 	return glm::lookAt(pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
-void CameraPanel::render() {
+void CameraPanel::update() {
 	ImGui::Begin("Camera panel");
 
 	ImGui::DragFloat("radius", &radius, 10, 10.0f, 2500.0f);

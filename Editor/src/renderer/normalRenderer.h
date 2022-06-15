@@ -4,12 +4,10 @@
 #include "shaderProgram.h"
 #include "vao.h"
 #include "vbo.h"
-#include <vector>
 
 static float i = 0;
 
 struct LinePoints {
-	// float vertices[6] = {};
 	float start[3] = {};
 	float end[3] = {};
 

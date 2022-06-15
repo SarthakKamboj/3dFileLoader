@@ -1,8 +1,9 @@
 #pragma once
 
+#define MAX_NUM_MESHES_PER_SCENE 10
+
 #include "glm/glm.hpp"
 #include <string>
-#include <vector>
 
 struct Vertex {
 	float position[3];
@@ -35,37 +36,19 @@ struct Mesh {
 	Vertex* vertices;
 	int vertexCount;
 
-	/* not having indicies for now b/c mapping over vertices by polygon,
-	which means number of vertices will be the same as indicies
-	*/
-	// unsigned int* indicies;
-	// int indexCount;
-
 	Transform transform;
 
-	int numChildren;
-	std::vector<int> childMeshIdxs;
+	int numChildren = 0;
+	int childMeshIdxs[MAX_NUM_MESHES_PER_SCENE];
 
 	std::string name;
 };
 
-struct Camera {
-	Camera() {}
-
-	Transform transform;
-};
-
-/*
-struct Light {
-	Light();
-	Transform transform;
-};
-*/
 
 struct Scene {
-	std::vector<Mesh> meshes;
+	Mesh meshes[MAX_NUM_MESHES_PER_SCENE] = {};
 	int numMeshes = 0;
-	std::vector<int> topLevelMeshIdxs;
+	int topLevelMeshIdxs[MAX_NUM_MESHES_PER_SCENE] = {};
 	char name[150];
 };
 
