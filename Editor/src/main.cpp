@@ -1,9 +1,5 @@
 #include <iostream>
-#include "helper.h"
 #include "renderer/light.h"
-#include "primitives/cube.h"
-#include "renderer/lightFrameBuffer.h"
-#include "glm/gtc/type_ptr.hpp"
 #include "renderer/normalRenderer.h"
 #include "window.h"
 #include "input.h"
@@ -46,6 +42,7 @@ int main(int argc, char* args[]) {
 	SceneRenderer sceneRenderer(&light);
 	g_SceneRenderer = &sceneRenderer;
 
+	// will refactor these NormalRenderers later
 	NormalRenderer splitNormalRenderer;
 	splitNormalRendererPtr = &splitNormalRenderer;
 	splitNormalRendererPtr->setColor(glm::vec3(1, 0, 0));
@@ -57,17 +54,6 @@ int main(int argc, char* args[]) {
 	g_PanelsManager = &panelsManager;
 
 	panelsManager.lightEditor.light = &light;
-
-	const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
-	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
-	ShaderProgram depthShader(depthVert, depthFrag);
-	depthShader.setInt("depthTexUnit", 1);
-	bool extraVisible = true;
-	depthShader.setInt("extraVisible", extraVisible);
-
-	const char* lightPassVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.vert";
-	const char* lightPassFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.frag";
-	ShaderProgram lightPassShader(lightPassVert, lightPassFrag);
 
 	while (window.running) {
 
