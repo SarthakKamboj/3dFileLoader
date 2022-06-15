@@ -4,7 +4,6 @@
 #include "fbxsdk/utils/fbxgeometryconverter.h"
 #include <stdlib.h>
 #include "glm/glm.hpp"
-#include <vector>
 
 int addMeshToScene(Scene& scene, FbxMesh* fbxMesh);
 bool nodeStoresMesh(FbxNode* node);
@@ -42,9 +41,6 @@ Scene loadFbx(const char* fbxFilePath) {
 
 	fbxImporter->Destroy();
 
-	// int maxPossibleMeshesInScene = fbxScene->GetNodeCount() - 1;
-	// scene.meshes.resize(maxPossibleMeshes);
-
 	FbxNode* rootNode = fbxScene->GetRootNode();
 	meshIdx = 0;
 
@@ -60,7 +56,6 @@ Scene loadFbx(const char* fbxFilePath) {
 				}
 			}
 		}
-		// scene.numMeshes = scene.meshes.size();
 	}
 	else {
 		scene.numMeshes = -1;
@@ -77,7 +72,7 @@ float randNum() {
 }
 
 struct NormalData {
-	std::vector<glm::vec3> splitNormals;
+	glm::vec3 splitNormals[5];
 	glm::vec3 avgNormal;
 	int numCoords;
 };
@@ -151,11 +146,11 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 
 	int vertexId = 0;
 
-	std::vector<int> vertPosIds;
-	vertPosIds.resize(numIndicies);
+	int vertPosIds[3000] = {};
 
 	for (int polygonId = 0; polygonId < fbxMesh->GetPolygonCount(); polygonId++) {
 		for (int polyVertIdx = 0; polyVertIdx < fbxMesh->GetPolygonSize(polygonId); polyVertIdx++) {
+			if (vertexId == 3000) break;
 			int positionId = fbxMesh->GetPolygonVertex(polygonId, polyVertIdx);
 			vertPosIds[vertexId] = positionId;
 			Vertex& vertex = mesh.vertices[vertexId];
@@ -235,15 +230,17 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 			normalGlm = glm::normalize(normalGlm);
 			NormalData& data = normalData[positionId];
 
-			normalData[positionId].splitNormals.push_back(normalGlm);
-			normalData[positionId].numCoords += 1;
+			if (normalData[positionId].numCoords < 5) {
+				int curSplitNormalIdx = normalData[positionId].numCoords;
+				normalData[positionId].splitNormals[curSplitNormalIdx] = normalGlm;
+				normalData[positionId].numCoords += 1;
+			}
 
 			vertexId += 1;
 		}
 	}
 
 	// averaging out normal data
-	// TOOD: seems like number of split normals effects avgNormal rn, giving unstable results
 	for (int i = 0; i < numPositions; i++) {
 		NormalData& data = normalData[i];
 		data.avgNormal = glm::vec3(0, 0, 0);
@@ -256,8 +253,6 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		}
 
 		data.avgNormal /= data.numCoords;
-
-		glm::vec3 avgNormal = data.avgNormal;
 	}
 
 	for (int i = 0; i < mesh.vertexCount; i++) {
@@ -282,11 +277,9 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		if (nodeStoresMesh(childNode)) {
 			int childMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
 			if (childMeshIdx != -1) {
-				// scene.meshes[curMeshIdx].childMeshIdxs.push_back(childMeshIdx);
 				int curNumChildren = scene.meshes[curMeshIdx].numChildren;
 				scene.meshes[curMeshIdx].childMeshIdxs[curNumChildren] = childMeshIdx;
 				scene.meshes[curMeshIdx].numChildren += 1;
-				// scene.meshes[curMeshIdx].numChildren += 1;
 			}
 		}
 	}
