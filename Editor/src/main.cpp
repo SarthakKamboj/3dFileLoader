@@ -6,7 +6,6 @@
 #include "panels/panelsManager.h"
 #include "sceneRenderer.h"
 
-// int width = 600, height = 600;
 NormalRenderer* splitNormalRendererPtr;
 NormalRenderer* normalRendererPtr;
 PanelsManager* g_PanelsManager;
