@@ -7,6 +7,9 @@
 ImFont* Window::openSansBold = NULL;
 ImFont* Window::openSansLight = NULL;
 
+int width = 800;
+int height = 600;
+
 Window::Window(Input* _input) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		std::cout << "sdl gave error" << std::endl;

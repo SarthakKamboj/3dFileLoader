@@ -24,7 +24,7 @@ void SceneHierarchyPanel::update() {
 	}
 	for (int meshIdx = 0; meshIdx < numMeshes; meshIdx++) {
 		Scene& scene = g_PanelsManager->sceneList.scenes[g_PanelsManager->sceneList.curSceneIdx];
-		std::vector<MeshRenderer>& meshRenderers = sceneListPtr->meshRenderLists[sceneListPtr->curSceneIdx];
+		MeshRenderer* meshRenderers = sceneListPtr->meshRenderLists[sceneListPtr->curSceneIdx];
 		if (ImGui::Selectable(scene.meshes[meshIdx].name.c_str(), meshIdx == selectedMeshIdx)) {
 			selectedMeshIdx = meshIdx;
 			MeshRenderer& selectedMeshRenderer = meshRenderers[selectedMeshIdx];

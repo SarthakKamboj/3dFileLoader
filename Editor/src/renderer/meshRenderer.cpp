@@ -72,13 +72,11 @@ void MeshRenderer::render() {
 		if (displaySplitNormals) {
 			splitNormalRendererPtr->shaderProgram.setMat4("model", model);
 			splitNormalRendererPtr->render(mesh->vertexCount);
-			std::cout << mesh->vertexCount << std::endl;
 		}
 
 		if (displayNormals) {
 			normalRendererPtr->shaderProgram.setMat4("model", model);
 			normalRendererPtr->render(mesh->vertexCount);
-			std::cout << mesh->vertexCount << std::endl;
 		}
 
 	}

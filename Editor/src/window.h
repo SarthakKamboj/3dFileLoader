@@ -21,9 +21,6 @@ struct Window {
 	SDL_Window* window;
 	SDL_GLContext context;
 
-	int width = 600;
-	int height = 600;
-
 	bool running = true;
 
 	static ImFont* openSansBold;

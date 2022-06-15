@@ -5,6 +5,7 @@
 #include "helper.h"
 #include "panels/meshRendererSettingsPanel.h"
 #include "panels/panelsManager.h"
+#include <cmath>
 
 extern PanelsManager* g_PanelsManager;
 
@@ -45,6 +46,9 @@ void SceneList::update() {
 }
 
 int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
+
+	if (numScenes == MAX_NUM_SCENES) return -1;
+
 	Scene scene = loadFbx(fbxToLoadPath);
 
 	if (scene.numMeshes == -1) {
@@ -52,12 +56,11 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 		return -1;
 	}
 
-	std::vector<MeshRenderer> meshRenderers;
+	MeshRenderer* meshRenderers = new MeshRenderer[MAX_MESHES_PER_SCENE];
 	int numMeshes = scene.numMeshes;
-	meshRenderers.resize(numMeshes);
-	std::vector<Mesh>& meshes = scene.meshes;
+	Mesh* meshes = scene.meshes;
 
-	for (int meshId = 0; meshId < numMeshes; meshId++) {
+	for (int meshId = 0; meshId < fmin(numMeshes, MAX_MESHES_PER_SCENE); meshId++) {
 		meshRenderers[meshId] = MeshRenderer(meshes[meshId], meshId);
 	}
 
@@ -66,17 +69,16 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 	memset(scene.name, 0, 150);
 	Helper::CopyBuffer(fbxToLoadPath + slashIdx + 1, scene.name, dotIdx - slashIdx - 1);
 	numScenes += 1;
-	scenes.push_back(scene);
-	meshRenderLists.push_back(meshRenderers);
+	int idx = numScenes - 1;
+	scenes[idx] = scene;
+	meshRenderLists[idx] = meshRenderers;
 	curSceneIdx = numScenes - 1;
 	resetEditorState();
-	return numScenes - 1;
+	return idx;
 }
 
 void SceneList::resetEditorState() {
-
 	MeshRendererSettingsPanel* meshRenPanelPtr = &g_PanelsManager->meshRenPanel;
-
 	selectedSceneIdx = -1;
 	meshRenPanelPtr->curMeshRenderer = NULL;
 	meshRenPanelPtr->renderSelected = false;

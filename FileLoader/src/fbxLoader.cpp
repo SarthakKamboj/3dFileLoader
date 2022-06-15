@@ -4,7 +4,6 @@
 #include "fbxsdk/utils/fbxgeometryconverter.h"
 #include <stdlib.h>
 #include "glm/glm.hpp"
-#include <vector>
 
 int addMeshToScene(Scene& scene, FbxMesh* fbxMesh);
 bool nodeStoresMesh(FbxNode* node);
@@ -19,6 +18,9 @@ Scene loadFbx(const char* fbxFilePath) {
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
 	Scene scene = {};
+	for (int i = 0; i < MAX_NUM_MESHES_PER_SCENE; i++) {
+		scene.topLevelMeshIdxs[i] = -1;
+	}
 
 	if (!fbxImporter->Initialize(fbxFilePath, -1, fbxManager->GetIOSettings())) {
 		std::cout << "fbx import failed" << std::endl;
@@ -39,21 +41,21 @@ Scene loadFbx(const char* fbxFilePath) {
 
 	fbxImporter->Destroy();
 
-	int maxPossibleMeshes = fbxScene->GetNodeCount() - 1;
-	scene.meshes.resize(maxPossibleMeshes);
-
 	FbxNode* rootNode = fbxScene->GetRootNode();
 	meshIdx = 0;
 
 	if (rootNode) {
+		int topLvlIdxIter = 0;
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
 			FbxNode* childNode = rootNode->GetChild(i);
 			if (nodeStoresMesh(childNode)) {
 				int topLevelMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
-				scene.topLevelMeshIdxs.push_back(topLevelMeshIdx);
+				if (topLevelMeshIdx != -1) {
+					scene.topLevelMeshIdxs[topLvlIdxIter] = topLevelMeshIdx;
+					topLvlIdxIter += 1;
+				}
 			}
 		}
-		scene.numMeshes = scene.meshes.size();
 	}
 	else {
 		scene.numMeshes = -1;
@@ -70,7 +72,7 @@ float randNum() {
 }
 
 struct NormalData {
-	std::vector<glm::vec3> splitNormals;
+	glm::vec3 splitNormals[5];
 	glm::vec3 avgNormal;
 	int numCoords;
 };
@@ -91,7 +93,14 @@ bool nodeStoresMesh(FbxNode* node) {
 }
 
 int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
+
+	if (scene.numMeshes == MAX_NUM_MESHES_PER_SCENE) return -1;
+
 	Mesh mesh;
+
+	for (int i = 0; i < MAX_NUM_MESHES_PER_SCENE; i++) {
+		mesh.childMeshIdxs[i] = -1;
+	}
 
 	FbxNode* node = fbxMesh->GetNode();
 
@@ -137,11 +146,11 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 
 	int vertexId = 0;
 
-	std::vector<int> vertPosIds;
-	vertPosIds.resize(numIndicies);
+	int vertPosIds[3000] = {};
 
 	for (int polygonId = 0; polygonId < fbxMesh->GetPolygonCount(); polygonId++) {
 		for (int polyVertIdx = 0; polyVertIdx < fbxMesh->GetPolygonSize(polygonId); polyVertIdx++) {
+			if (vertexId == 3000) break;
 			int positionId = fbxMesh->GetPolygonVertex(polygonId, polyVertIdx);
 			vertPosIds[vertexId] = positionId;
 			Vertex& vertex = mesh.vertices[vertexId];
@@ -221,15 +230,17 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 			normalGlm = glm::normalize(normalGlm);
 			NormalData& data = normalData[positionId];
 
-			normalData[positionId].splitNormals.push_back(normalGlm);
-			normalData[positionId].numCoords += 1;
+			if (normalData[positionId].numCoords < 5) {
+				int curSplitNormalIdx = normalData[positionId].numCoords;
+				normalData[positionId].splitNormals[curSplitNormalIdx] = normalGlm;
+				normalData[positionId].numCoords += 1;
+			}
 
 			vertexId += 1;
 		}
 	}
 
 	// averaging out normal data
-	// TOOD: seems like number of split normals effects avgNormal rn, giving unstable results
 	for (int i = 0; i < numPositions; i++) {
 		NormalData& data = normalData[i];
 		data.avgNormal = glm::vec3(0, 0, 0);
@@ -242,8 +253,6 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		}
 
 		data.avgNormal /= data.numCoords;
-
-		glm::vec3 avgNormal = data.avgNormal;
 	}
 
 	for (int i = 0; i < mesh.vertexCount; i++) {
@@ -258,6 +267,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	// scene.meshes.push_back(mesh);
 	int curMeshIdx = meshIdx;
 	scene.meshes[curMeshIdx] = mesh;
+	scene.numMeshes++;
 	meshIdx++;
 
 	mesh.numChildren = 0;
@@ -266,8 +276,11 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		FbxNode* childNode = node->GetChild(i);
 		if (nodeStoresMesh(childNode)) {
 			int childMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
-			scene.meshes[curMeshIdx].childMeshIdxs.push_back(childMeshIdx);
-			scene.meshes[curMeshIdx].numChildren += 1;
+			if (childMeshIdx != -1) {
+				int curNumChildren = scene.meshes[curMeshIdx].numChildren;
+				scene.meshes[curMeshIdx].childMeshIdxs[curNumChildren] = childMeshIdx;
+				scene.meshes[curMeshIdx].numChildren += 1;
+			}
 		}
 	}
 
