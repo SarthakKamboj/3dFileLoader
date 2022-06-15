@@ -31,12 +31,13 @@ int main(int argc, char* args[]) {
 	Window window(g_Input);
 	g_Window = &window;
 
+	// will create better system to have multiple lights a little later
 	Light light = {};
 	light.ambientColor = glm::vec3(1, 0, 0);
 	light.ambientFactor = 0.2f;
 	light.specularFactor = 0.2f;
 	light.pos = glm::vec3(10, 700, 900);
-	light.lightColor = glm::vec3(0, 1, 0);
+	light.lightColor = glm::vec3(1, 1, 1);
 	light.shininess = 32.0f;
 
 	SceneRenderer sceneRenderer(&light);

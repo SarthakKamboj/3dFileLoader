@@ -36,7 +36,7 @@ void SceneRenderer::renderScene() {
 	lightPassShader.bind();
 	if (sceneList.curSceneIdx > -1) {
 		Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-		std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+		MeshRenderer* meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
 		glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 		for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
 			Mesh* mesh = &scene.meshes[meshRenderers[meshId].meshIdx];
@@ -80,7 +80,7 @@ void SceneRenderer::renderScene() {
 	Light* light = lightFrameBuffer.light;
 	if (sceneList.curSceneIdx > -1) {
 		Scene& scene = sceneList.scenes[sceneList.curSceneIdx];
-		std::vector<MeshRenderer>& meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
+		MeshRenderer* meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
 		glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 		ShaderRegistry& shaderRegistry = g_PanelsManager->shaderRegistry;
 		for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
