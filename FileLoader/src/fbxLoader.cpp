@@ -19,6 +19,9 @@ Scene loadFbx(const char* fbxFilePath) {
 	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
 	Scene scene = {};
+	for (int i = 0; i < MAX_NUM_MESHES_PER_SCENE; i++) {
+		scene.topLevelMeshIdxs[i] = -1;
+	}
 
 	if (!fbxImporter->Initialize(fbxFilePath, -1, fbxManager->GetIOSettings())) {
 		std::cout << "fbx import failed" << std::endl;
@@ -39,21 +42,25 @@ Scene loadFbx(const char* fbxFilePath) {
 
 	fbxImporter->Destroy();
 
-	int maxPossibleMeshes = fbxScene->GetNodeCount() - 1;
-	scene.meshes.resize(maxPossibleMeshes);
+	// int maxPossibleMeshesInScene = fbxScene->GetNodeCount() - 1;
+	// scene.meshes.resize(maxPossibleMeshes);
 
 	FbxNode* rootNode = fbxScene->GetRootNode();
 	meshIdx = 0;
 
 	if (rootNode) {
+		int topLvlIdxIter = 0;
 		for (int i = 0; i < rootNode->GetChildCount(); i++) {
 			FbxNode* childNode = rootNode->GetChild(i);
 			if (nodeStoresMesh(childNode)) {
 				int topLevelMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
-				scene.topLevelMeshIdxs.push_back(topLevelMeshIdx);
+				if (topLevelMeshIdx != -1) {
+					scene.topLevelMeshIdxs[topLvlIdxIter] = topLevelMeshIdx;
+					topLvlIdxIter += 1;
+				}
 			}
 		}
-		scene.numMeshes = scene.meshes.size();
+		// scene.numMeshes = scene.meshes.size();
 	}
 	else {
 		scene.numMeshes = -1;
@@ -91,7 +98,14 @@ bool nodeStoresMesh(FbxNode* node) {
 }
 
 int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
+
+	if (scene.numMeshes == MAX_NUM_MESHES_PER_SCENE) return -1;
+
 	Mesh mesh;
+
+	for (int i = 0; i < MAX_NUM_MESHES_PER_SCENE; i++) {
+		mesh.childMeshIdxs[i] = -1;
+	}
 
 	FbxNode* node = fbxMesh->GetNode();
 
@@ -258,6 +272,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	// scene.meshes.push_back(mesh);
 	int curMeshIdx = meshIdx;
 	scene.meshes[curMeshIdx] = mesh;
+	scene.numMeshes++;
 	meshIdx++;
 
 	mesh.numChildren = 0;
@@ -266,8 +281,13 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		FbxNode* childNode = node->GetChild(i);
 		if (nodeStoresMesh(childNode)) {
 			int childMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
-			scene.meshes[curMeshIdx].childMeshIdxs.push_back(childMeshIdx);
-			scene.meshes[curMeshIdx].numChildren += 1;
+			if (childMeshIdx != -1) {
+				// scene.meshes[curMeshIdx].childMeshIdxs.push_back(childMeshIdx);
+				int curNumChildren = scene.meshes[curMeshIdx].numChildren;
+				scene.meshes[curMeshIdx].childMeshIdxs[curNumChildren] = childMeshIdx;
+				scene.meshes[curMeshIdx].numChildren += 1;
+				// scene.meshes[curMeshIdx].numChildren += 1;
+			}
 		}
 	}
 

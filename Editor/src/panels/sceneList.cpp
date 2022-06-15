@@ -58,7 +58,7 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 
 	MeshRenderer* meshRenderers = new MeshRenderer[MAX_MESHES_PER_SCENE];
 	int numMeshes = scene.numMeshes;
-	std::vector<Mesh>& meshes = scene.meshes;
+	Mesh* meshes = scene.meshes;
 
 	for (int meshId = 0; meshId < fmin(numMeshes, MAX_MESHES_PER_SCENE); meshId++) {
 		meshRenderers[meshId] = MeshRenderer(meshes[meshId], meshId);
@@ -70,8 +70,6 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 	Helper::CopyBuffer(fbxToLoadPath + slashIdx + 1, scene.name, dotIdx - slashIdx - 1);
 	numScenes += 1;
 	int idx = numScenes - 1;
-	// scenes.push_back(scene);
-	// meshRenderLists.push_back(meshRenderers);
 	scenes[idx] = scene;
 	meshRenderLists[idx] = meshRenderers;
 	curSceneIdx = numScenes - 1;
@@ -80,9 +78,7 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 }
 
 void SceneList::resetEditorState() {
-
 	MeshRendererSettingsPanel* meshRenPanelPtr = &g_PanelsManager->meshRenPanel;
-
 	selectedSceneIdx = -1;
 	meshRenPanelPtr->curMeshRenderer = NULL;
 	meshRenPanelPtr->renderSelected = false;
