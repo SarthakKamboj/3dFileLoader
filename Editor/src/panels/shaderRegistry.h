@@ -11,6 +11,6 @@ struct ShaderRegistry {
 	int numShaders = 0;
 	int selectedIdx = -1;
 	void update();
-	bool open = true;
+	bool open = false;
 	ShaderProgram defaultShaderProgram;
 };

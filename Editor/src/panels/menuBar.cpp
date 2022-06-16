@@ -10,7 +10,7 @@ extern PanelsManager* g_PanelsManager;
 void MenuBar::update() {
 	FileBrowser& fileBrowser = g_PanelsManager->fileBrowser;
 	if (ImGui::BeginMainMenuBar()) {
-		if (ImGui::BeginMenu("File")) {
+		if (ImGui::BeginMenu("Menu")) {
 			if (ImGui::MenuItem("Open fbx file")) {
 				// open filebrowser to select file
 				fileBrowser.open = true;
@@ -22,6 +22,15 @@ void MenuBar::update() {
 				Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
 				selectingFbxToLoad = true;
 			}
+
+			if (ImGui::MenuItem("Open shader registry")) {
+				g_PanelsManager->shaderRegistry.open = true;
+			}
+
+			if (ImGui::MenuItem("Open shader editor")) {
+				g_PanelsManager->shaderEditor.open = true;
+			}
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
