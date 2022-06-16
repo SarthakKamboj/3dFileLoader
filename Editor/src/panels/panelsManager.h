@@ -14,6 +14,7 @@
 struct PanelsManager {
 	PanelsManager();
 	void update();
+	void render();
 
 	MeshRendererSettingsPanel meshRenPanel;
 	ShaderEditor shaderEditor;

@@ -23,7 +23,8 @@ void WorldView::update() {
 	{
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
-		ImGui::Image((ImTextureID)g_SceneRenderer->sceneFbo.frameBufferTex, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
+		// render color texture from scene framebuffer
+		ImGui::Image((ImTextureID)g_SceneRenderer->sceneFbo.colorTexture, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
 	}
 
 	ImGui::End();

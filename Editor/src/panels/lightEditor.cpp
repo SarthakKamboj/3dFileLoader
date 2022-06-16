@@ -31,7 +31,6 @@ LightEditor::LightEditor() {
 	depthVAO.attachVBO(depthVBO, 0, 2, 4 * sizeof(float), 0);
 	depthVAO.attachVBO(depthVBO, 1, 2, 4 * sizeof(float), 2 * sizeof(float));
 	depthVBO.unbind();
-
 }
 
 void LightEditor::update() {
@@ -42,10 +41,10 @@ void LightEditor::update() {
 	ImGui::SetNextWindowViewport(mainViewport->ID);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetWindowPos(ImVec2(0, 0));
-	glm::vec4 openGlViewportLightWin;
 	float fontSize = 16.0f;
 	ImGui::Begin("Light depth texture");
 	{
+		// get size and position of this ImGui window
 		ImVec2 lightDepTexWindowSize = ImGui::GetWindowSize();
 		ImVec2 lightDepTexWindowPos = ImGui::GetWindowPos();
 		ImGuiViewport* mainViewport = ImGui::GetMainViewport();
@@ -61,6 +60,7 @@ void LightEditor::update() {
 	Light* light = g_SceneRenderer->lightFrameBuffer.light;
 	ImGui::DragFloat3("Light pos", &light->pos.x, 10);
 
+	// toggle whether to display regular light depth texture or make it more visible
 	bool prev = extraVisible;
 	ImGui::Checkbox("Light depth buffer extra visible", &extraVisible);
 	if (prev != extraVisible) {
@@ -72,15 +72,22 @@ void LightEditor::update() {
 	ImGui::DragFloat("Specular light factor", &light->specularFactor, .01, 0, 1);
 	ImGui::DragFloat("Specular shininess", &light->shininess, 0.5, 5, 64);
 	ImGui::End();
+}
 
+void LightEditor::render() {
+	// render the light depth texture in the "Light depth texture" window
 	glDisable(GL_DEPTH_TEST);
 	glViewport(openGlViewportLightWin.x, openGlViewportLightWin.y, openGlViewportLightWin.z, openGlViewportLightWin.w);
+
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_SceneRenderer->lightFrameBuffer.depthTexture);
+
 	depthShader.bind();
 	depthVAO.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	depthVAO.unbind();
 	depthShader.unbind();
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glEnable(GL_DEPTH_TEST);
 }

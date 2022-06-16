@@ -92,12 +92,6 @@ void Window::initGuiForFrame() {
 	ImGui::NewFrame();
 }
 
-void Window::renderGui() {
-	glViewport(0, 0, (int)ioPtr->DisplaySize.x, (int)ioPtr->DisplaySize.y);
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
 void Window::swapBuffers() {
 	if (ioPtr->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{

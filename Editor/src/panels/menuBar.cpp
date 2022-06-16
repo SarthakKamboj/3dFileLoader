@@ -12,6 +12,7 @@ void MenuBar::update() {
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Open fbx file")) {
+				// open filebrowser to select file
 				fileBrowser.open = true;
 				fileBrowser.validPath = false;
 				fileBrowser.resultBuffer = fbxToLoadPath;

@@ -22,6 +22,7 @@ void SceneHierarchyPanel::update() {
 	if (g_PanelsManager->sceneList.curSceneIdx > -1) {
 		numMeshes = sceneListPtr->scenes[sceneListPtr->curSceneIdx].numMeshes;
 	}
+	// iterate through every mesh and display mesh name
 	for (int meshIdx = 0; meshIdx < numMeshes; meshIdx++) {
 		Scene& scene = g_PanelsManager->sceneList.scenes[g_PanelsManager->sceneList.curSceneIdx];
 		MeshRenderer* meshRenderers = sceneListPtr->meshRenderLists[sceneListPtr->curSceneIdx];
@@ -30,6 +31,7 @@ void SceneHierarchyPanel::update() {
 			MeshRenderer& selectedMeshRenderer = meshRenderers[selectedMeshIdx];
 			meshRenPanelPtr->curMeshRenderer = &selectedMeshRenderer;
 			meshRenPanelPtr->renderSelected = true;
+			// update shader in shader editor based on selected MeshRenderer
 			shaderEditorPtr->curShaderProgram = &shaderRegistryPtr->shaders[selectedMeshRenderer.shaderIdx];
 			shaderEditorPtr->updateTexturePath();
 		}

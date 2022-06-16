@@ -11,8 +11,6 @@ struct Window {
 	void pollEvents();
 	// readies GUI for current frame
 	void initGuiForFrame();
-	// renders GUI panels (in this case IMGUI)
-	void renderGui();
 	// Swaps window screen buffers
 	void swapBuffers();
 	glm::vec2 getWindowSize();
@@ -29,6 +27,5 @@ struct Window {
 	static int width;
 	static int height;
 
-private:
 	ImGuiIO* ioPtr;
 };

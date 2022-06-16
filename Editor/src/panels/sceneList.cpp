@@ -12,15 +12,17 @@ extern PanelsManager* g_PanelsManager;
 void SceneList::update() {
 	ImGui::Begin("Scene List");
 	if (curSceneIdx < 0) {
-		ImGui::Text("Select a scene");
+		ImGui::Text("Please load in a scene");
 	}
 	else {
+		// display selected scene
 		char buffer[200] = {};
 		Helper::CopyBuffer("Active scene: ", buffer, 200);
 		Helper::ConcatBuffer(buffer, scenes[curSceneIdx].name);
 		ImGui::Text(buffer);
 	}
 	ImGui::Separator();
+	// display scene names
 	for (int i = 0; i < numScenes; i++) {
 		if (ImGui::Selectable(scenes[i].name, selectedSceneIdx == i)) {
 			selectedSceneIdx = i;
@@ -29,6 +31,7 @@ void SceneList::update() {
 	}
 	if (numScenes > 0) {
 		if (ImGui::Button("Open scene")) {
+			// open an already loaded scene
 			if (selectedSceneIdx < 0 || selectedSceneIdx >= numScenes) {
 				ImGui::End();
 				return;
@@ -38,9 +41,6 @@ void SceneList::update() {
 			resetEditorState();
 			selectedSceneIdx = -1;
 		}
-	}
-	else {
-		ImGui::Text("Load in a scene");
 	}
 	ImGui::End();
 }
@@ -64,12 +64,15 @@ int SceneList::loadSceneFromFbxFile(const char* fbxToLoadPath) {
 		meshRenderers[meshId] = MeshRenderer(meshes[meshId], meshId);
 	}
 
+	// get scene name
 	int slashIdx = Helper::GetLastIndex(fbxToLoadPath, '\\');
 	int dotIdx = Helper::GetLastIndex(fbxToLoadPath, '.');
 	memset(scene.name, 0, 150);
 	Helper::CopyBuffer(fbxToLoadPath + slashIdx + 1, scene.name, dotIdx - slashIdx - 1);
 	numScenes += 1;
 	int idx = numScenes - 1;
+
+	// store scene and mesh data
 	scenes[idx] = scene;
 	meshRenderLists[idx] = meshRenderers;
 	curSceneIdx = numScenes - 1;

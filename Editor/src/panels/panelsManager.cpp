@@ -3,6 +3,7 @@
 #include "sceneRenderer.h"
 #include "window.h"
 #include "dockspace.h"
+#include "imgui_impl_opengl3.h"
 
 extern SceneRenderer* g_SceneRenderer;
 extern Window* g_Window;
@@ -28,10 +29,18 @@ void PanelsManager::update() {
 	sceneHierarchyPanel.update();
 	cameraPanel.update();
 	shaderEditor.update();
-	fileBrowser.update();
 	shaderRegistry.update();
 	sceneList.update();
 	worldView.update();
-	lightEditor.update();
+	fileBrowser.update();
 	menuBar.update();
+	lightEditor.update();
+}
+
+void PanelsManager::render() {
+	glViewport(0, 0, (int)g_Window->ioPtr->DisplaySize.x, (int)g_Window->ioPtr->DisplaySize.y);
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	lightEditor.render();
 }

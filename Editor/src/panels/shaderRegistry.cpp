@@ -7,6 +7,7 @@
 extern PanelsManager* g_PanelsManager;
 
 ShaderRegistry::ShaderRegistry() {
+	// add default shader to registry
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 	const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 	defaultShaderProgram = ShaderProgram(defaultVert, defaultFrag);
@@ -20,6 +21,7 @@ ShaderRegistry::ShaderRegistry() {
 
 void ShaderRegistry::update() {
 	if (open) {
+		// show all shaders
 		ImGui::Begin("Shader registry", &open);
 		for (int i = 0; i < numShaders; i++) {
 			if (ImGui::Selectable(shaders[i].name, selectedIdx == i)) {

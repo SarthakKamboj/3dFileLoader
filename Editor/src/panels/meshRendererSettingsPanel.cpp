@@ -15,6 +15,7 @@ void MeshRendererSettingsPanel::update() {
 	ImGui::ShowDemoWindow();
 	ImGui::Begin("Mesh Rendering Settings");
 
+	// handle if no scene or object is selected
 	if (g_PanelsManager->sceneList.curSceneIdx < 0) {
 		ImGui::Text("Please select a scene");
 		ImGui::End();
@@ -27,6 +28,7 @@ void MeshRendererSettingsPanel::update() {
 		return;
 	}
 
+	// show some mesh info
 	Scene* scenePtr = &g_PanelsManager->sceneList.scenes[g_PanelsManager->sceneList.curSceneIdx];
 	Mesh* mesh = &scenePtr->meshes[curMeshRenderer->meshIdx];
 	std::string meshNameStr = std::string("Name: ") + mesh->name;
@@ -40,12 +42,14 @@ void MeshRendererSettingsPanel::update() {
 	glm::vec3& rot = mesh->transform.rotation;
 	glm::vec3& scale = mesh->transform.scale;
 
+	// show transformation data
 	ImGui::PushFont(Window::openSansLight);
 	ImGui::DragFloat3("Position: ", &pos.x, 0.1);
 	ImGui::DragFloat3("Rotation: ", &rot.x, 1, -180, 180);
 	ImGui::DragFloat3("Scale:", &scale.x, 0.1, 0, 10);
 	ImGui::PopFont();
 
+	// show children
 	ImGui::Separator();
 	ImGui::Text("Num children: %i", mesh->numChildren);
 	ImGui::PushFont(Window::openSansLight);
@@ -55,12 +59,15 @@ void MeshRendererSettingsPanel::update() {
 	}
 	ImGui::PopFont();
 
+	// options to change view modes
 	ImGui::Separator();
 	ImGui::Checkbox("Display normals", &curMeshRenderer->displayNormals);
 	ImGui::Checkbox("Display split normals", &curMeshRenderer->displaySplitNormals);
 	ImGui::Checkbox("Wireframe mode", &curMeshRenderer->wireframeMode);
 
 	ImGui::Separator();
+
+	// get info about current shader
 	char shaderProgText[200];
 	Helper::CopyBuffer("Current Shader Program: ", shaderProgText, 200);
 	Helper::ConcatBuffer(shaderProgText, g_PanelsManager->shaderRegistry.shaders[curMeshRenderer->shaderIdx].name);
@@ -80,6 +87,7 @@ void MeshRendererSettingsPanel::update() {
 	ImGui::Checkbox("Smooth shading", &curMeshRenderer->useNormals);
 
 	ImGui::Separator();
+	// open the shader editor to either edit this mesh's shader or attach a new shader and modify that
 	if (ImGui::Button("Open Shader Editor")) {
 		g_PanelsManager->shaderEditor.open = true;
 		g_PanelsManager->shaderEditor.curShaderProgram = &g_PanelsManager->shaderRegistry.shaders[curMeshRenderer->shaderIdx];

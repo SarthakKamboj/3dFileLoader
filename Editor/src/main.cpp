@@ -55,7 +55,8 @@ int main(int argc, char* args[]) {
 
 		sceneRenderer.renderScene();
 		panelsManager.update();
-		window.renderGui();
+
+		panelsManager.render();
 
 		window.swapBuffers();
 	}

@@ -25,6 +25,7 @@ void ShaderEditor::update() {
 		return;
 	}
 
+	// display shader data
 	ImGui::InputText("Name", curShaderProgram->name, 50);
 
 	glm::vec3 prevColor = curShaderProgram->color;
@@ -44,6 +45,7 @@ void ShaderEditor::update() {
 	}
 
 	if (curShaderProgram->textureBasedColor) {
+		// show texture path
 		char texPathStr[300];
 		strcpy_s(texPathStr, "Texture Path: ");
 		strcat_s(texPathStr, curShaderProgram->texture.filePath);
@@ -51,6 +53,7 @@ void ShaderEditor::update() {
 
 		FileBrowser* fileBrowserPtr = &g_PanelsManager->fileBrowser;
 		if (ImGui::Button("Update texture")) {
+			// open file browser to select new texture image
 			int lastIdx = Helper::GetLastIndex(curShaderProgram->texture.filePath, '\\');
 			memset(fileBrowserPtr->curFolderPath, 0, 200);
 			Helper::CopyBuffer(curShaderProgram->texture.filePath, fileBrowserPtr->curFolderPath, lastIdx);
@@ -61,6 +64,7 @@ void ShaderEditor::update() {
 			selectingNewTexturePath = true;
 		}
 		if (!fileBrowserPtr->open && fileBrowserPtr->validPath && selectingNewTexturePath) {
+			// update texture path
 			selectingNewTexturePath = false;
 			if (!Helper::IsSameString(newTexturePath, curShaderProgram->texture.filePath)) {
 				curShaderProgram->texture.updateTextureFilePath(newTexturePath);
@@ -68,7 +72,7 @@ void ShaderEditor::update() {
 		}
 	}
 
-
+	// update object vertex normal displacement
 	float prevDisplacement = curShaderProgram->normalDisplacement;
 	ImGui::DragFloat("Normal Displacement", &curShaderProgram->normalDisplacement);
 	float newDisplacement = curShaderProgram->normalDisplacement;
