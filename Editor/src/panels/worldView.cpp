@@ -2,9 +2,9 @@
 #include "imgui.h"
 #include "glm/glm.hpp"
 #include "sceneRenderer.h"
+#include "window.h"
 
 extern SceneRenderer* g_SceneRenderer;
-extern int height;
 
 WorldView::WorldView() {}
 
