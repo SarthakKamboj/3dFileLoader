@@ -10,6 +10,7 @@ bool nodeStoresMesh(FbxNode* node);
 
 int meshIdx = 0;
 Scene loadFbx(const char* fbxFilePath) {
+	// initiliaze fbx loader/manager objects
 	FbxManager* fbxManager = FbxManager::Create();
 	FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
 	ioSettings->SetBoolProp(IMP_ANIMATION, false);
@@ -32,6 +33,7 @@ Scene loadFbx(const char* fbxFilePath) {
 
 	fbxImporter->Import(fbxScene);
 
+	// triangle imported file data
 	FbxGeometryConverter converter(fbxManager);
 	for (int nodeIdx = 0; nodeIdx < fbxScene->GetNodeCount(); nodeIdx++) {
 		if (nodeStoresMesh(fbxScene->GetNode(nodeIdx))) {
@@ -51,6 +53,7 @@ Scene loadFbx(const char* fbxFilePath) {
 			if (nodeStoresMesh(childNode)) {
 				int topLevelMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
 				if (topLevelMeshIdx != -1) {
+					// store idx to denote this is the highest level parent object
 					scene.topLevelMeshIdxs[topLvlIdxIter] = topLevelMeshIdx;
 					topLvlIdxIter += 1;
 				}
@@ -107,6 +110,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	const char* meshName = fbxMesh->GetName();
 	mesh.name = std::string(meshName);
 
+	// get transformation data
 	FbxDouble3 translation = node->LclTranslation.Get();
 	FbxDouble3 rotation = node->LclRotation.Get();
 	FbxDouble3 scaling = node->LclScaling.Get();
@@ -115,10 +119,12 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	mesh.transform.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
 	mesh.transform.scale = glm::vec3(scaling[0], scaling[1], scaling[2]);
 
+	// get UV mapping data
 	FbxGeometryElementUV* uvElement = fbxMesh->GetElementUV(0);
 	FbxGeometryElement::EMappingMode uvMappingMode = uvElement->GetMappingMode();
 	FbxGeometryElement::EReferenceMode uvRefMode = uvElement->GetReferenceMode();
 
+	// get normals data
 	int numNormalEls = fbxMesh->GetElementNormalCount();
 	FbxGeometryElementNormal* normalsElement = fbxMesh->GetElementNormal(0);
 	FbxGeometryElement::EMappingMode normalsMappingMode = normalsElement->GetMappingMode();
@@ -133,6 +139,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		normalData[i].numCoords = 0;
 	}
 
+	// get unique positions on this fbx mesh
 	FbxVector4* fbxLclPositions = fbxMesh->GetControlPoints();
 	/*
 	- making as many vertices as indicies b/c diff verts may have same pos but diff uv/normals
@@ -151,6 +158,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 	for (int polygonId = 0; polygonId < fbxMesh->GetPolygonCount(); polygonId++) {
 		for (int polyVertIdx = 0; polyVertIdx < fbxMesh->GetPolygonSize(polygonId); polyVertIdx++) {
 			if (vertexId == 3000) break;
+			// get vertex position index to use in positions array
 			int positionId = fbxMesh->GetPolygonVertex(polygonId, polyVertIdx);
 			vertPosIds[vertexId] = positionId;
 			Vertex& vertex = mesh.vertices[vertexId];
@@ -204,16 +212,19 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 			FbxVector4 normal;
 			switch (normalsMappingMode) {
 			case FbxGeometryElement::eByControlPoint: {
+				// get data directly from normals data
 				normal = normalsElement->GetDirectArray().GetAt(positionId);
 			}
 													break;
 			case FbxGeometryElement::eByPolygonVertex: {
 				switch (normalsRefMode) {
 				case FbxGeometryElement::eDirect: {
+					// get data directly from normals data
 					normal = normalsElement->GetDirectArray().GetAt(vertexId);
 				}
 												break;
 				case FbxGeometryElement::eIndexToDirect: {
+					// get data directly from normals index array to get normals data
 					int idx = normalsElement->GetIndexArray().GetAt(vertexId);
 					normal = normalsElement->GetDirectArray().GetAt(idx);
 				}
@@ -226,10 +237,10 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 			vertex.normal[1] = normal[1];
 			vertex.normal[2] = normal[2];
 
+			// add current normal data to the vertex corresponding to the vertex position
 			glm::vec3 normalGlm(normal[0], normal[1], normal[2]);
 			normalGlm = glm::normalize(normalGlm);
 			NormalData& data = normalData[positionId];
-
 			if (normalData[positionId].numCoords < 5) {
 				int curSplitNormalIdx = normalData[positionId].numCoords;
 				normalData[positionId].splitNormals[curSplitNormalIdx] = normalGlm;
@@ -255,6 +266,7 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		data.avgNormal /= data.numCoords;
 	}
 
+	// populating average normal data for vertices
 	for (int i = 0; i < mesh.vertexCount; i++) {
 		Vertex* vertices = mesh.vertices;
 		int meshPosId = vertPosIds[i];
@@ -264,12 +276,12 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		vertices[i].avgNormal[2] = avgNormalForPos.z;
 	}
 
-	// scene.meshes.push_back(mesh);
 	int curMeshIdx = meshIdx;
 	scene.meshes[curMeshIdx] = mesh;
 	scene.numMeshes++;
 	meshIdx++;
 
+	// call function recursively for the mesh's children
 	mesh.numChildren = 0;
 	int childCount = node->GetChildCount();
 	for (int i = 0; i < childCount; i++) {
@@ -277,9 +289,12 @@ int addMeshToScene(Scene& scene, FbxMesh* fbxMesh) {
 		if (nodeStoresMesh(childNode)) {
 			int childMeshIdx = addMeshToScene(scene, (FbxMesh*)childNode->GetNodeAttributeByIndex(0));
 			if (childMeshIdx != -1) {
-				int curNumChildren = scene.meshes[curMeshIdx].numChildren;
-				scene.meshes[curMeshIdx].childMeshIdxs[curNumChildren] = childMeshIdx;
-				scene.meshes[curMeshIdx].numChildren += 1;
+				Mesh& curMesh = scene.meshes[curMeshIdx];
+				int curNumChildren = curMesh.numChildren;
+				if (curNumChildren < MAX_NUM_MESHES_PER_SCENE) {
+					curMesh.childMeshIdxs[curNumChildren] = childMeshIdx;
+					curMesh.numChildren += 1;
+				}
 			}
 		}
 	}

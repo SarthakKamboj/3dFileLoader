@@ -7,7 +7,7 @@ struct FrameBuffer {
 	void bind();
 	void unbind();
 
-	static void ClearBuffers(glm::vec3 color);
+	static void ClearBuffers(const glm::vec3& color);
 
 	unsigned int frameBufferTex;
 

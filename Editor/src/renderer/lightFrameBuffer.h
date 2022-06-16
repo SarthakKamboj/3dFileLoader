@@ -10,7 +10,6 @@ struct LightFrameBuffer {
 	Light* light = NULL;
 	unsigned int fbo;
 	unsigned int depthTexture;
-	unsigned int colorTexture;
 
 	glm::mat4 getLightViewMat();
 };

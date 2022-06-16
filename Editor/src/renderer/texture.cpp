@@ -21,6 +21,7 @@ void Texture::updateTextureFilePath(const char* _filePath) {
 
 	stbi_set_flip_vertically_on_load(true);
 
+	// load image data
 	int imgWidth, imgHeight, nrChannels;
 	unsigned char* data = stbi_load(_filePath, &imgWidth, &imgHeight, &nrChannels, 0);
 
@@ -45,6 +46,7 @@ void Texture::updateTextureFilePath(const char* _filePath) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	}
 
+	// create mipmaps
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 

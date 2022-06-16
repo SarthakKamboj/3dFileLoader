@@ -40,7 +40,6 @@ void LightEditor::update() {
 
 	ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowViewport(mainViewport->ID);
-	// ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetWindowPos(ImVec2(0, 0));
 	glm::vec4 openGlViewportLightWin;

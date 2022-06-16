@@ -7,8 +7,8 @@
 ImFont* Window::openSansBold = NULL;
 ImFont* Window::openSansLight = NULL;
 
-int width = 800;
-int height = 600;
+int Window::width = 800;
+int Window::height = 600;
 
 Window::Window(Input* _input) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -16,6 +16,7 @@ Window::Window(Input* _input) {
 		return;
 	}
 
+	// set opengl attributes through sdl
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -23,8 +24,8 @@ Window::Window(Input* _input) {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;// | SDL_WINDOW_MAXIMIZED;
-	window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags);
+	uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+	window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Window::width, Window::height, windowFlags);
 
 	context = SDL_GL_CreateContext(window);
 
@@ -35,6 +36,7 @@ Window::Window(Input* _input) {
 	glEnable(GL_DEPTH_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
+	// set up ImGUi
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -56,6 +58,7 @@ Window::Window(Input* _input) {
 	const char* glslVersion = "#version 330";
 	ImGui_ImplOpenGL3_Init(glslVersion);
 
+	// create fonts
 	float fontSize = 16.0f;
 	Window::openSansBold = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Bold.ttf", fontSize);
 	Window::openSansLight = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Light.ttf", fontSize);
@@ -75,12 +78,6 @@ void Window::pollEvents() {
 		}
 		if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
 			running = false;
-		}
-		if (event.type == SDL_WINDOWEVENT) {
-			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-				// width = event.window.data1;
-				// height = event.window.data2;
-			}
 		}
 		if (event.type == SDL_KEYDOWN) {
 			SDL_Keycode keyDown = event.key.keysym.sym;
@@ -104,6 +101,7 @@ void Window::renderGui() {
 void Window::swapBuffers() {
 	if (ioPtr->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
+		// handles the multiple windows created by ImGui
 		SDL_Window* backupCurrentWindow = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backupCurrentContext = SDL_GL_GetCurrentContext();
 		ImGui::UpdatePlatformWindows();

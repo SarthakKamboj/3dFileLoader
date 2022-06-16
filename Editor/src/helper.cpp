@@ -1,8 +1,18 @@
 #include "helper.h"
 #include "glad/glad.h"
 #include <iostream>
+#include "glm/gtc/type_ptr.hpp"
 
 namespace Helper {
+
+	glm::mat4 GetRotationMatrix(const glm::vec3& rot) {
+		glm::mat4 rotMatrix(1.0f);
+		rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.x), glm::vec3(1, 0, 0));
+		rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.y), glm::vec3(0, 1, 0));
+		rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.z), glm::vec3(0, 0, 1));
+		return rotMatrix;
+	}
+
 	int GetLastIndex(const char* buffer, char c) {
 		int res = -1;
 		int idx = 0;

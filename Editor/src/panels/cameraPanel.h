@@ -14,5 +14,8 @@ struct CameraPanel {
 	glm::mat4 getViewMat();
 
 	void update();
+
+	static float nearPlane;
+	static float farPlane;
 };
 

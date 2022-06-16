@@ -6,22 +6,12 @@
 #include "panels/panelsManager.h"
 #include "sceneRenderer.h"
 
-NormalRenderer* splitNormalRendererPtr;
-NormalRenderer* normalRendererPtr;
+NormalRenderer* g_SplitNormalRendererPtr;
+NormalRenderer* g_NormalRendererPtr;
 PanelsManager* g_PanelsManager;
 Input* g_Input;
 SceneRenderer* g_SceneRenderer;
 Window* g_Window;
-
-extern float nearPlane, farPlane;
-
-glm::mat4 getRotationMatrix(glm::vec3 rot) {
-	glm::mat4 rotMatrix(1.0f);
-	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.x), glm::vec3(1, 0, 0));
-	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.y), glm::vec3(0, 1, 0));
-	rotMatrix = glm::rotate(rotMatrix, glm::radians(rot.z), glm::vec3(0, 0, 1));
-	return rotMatrix;
-}
 
 int main(int argc, char* args[]) {
 
@@ -44,11 +34,11 @@ int main(int argc, char* args[]) {
 
 	// will refactor these NormalRenderers later
 	NormalRenderer splitNormalRenderer;
-	splitNormalRendererPtr = &splitNormalRenderer;
-	splitNormalRendererPtr->setColor(glm::vec3(1, 0, 0));
+	g_SplitNormalRendererPtr = &splitNormalRenderer;
+	g_SplitNormalRendererPtr->setColor(glm::vec3(1, 0, 0));
 
 	NormalRenderer normalRenderer;
-	normalRendererPtr = &normalRenderer;
+	g_NormalRendererPtr = &normalRenderer;
 
 	PanelsManager panelsManager;
 	g_PanelsManager = &panelsManager;

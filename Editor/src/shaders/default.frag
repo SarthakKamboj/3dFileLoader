@@ -35,12 +35,7 @@ float ndcToZeroToOne(float ndc) {
 }
 
 void main() {
-	vec4 objectColor = vec4(0,0,0,0);
-	if (renderTexture == 1) {
-		objectColor = texture(material.diffuse, texCoords);
-	} else {
-		objectColor = vec4(color, 1.0);
-	}
+	vec4 objectColor = (renderTexture * texture(material.diffuse, texCoords)) + ((1 - renderTexture) * vec4(color, 1.0));
 
 	vec3 normNormal = normalize(normal);
 	vec3 normLightDir = normalize(light.pos - worldPos.xyz);

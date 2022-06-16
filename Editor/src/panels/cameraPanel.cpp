@@ -1,13 +1,13 @@
 #include "cameraPanel.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
+#include "window.h"
 
-extern int width, height;
-float nearPlane = 10.0f;
-float farPlane = 5000.0f;
+float CameraPanel::nearPlane = 10.0f;
+float CameraPanel::farPlane = 5000.0f;
 
 glm::mat4 CameraPanel::getProjectionMat() {
-	return glm::perspective(glm::radians(pov), ((float)width) / height, nearPlane, farPlane);
+	return glm::perspective(glm::radians(pov), ((float)Window::width) / Window::height, CameraPanel::nearPlane, CameraPanel::farPlane);
 }
 
 glm::mat4 CameraPanel::getViewMat() {

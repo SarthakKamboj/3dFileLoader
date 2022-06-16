@@ -8,10 +8,10 @@
 struct ShaderProgram {
 	ShaderProgram();
 	ShaderProgram(const char* vertexPath, const char* fragmentPath);
-	void setMat4(const char* varName, glm::mat4& mat);
+	void setMat4(const char* varName, const glm::mat4& mat);
 	void setInt(const char* varName, int val);
 	void setFloat(const char* varName, float val);
-	void setVec3(const char* varName, glm::vec3 vec3);
+	void setVec3(const char* varName, const glm::vec3& vec3);
 	void bind();
 	void unbind();
 
@@ -24,5 +24,4 @@ struct ShaderProgram {
 	bool textureBasedColor = false;
 	Texture texture;
 	float normalDisplacement;
-	// char texturePath[200] = {};
 };

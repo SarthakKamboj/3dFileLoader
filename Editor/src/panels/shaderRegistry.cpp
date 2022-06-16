@@ -5,7 +5,6 @@
 #include "panelsManager.h"
 
 extern PanelsManager* g_PanelsManager;
-extern int width, height;
 
 ShaderRegistry::ShaderRegistry() {
 	const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
@@ -13,9 +12,9 @@ ShaderRegistry::ShaderRegistry() {
 	defaultShaderProgram = ShaderProgram(defaultVert, defaultFrag);
 	memset(defaultShaderProgram.name, 0, 50);
 	Helper::CopyBuffer("Default shader", defaultShaderProgram.name, 50);
-	// shaders.push_back(defaultShaderProgram);
 	shaders[0] = defaultShaderProgram;
 	defaultShaderProgram.setVec3("color", glm::vec3(1, 1, 1));
+	defaultShaderProgram.setInt("useSplit", 1);
 	numShaders++;
 }
 
@@ -32,10 +31,9 @@ void ShaderRegistry::update() {
 	}
 }
 
-int ShaderRegistry::addShader(ShaderProgram newShader) {
+int ShaderRegistry::addShader(ShaderProgram& newShader) {
 	if (numShaders == MAX_NUM_SHADERS) return -1;
 	sprintf_s(newShader.name, "Shader_%i", numShaders);
-	// shaders.push_back(newShader);
 	shaders[numShaders] = newShader;
 	numShaders += 1;
 	return numShaders - 1;

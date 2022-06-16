@@ -6,9 +6,7 @@
 extern SceneRenderer* g_SceneRenderer;
 extern int height;
 
-WorldView::WorldView() {
-	testTexture = Texture("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\cylinderTexture.png", 0);
-}
+WorldView::WorldView() {}
 
 void WorldView::update() {
 
@@ -19,8 +17,6 @@ void WorldView::update() {
 
 	ImVec2 sceneViewWinPadding(5.0f, 5.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, sceneViewWinPadding);
-
-	// ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), setSceneViewWindowConstraint);
 
 	float fontSize = 16.0f;
 	ImGui::Begin("World view window", NULL, worldViewWinFlags);

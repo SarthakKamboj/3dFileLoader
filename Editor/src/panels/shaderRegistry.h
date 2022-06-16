@@ -6,7 +6,7 @@
 
 struct ShaderRegistry {
 	ShaderRegistry();
-	int addShader(ShaderProgram newShader);
+	int addShader(ShaderProgram& newShader);
 	ShaderProgram shaders[MAX_NUM_SHADERS] = {};
 	int numShaders = 0;
 	int selectedIdx = -1;

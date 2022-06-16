@@ -6,8 +6,8 @@ class VBO {
 public:
 	VBO();
 	void setData(float* vertices, int byteSizeOfVertices, GLenum usage);
-	void bind();
-	void unbind();
+	void bind() const;
+	void unbind() const;
 
 private:
 	GLuint vbo;

@@ -57,9 +57,10 @@ void ShaderEditor::update() {
 			fileBrowserPtr->loadMode = FileBrowserLoadMode::IMAGE;
 			fileBrowserPtr->resultBuffer = newTexturePath;
 			fileBrowserPtr->open = true;
+			fileBrowserPtr->validPath = false;
 			selectingNewTexturePath = true;
 		}
-		if (!fileBrowserPtr->open && selectingNewTexturePath) {
+		if (!fileBrowserPtr->open && fileBrowserPtr->validPath && selectingNewTexturePath) {
 			selectingNewTexturePath = false;
 			if (!Helper::IsSameString(newTexturePath, curShaderProgram->texture.filePath)) {
 				curShaderProgram->texture.updateTextureFilePath(newTexturePath);

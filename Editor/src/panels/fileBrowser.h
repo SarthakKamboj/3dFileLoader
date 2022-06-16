@@ -12,6 +12,7 @@ struct FileBrowser {
 	char curFolderPath[200];
 	bool open = false;
 	int selectedIdx = -1;
+	bool validPath = false;
 	FileBrowserLoadMode loadMode;
 };
 

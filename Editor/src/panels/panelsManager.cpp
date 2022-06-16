@@ -4,12 +4,11 @@
 #include "window.h"
 #include "dockspace.h"
 
-extern int width, height;
 extern SceneRenderer* g_SceneRenderer;
 extern Window* g_Window;
 
 void setSceneViewWindowConstraint(ImGuiSizeCallbackData* data) {
-	data->DesiredSize.y = data->DesiredSize.x * (((float)height) / width);
+	data->DesiredSize.y = data->DesiredSize.x * (((float)Window::height) / Window::width);
 }
 
 PanelsManager::PanelsManager() {
@@ -22,7 +21,7 @@ PanelsManager::PanelsManager() {
 void PanelsManager::update() {
 
 	FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, Window::width, Window::height);
 
 	renderDockspace();
 	meshRenPanel.update();

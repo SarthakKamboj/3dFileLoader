@@ -8,8 +8,7 @@
 
 struct MeshRenderer {
 	MeshRenderer();
-	// MeshRenderer(Mesh* mesh);
-	MeshRenderer(Mesh& mesh, int _meshIdx);
+	MeshRenderer(const Mesh& mesh, int _meshIdx);
 	void render();
 
 	bool displaySplitNormals = false;
@@ -17,12 +16,10 @@ struct MeshRenderer {
 	bool wireframeMode = false;
 	bool useNormals = false;
 
-	// Mesh* mesh;
 	int meshIdx;
-	// int normalIdx;
-	// int splitNormalIdx;
-	// ShaderProgram* shaderProgram;
 	int shaderIdx = 0;
+
+	ShaderProgram wireFrameShaderProgram;
 
 	VAO vao;
 	VBO vbo;

@@ -6,7 +6,6 @@
 #include "helper.h"
 
 extern PanelsManager* g_PanelsManager;
-extern int width, height;
 
 void MenuBar::update() {
 	FileBrowser& fileBrowser = g_PanelsManager->fileBrowser;
@@ -14,6 +13,7 @@ void MenuBar::update() {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Open fbx file")) {
 				fileBrowser.open = true;
+				fileBrowser.validPath = false;
 				fileBrowser.resultBuffer = fbxToLoadPath;
 				fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
 				memset(fileBrowser.curFolderPath, 0, 200);
@@ -26,7 +26,7 @@ void MenuBar::update() {
 		ImGui::EndMainMenuBar();
 	}
 
-	if (selectingFbxToLoad && !fileBrowser.open) {
+	if (selectingFbxToLoad && !fileBrowser.open && fileBrowser.validPath) {
 		selectingFbxToLoad = false;
 		g_PanelsManager->sceneList.loadSceneFromFbxFile(fbxToLoadPath);
 	}

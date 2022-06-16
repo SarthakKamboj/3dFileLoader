@@ -10,10 +10,10 @@ void VBO::setData(float* vertices, int byteSizeOfVertices, GLenum usage) {
 	unbind();
 }
 
-void VBO::bind() {
+void VBO::bind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 }
 
-void VBO::unbind() {
+void VBO::unbind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

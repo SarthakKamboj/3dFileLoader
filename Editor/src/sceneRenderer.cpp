@@ -1,13 +1,12 @@
 #include "sceneRenderer.h"
 #include "renderer/normalRenderer.h"
 #include "imgui.h"
+#include "helper.h"
+#include "window.h"
 
-extern glm::mat4 getRotationMatrix(glm::vec3 rot);
 extern PanelsManager* g_PanelsManager;
-extern NormalRenderer* splitNormalRendererPtr;
-extern NormalRenderer* normalRendererPtr;
-extern int width, height;
-
+extern NormalRenderer* g_SplitNormalRendererPtr;
+extern NormalRenderer* g_NormalRendererPtr;
 
 SceneRenderer::SceneRenderer(Light* light) {
 	const char* lightPassVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.vert";
@@ -26,10 +25,10 @@ void SceneRenderer::renderScene() {
 	lightFrameBuffer.bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, Window::width, Window::height);
+	// get and set light view and proejction matrices for the shader
 	glm::mat4 lightView = lightFrameBuffer.getLightViewMat();
 	glm::mat4 lightProj = cameraPanel.getProjectionMat();
-	glm::mat4 cameraProj = cameraPanel.getProjectionMat();
 
 	lightPassShader.setMat4("lightView", lightView);
 	lightPassShader.setMat4("lightProj", lightProj);
@@ -39,14 +38,16 @@ void SceneRenderer::renderScene() {
 		MeshRenderer* meshRenderers = sceneList.meshRenderLists[sceneList.curSceneIdx];
 		glm::vec3 camPos(cameraPanel.radius * cos(glm::radians(cameraPanel.angle)), cameraPanel.yPos, cameraPanel.radius * sin(glm::radians(cameraPanel.angle)));
 		for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
+			// update the model matrix for this particular mesh
 			Mesh* mesh = &scene.meshes[meshRenderers[meshId].meshIdx];
 			glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
-			glm::mat4 rotation = getRotationMatrix(mesh->transform.rotation);
+			glm::mat4 rotation = Helper::GetRotationMatrix(mesh->transform.rotation);
 			glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh->transform.scale);
 
 			glm::mat4 model = translation * rotation * scale;
 			lightPassShader.setMat4("model", model);
 
+			// render mesh with light pass shader
 			lightPassShader.bind();
 			meshRenderers[meshId].vao.bind();
 			glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
@@ -61,18 +62,20 @@ void SceneRenderer::renderScene() {
 	/*
 		SCENE PASS
 	*/
+	// get matrices for camera rendering
 	glm::mat4 view = cameraPanel.getViewMat();
-	normalRendererPtr->shaderProgram.setMat4("view", view);
-	normalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
-	splitNormalRendererPtr->shaderProgram.setMat4("view", view);
-	splitNormalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
+	glm::mat4 cameraProj = cameraPanel.getProjectionMat();
+	g_NormalRendererPtr->shaderProgram.setMat4("view", view);
+	g_NormalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
+	g_SplitNormalRendererPtr->shaderProgram.setMat4("view", view);
+	g_SplitNormalRendererPtr->shaderProgram.setMat4("projection", cameraProj);
 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, Window::width, Window::height);
 
 	sceneFbo.bind();
 	FrameBuffer::ClearBuffers(glm::vec3(0, 0, 0));
 	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, Window::width, Window::height);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, lightFrameBuffer.depthTexture);
@@ -85,6 +88,7 @@ void SceneRenderer::renderScene() {
 		ShaderRegistry& shaderRegistry = g_PanelsManager->shaderRegistry;
 		for (int meshId = 0; meshId < scene.numMeshes; meshId++) {
 
+			// update shader data for MeshRenderer and then render it
 			int shaderIdx = meshRenderers[meshId].shaderIdx;
 			shaderRegistry.shaders[shaderIdx].setInt("depthTexUnit", 1);
 			shaderRegistry.shaders[shaderIdx].setMat4("lightProj", lightProj);
@@ -102,9 +106,13 @@ void SceneRenderer::renderScene() {
 
 			shaderRegistry.shaders[shaderIdx].setVec3("viewPos", camPos);
 
+			meshRenderers[meshId].wireFrameShaderProgram.setMat4("view", view);
+			meshRenderers[meshId].wireFrameShaderProgram.setMat4("projection", cameraProj);
+
 			meshRenderers[meshId].render();
 		}
 
+		// render light cube to see where light source is
 		lightCube.shaderProgram.setVec3("color", light->lightColor);
 		glm::mat4 translation = glm::translate(glm::mat4(1.0f), light->pos);
 		glm::mat4 rotation(1.0f);

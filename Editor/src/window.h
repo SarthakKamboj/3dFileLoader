@@ -26,6 +26,9 @@ struct Window {
 	static ImFont* openSansBold;
 	static ImFont* openSansLight;
 
+	static int width;
+	static int height;
+
 private:
 	ImGuiIO* ioPtr;
 };

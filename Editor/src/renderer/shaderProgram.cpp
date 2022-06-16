@@ -11,12 +11,14 @@ ShaderProgram::ShaderProgram() {
 
 	normalDisplacement = 0;
 
+	// create default texture
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	texture = Texture(defaultTexPath, 0);
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	normalDisplacement = 0;
+	// create vertex and fragment shaders
 	GLuint vertexId = createShader(vertexPath, GL_VERTEX_SHADER);
 	sprintf_s(name, "Shader_%i", ShaderProgram::shaderId);
 	if (vertexId == -1) {
@@ -36,9 +38,9 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	glDeleteShader(vertexId);
 	glDeleteShader(fragmentId);
 
+	// create default texture
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
 	texture = Texture(defaultTexPath, 0);
-	std::cout << "texture id: " << texture.texture << std::endl;
 }
 
 void ShaderProgram::bind() {
@@ -49,7 +51,7 @@ void ShaderProgram::unbind() {
 	glUseProgram(0);
 }
 
-void ShaderProgram::setMat4(const char* varName, glm::mat4& mat) {
+void ShaderProgram::setMat4(const char* varName, const glm::mat4& mat) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
@@ -71,7 +73,7 @@ void ShaderProgram::setFloat(const char* varName, float val) {
 	unbind();
 }
 
-void ShaderProgram::setVec3(const char* varName, glm::vec3 vec3) {
+void ShaderProgram::setVec3(const char* varName, const glm::vec3& vec3) {
 	if (programId == -1) return;
 	bind();
 	GLint loc = glGetUniformLocation(programId, varName);
@@ -94,6 +96,7 @@ void ShaderProgram::setInt(const char* varName, int val) {
 }
 
 GLuint ShaderProgram::createShader(const char* path, GLenum shaderType) {
+	// get shader file contents
 	std::string line, fileContents;
 	std::ifstream file(path);
 
@@ -101,6 +104,7 @@ GLuint ShaderProgram::createShader(const char* path, GLenum shaderType) {
 		fileContents += line + "\n";
 	}
 
+	// compile shader and make sure there aren't any errors other return shader id
 	const char* fileCodeChar = fileContents.c_str();
 	GLuint shaderId = glCreateShader(shaderType);
 	glShaderSource(shaderId, 1, &fileCodeChar, NULL);

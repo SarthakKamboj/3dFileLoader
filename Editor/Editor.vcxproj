@@ -184,7 +184,6 @@
     <ClCompile Include="src\renderer\ebo.cpp" />
     <ClCompile Include="src\renderer\frameBuffer.cpp" />
     <ClCompile Include="src\renderer\lightFrameBuffer.cpp" />
-    <ClCompile Include="src\renderer\line.cpp" />
     <ClCompile Include="src\renderer\meshRenderer.cpp" />
     <ClCompile Include="src\renderer\normalRenderer.cpp" />
     <ClCompile Include="src\renderer\shaderProgram.cpp" />
@@ -214,7 +213,6 @@
     <ClInclude Include="src\renderer\frameBuffer.h" />
     <ClInclude Include="src\renderer\light.h" />
     <ClInclude Include="src\renderer\lightFrameBuffer.h" />
-    <ClInclude Include="src\renderer\line.h" />
     <ClInclude Include="src\renderer\meshRenderer.h" />
     <ClInclude Include="src\renderer\normalRenderer.h" />
     <ClInclude Include="src\renderer\shaderProgram.h" />
@@ -237,11 +235,16 @@
     <None Include="src\shaders\line.vert" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\quad.vert" />
+    <None Include="src\shaders\wireframe.frag" />
+    <None Include="src\shaders\wireframe.vert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileLoader\FileLoader.vcxproj">
       <Project>{089f727d-da65-4e25-a9bd-937e8f13ae86}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

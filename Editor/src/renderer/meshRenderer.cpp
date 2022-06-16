@@ -1,5 +1,4 @@
 #include "meshRenderer.h"
-#include "line.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "panels/shaderRegistry.h"
@@ -8,22 +7,33 @@
 #include "panels/panelsManager.h"
 #include "renderer/normalRenderer.h"
 #include <iostream>
+#include "helper.h"
 
-extern glm::mat4 getRotationMatrix(glm::vec3 rot);
-extern NormalRenderer* normalRendererPtr;
-extern NormalRenderer* splitNormalRendererPtr;
+extern NormalRenderer* g_NormalRendererPtr;
+extern NormalRenderer* g_SplitNormalRendererPtr;
 extern PanelsManager* g_PanelsManager;
 
 MeshRenderer::MeshRenderer() {
 	meshIdx = -1;
+
+	const char* wireframeVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.vert";
+	const char* wireframeFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.frag";
+	wireFrameShaderProgram = ShaderProgram(wireframeVert, wireframeFrag);
+
 }
 
-MeshRenderer::MeshRenderer(Mesh& _mesh, int _meshIdx) {
+MeshRenderer::MeshRenderer(const Mesh& _mesh, int _meshIdx) {
+
+	const char* wireframeVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.vert";
+	const char* wireframeFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.frag";
+	wireFrameShaderProgram = ShaderProgram(wireframeVert, wireframeFrag);
+
 	meshIdx = _meshIdx;
-	Mesh* mesh = &_mesh;
+	const Mesh* mesh = &_mesh;
 
 	vao.bind();
 
+	// set mesh vertex data in vbo
 	vbo.setData((float*)&mesh->vertices[0], mesh->vertexCount * sizeof(Vertex), GL_STATIC_DRAW);
 
 	vao.attachVBO(vbo, 0, 3, sizeof(Vertex), offsetof(Vertex, position));
@@ -41,16 +51,39 @@ void MeshRenderer::render() {
 	SceneList* sceneListPtr = &g_PanelsManager->sceneList;
 	if (sceneListPtr->curSceneIdx < 0) return;
 
+	// get mesh model matrix
 	Scene* scenePtr = &sceneListPtr->scenes[sceneListPtr->curSceneIdx];
 	Mesh* mesh = &scenePtr->meshes[meshIdx];
 	glm::mat4 translation = glm::translate(glm::mat4(1.0f), mesh->transform.position);
-	glm::mat4 rotation = getRotationMatrix(mesh->transform.rotation);
+	glm::mat4 rotation = Helper::GetRotationMatrix(mesh->transform.rotation);
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), mesh->transform.scale);
 
 	glm::mat4 model = translation * rotation * scale;
+	ShaderRegistry* shaderRegistryPtr = &g_PanelsManager->shaderRegistry;
+	ShaderProgram& curShader = shaderRegistryPtr->shaders[shaderIdx];
+
+	if (wireframeMode) {
+		GLint splitLoc = glGetUniformLocation(curShader.programId, "useSplit");
+		GLint displacementLoc = glGetUniformLocation(curShader.programId, "displacement");
+
+		GLfloat displacement;
+		glGetUniformfv(curShader.programId, displacementLoc, &displacement);
+
+		wireFrameShaderProgram.setMat4("model", model);
+		wireFrameShaderProgram.setFloat("displacement", displacement);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		wireFrameShaderProgram.bind();
+		vao.bind();
+		glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
+		vao.unbind();
+		wireFrameShaderProgram.unbind();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		return;
+	}
 
 	if (displayNormals | displaySplitNormals) {
 
+		// if should display normals, calculate those normals and update the normal renderers accordingly
 		for (int vertexIdx = 0; vertexIdx < mesh->vertexCount; vertexIdx++) {
 			Vertex& vert = mesh->vertices[vertexIdx];
 			glm::vec4 startPoint(vert.position[0], vert.position[1], vert.position[2], 1);
@@ -58,36 +91,36 @@ void MeshRenderer::render() {
 			glm::vec4 avgEndPoint = startPoint + 1.25f * 100.0f * glm::vec4(vert.avgNormal[0], vert.avgNormal[1], vert.avgNormal[2], 0.0f);
 
 			if (displaySplitNormals) {
-				splitNormalRendererPtr->setStartPoint(vertexIdx, startPoint);
-				splitNormalRendererPtr->setEndPoint(vertexIdx, endPoint);
+				g_SplitNormalRendererPtr->setStartPoint(vertexIdx, startPoint);
+				g_SplitNormalRendererPtr->setEndPoint(vertexIdx, endPoint);
 			}
 
 			if (displayNormals) {
-				normalRendererPtr->setStartPoint(vertexIdx, startPoint);
-				normalRendererPtr->setEndPoint(vertexIdx, avgEndPoint);
+				g_NormalRendererPtr->setStartPoint(vertexIdx, startPoint);
+				g_NormalRendererPtr->setEndPoint(vertexIdx, avgEndPoint);
 			}
 
 		}
 
 		if (displaySplitNormals) {
-			splitNormalRendererPtr->shaderProgram.setMat4("model", model);
-			splitNormalRendererPtr->render(mesh->vertexCount);
+			g_SplitNormalRendererPtr->shaderProgram.setMat4("model", model);
+			g_SplitNormalRendererPtr->render(mesh->vertexCount);
 		}
 
 		if (displayNormals) {
-			normalRendererPtr->shaderProgram.setMat4("model", model);
-			normalRendererPtr->render(mesh->vertexCount);
+			g_NormalRendererPtr->shaderProgram.setMat4("model", model);
+			g_NormalRendererPtr->render(mesh->vertexCount);
 		}
 
 	}
 
-	ShaderRegistry* shaderRegistryPtr = &g_PanelsManager->shaderRegistry;
+	// set shader data and render mesh
 	shaderRegistryPtr->shaders[shaderIdx].setMat4("model", model);
 	shaderRegistryPtr->shaders[shaderIdx].setInt("useSplit", !useNormals);
 	shaderRegistryPtr->shaders[shaderIdx].bind();
-	if (wireframeMode) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
+	// if (wireframeMode) {
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// }
 	if (shaderRegistryPtr->shaders[shaderIdx].textureBasedColor) {
 		shaderRegistryPtr->shaders[shaderIdx].texture.bind();
 	}
@@ -97,9 +130,9 @@ void MeshRenderer::render() {
 	if (shaderRegistryPtr->shaders[shaderIdx].textureBasedColor) {
 		shaderRegistryPtr->shaders[shaderIdx].texture.unbind();
 	}
-	if (wireframeMode) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+	// if (wireframeMode) {
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// }
 	shaderRegistryPtr->shaders[shaderIdx].unbind();
 
 }

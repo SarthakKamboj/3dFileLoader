@@ -86,14 +86,13 @@ void MeshRendererSettingsPanel::update() {
 		g_PanelsManager->shaderEditor.updateTexturePath();
 	}
 
-
-
 	if (ImGui::Button("Create new shader")) {
 		const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 		const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
 		ShaderProgram shaderProgram(defaultVert, defaultFrag);
 		shaderProgram.setInt("renderTexture", 0);
 		shaderProgram.setInt("material.diffuse", 0);
+		shaderProgram.setInt("useSplit", 1);
 		shaderProgram.setVec3("color", glm::vec3(0, 1, 0));
 		int newShaderIdx = g_PanelsManager->shaderRegistry.addShader(shaderProgram);
 		curMeshRenderer->shaderIdx = newShaderIdx;
