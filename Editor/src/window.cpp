@@ -62,18 +62,17 @@ Window::Window(Input* _input) {
 	// create fonts
 	float fontSize = 16.0f;
 
+	// get font paths
 	char fontPath[200] = {};
 	Helper::GetApplicationPath(fontPath);
-	const char* relativeShadersFolderPath = "\\assets\\fonts\\";
-	Helper::ConcatBuffer(fontPath, relativeShadersFolderPath);
-	Helper::ConcatBuffer(fontPath, "OpenSans-Bold.ttf");
+	Helper::ConcatBuffer(fontPath, "\\assets\\fonts\\OpenSans-Bold.ttf");
 	Window::openSansBold = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
 
 	const char* slash = "\\";
 	int slashIdx = Helper::GetLastIndex(fontPath, *slash);
 	*(fontPath + slashIdx + 1) = 0;
 	Helper::ConcatBuffer(fontPath, "OpenSans-Light.ttf");
-	Window::openSansLight = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
+	Window::openSansBold = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
 
 	slashIdx = Helper::GetLastIndex(fontPath, *slash);
 	*(fontPath + slashIdx + 1) = 0;

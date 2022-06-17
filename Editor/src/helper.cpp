@@ -102,13 +102,16 @@ namespace Helper {
 		std::string curPathStr = currentPath.string();
 		const char* curPathChar = curPathStr.c_str();
 		Helper::CopyBuffer(curPathChar, bufferToCopyInto, Helper::GetLength(curPathChar));
-		// return curPathChar;
-		// CharWrapper charWrapper;
-		// charWrapper.str = curPathChar;
-		// Helper::GetLastIndex(curPathChar);
-		// Helper::CopyBuffer(curPathChar, )
-		// charWrapper.strLength = curPathStr.size();
-		// return charWrapper;
+	}
+
+	void GetPathForPredefinedShader(char* bufferToCopyInto, const char* shaderName) {
+		fs::path currentPath = fs::current_path();
+		std::string curPathStr = currentPath.string();
+		const char* curPathChar = curPathStr.c_str();
+		Helper::CopyBuffer(curPathChar, bufferToCopyInto, Helper::GetLength(curPathChar));
+		const char* relShaderPath = "\\src\\shaders\\";
+		Helper::ConcatBuffer(bufferToCopyInto, relShaderPath);
+		Helper::ConcatBuffer(bufferToCopyInto, shaderName);
 	}
 
 }

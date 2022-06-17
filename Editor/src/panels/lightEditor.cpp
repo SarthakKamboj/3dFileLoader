@@ -20,22 +20,13 @@ static float quadVertices[] = {
 };
 
 LightEditor::LightEditor() {
-	// get shader paths
-	/*
+
+	// get depth shader paths
 	char depthVert[200] = {};
 	char depthFrag[200] = {};
-	Helper::GetApplicationPath(depthVert);
-	Helper::GetApplicationPath(depthFrag);
-	const char* relativeShadersFolderPath = "\\src\\shaders\\";
-	Helper::ConcatBuffer(depthVert, relativeShadersFolderPath);
-	Helper::ConcatBuffer(depthFrag, relativeShadersFolderPath);
-	Helper::ConcatBuffer(depthVert, "depth.vert");
-	Helper::ConcatBuffer(depthFrag, "depth.frag");
-	*/
-	const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
-	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
+	Helper::GetPathForPredefinedShader(depthVert, "depth.vert");
+	Helper::GetPathForPredefinedShader(depthFrag, "depth.frag");
 
-	// create depth shader program
 	depthShader = ShaderProgram(depthVert, depthFrag);
 	depthShader.setInt("depthTexUnit", 1);
 	depthShader.setInt("extraVisible", extraVisible);
@@ -46,8 +37,6 @@ LightEditor::LightEditor() {
 	depthVAO.attachVBO(depthVBO, 0, 2, 4 * sizeof(float), 0);
 	depthVAO.attachVBO(depthVBO, 1, 2, 4 * sizeof(float), 2 * sizeof(float));
 	depthVBO.unbind();
-
-	testTexture = Texture("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\suzanneTexture.png", 1);
 }
 
 void LightEditor::update() {
@@ -97,8 +86,7 @@ void LightEditor::render() {
 	glViewport(openGlViewportLightWin.x, openGlViewportLightWin.y, openGlViewportLightWin.z, openGlViewportLightWin.w);
 
 	glActiveTexture(GL_TEXTURE1);
-	// glBindTexture(GL_TEXTURE_2D, g_SceneRenderer->lightFrameBuffer.depthTexture);
-	glBindTexture(GL_TEXTURE_2D, testTexture.texture);
+	glBindTexture(GL_TEXTURE_2D, g_SceneRenderer->lightFrameBuffer.depthTexture);
 
 	depthShader.bind();
 	depthVAO.bind();

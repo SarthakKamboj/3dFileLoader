@@ -10,20 +10,11 @@ NormalRenderer::NormalRenderer() {
 	vao.unbind();
 	vbo.unbind();
 
-	/*
+	// get line shader paths
 	char lineVert[200] = {};
 	char lineFrag[200] = {};
-	Helper::GetApplicationPath(lineVert);
-	Helper::GetApplicationPath(lineFrag);
-	const char* relativeShadersFolderPath = "\\src\\shaders\\";
-	Helper::ConcatBuffer(lineVert, relativeShadersFolderPath);
-	Helper::ConcatBuffer(lineFrag, relativeShadersFolderPath);
-	Helper::ConcatBuffer(lineVert, "line.vert");
-	Helper::ConcatBuffer(lineFrag, "line.frag");
-	*/
-
-	const char* lineVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.vert";
-	const char* lineFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.frag";
+	Helper::GetPathForPredefinedShader(lineVert, "line.vert");
+	Helper::GetPathForPredefinedShader(lineFrag, "line.frag");
 
 	shaderProgram = ShaderProgram(lineVert, lineFrag);
 

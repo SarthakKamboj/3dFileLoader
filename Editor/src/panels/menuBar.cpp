@@ -7,7 +7,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-
 extern PanelsManager* g_PanelsManager;
 
 void MenuBar::update() {
@@ -22,17 +21,13 @@ void MenuBar::update() {
 				fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
 				memset(fileBrowser.curFolderPath, 0, 200);
 
-				// get root directory and set it as filebrowser path
-				/*
+				// set filebrowser path
 				fs::path currentPath = fs::current_path();
-				std::string curPathStr = currentPath.root_name().string();
-				const char* curPathChar = curPathStr.c_str();
-				Helper::CopyBuffer(curPathChar, fileBrowser.curFolderPath, 200);
-				const char* slash = "\\";
-				Helper::ConcatBuffer(fileBrowser.curFolderPath, slash);
-				*/
+				std::string curRootStr = currentPath.root_name().string();
+				const char* curRootChar = curRootStr.c_str();
+				Helper::CopyBuffer(curRootChar, fileBrowser.curFolderPath, Helper::GetLength(curRootChar));
+				Helper::ConcatBuffer(fileBrowser.curFolderPath, "\\");
 
-				Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
 				selectingFbxToLoad = true;
 			}
 

@@ -7,15 +7,11 @@ Cube::Cube() {
 	vao.attachVBO(vbo, 0, 3, 6 * sizeof(float), 0);
 	vao.unbind();
 
+	// get cube shader paths
 	char vert[200] = {};
 	char frag[200] = {};
-	Helper::GetApplicationPath(vert);
-	Helper::GetApplicationPath(frag);
-	const char* relativeShadersFolderPath = "\\src\\shaders\\";
-	Helper::ConcatBuffer(vert, relativeShadersFolderPath);
-	Helper::ConcatBuffer(frag, relativeShadersFolderPath);
-	Helper::ConcatBuffer(vert, "cube.vert");
-	Helper::ConcatBuffer(frag, "cube.frag");
+	Helper::GetPathForPredefinedShader(vert, "cube.vert");
+	Helper::GetPathForPredefinedShader(frag, "cube.frag");
 
 	shaderProgram = ShaderProgram(vert, frag);
 
