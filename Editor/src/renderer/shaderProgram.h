@@ -24,4 +24,7 @@ struct ShaderProgram {
 	bool textureBasedColor = false;
 	Texture texture;
 	float normalDisplacement;
+
+private:
+	void loadDefaultTexture();
 };

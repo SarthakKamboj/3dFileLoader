@@ -1,4 +1,5 @@
 #include "normalRenderer.h"
+#include "helper.h"
 
 NormalRenderer::NormalRenderer() {
 	// set vbo to house NUM_LINES Linepoints
@@ -9,8 +10,11 @@ NormalRenderer::NormalRenderer() {
 	vao.unbind();
 	vbo.unbind();
 
-	const char* lineVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.vert";
-	const char* lineFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.frag";
+	// get line shader paths
+	char lineVert[200] = {};
+	char lineFrag[200] = {};
+	Helper::GetPathForPredefinedShader(lineVert, "line.vert");
+	Helper::GetPathForPredefinedShader(lineFrag, "line.frag");
 
 	shaderProgram = ShaderProgram(lineVert, lineFrag);
 

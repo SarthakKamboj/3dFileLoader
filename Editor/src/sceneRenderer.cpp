@@ -9,8 +9,12 @@ extern NormalRenderer* g_SplitNormalRendererPtr;
 extern NormalRenderer* g_NormalRendererPtr;
 
 SceneRenderer::SceneRenderer(Light* light) {
-	const char* lightPassVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.vert";
-	const char* lightPassFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\lightPass.frag";
+	// get light pass shader paths
+	char lightPassVert[200] = {};
+	char lightPassFrag[200] = {};
+	Helper::GetPathForPredefinedShader(lightPassVert, "lightPass.vert");
+	Helper::GetPathForPredefinedShader(lightPassFrag, "lightPass.frag");
+
 	lightPassShader = ShaderProgram(lightPassVert, lightPassFrag);
 	lightFrameBuffer.light = light;
 }

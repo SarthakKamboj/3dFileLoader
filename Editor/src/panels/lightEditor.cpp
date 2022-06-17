@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "sceneRenderer.h"
 #include "glad/glad.h"
+#include "helper.h"
 
 extern Window* g_Window;
 extern SceneRenderer* g_SceneRenderer;
@@ -19,8 +20,13 @@ static float quadVertices[] = {
 };
 
 LightEditor::LightEditor() {
-	const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
-	const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
+
+	// get depth shader paths
+	char depthVert[200] = {};
+	char depthFrag[200] = {};
+	Helper::GetPathForPredefinedShader(depthVert, "depth.vert");
+	Helper::GetPathForPredefinedShader(depthFrag, "depth.frag");
+
 	depthShader = ShaderProgram(depthVert, depthFrag);
 	depthShader.setInt("depthTexUnit", 1);
 	depthShader.setInt("extraVisible", extraVisible);
