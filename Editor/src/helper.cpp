@@ -2,6 +2,9 @@
 #include "glad/glad.h"
 #include <iostream>
 #include "glm/gtc/type_ptr.hpp"
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace Helper {
 
@@ -13,7 +16,7 @@ namespace Helper {
 		return rotMatrix;
 	}
 
-	int GetLastIndex(const char* buffer, char c) {
+	int GetLastIndex(const char* buffer, const char c) {
 		int res = -1;
 		int idx = 0;
 		while (*buffer != 0) {
@@ -24,6 +27,15 @@ namespace Helper {
 			idx++;
 		}
 		return res;
+	}
+
+	int GetLength(const char* buffer) {
+		int len = 0;
+		while (*buffer != 0) {
+			buffer++;
+			len++;
+		}
+		return len;
 	}
 
 	bool IsImage(const char* filePath) {
@@ -44,7 +56,7 @@ namespace Helper {
 		}
 	}
 
-	void ConcatBuffer(char* buffer, char* extBuffer) {
+	void ConcatBuffer(char* buffer, const char* extBuffer) {
 		while (*buffer != 0) {
 			buffer++;
 		}
@@ -84,4 +96,19 @@ namespace Helper {
 									break;
 		}
 	}
+
+	void GetApplicationPath(char* bufferToCopyInto) {
+		fs::path currentPath = fs::current_path();
+		std::string curPathStr = currentPath.string();
+		const char* curPathChar = curPathStr.c_str();
+		Helper::CopyBuffer(curPathChar, bufferToCopyInto, Helper::GetLength(curPathChar));
+		// return curPathChar;
+		// CharWrapper charWrapper;
+		// charWrapper.str = curPathChar;
+		// Helper::GetLastIndex(curPathChar);
+		// Helper::CopyBuffer(curPathChar, )
+		// charWrapper.strLength = curPathStr.size();
+		// return charWrapper;
+	}
+
 }
