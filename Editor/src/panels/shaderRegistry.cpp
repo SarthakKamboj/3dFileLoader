@@ -8,14 +8,12 @@ extern PanelsManager* g_PanelsManager;
 
 ShaderRegistry::ShaderRegistry() {
 	// add default shader to registry
-
 	char defaultVert[200] = {};
 	char defaultFrag[200] = {};
 	Helper::GetPathForPredefinedShader(defaultVert, "default.vert");
 	Helper::GetPathForPredefinedShader(defaultFrag, "default.frag");
 
-	// const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
-	// const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
+	// create default shader
 	defaultShaderProgram = ShaderProgram(defaultVert, defaultFrag);
 	memset(defaultShaderProgram.name, 0, 50);
 	Helper::CopyBuffer("Default shader", defaultShaderProgram.name, 50);

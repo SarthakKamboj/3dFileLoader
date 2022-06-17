@@ -21,17 +21,12 @@ void MenuBar::update() {
 				fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
 				memset(fileBrowser.curFolderPath, 0, 200);
 
-				// char rootPath[200] = {};
-				memset(fileBrowser.curFolderPath, 0, 200);
-
+				// set filebrowser path
 				fs::path currentPath = fs::current_path();
 				std::string curRootStr = currentPath.root_name().string();
 				const char* curRootChar = curRootStr.c_str();
 				Helper::CopyBuffer(curRootChar, fileBrowser.curFolderPath, Helper::GetLength(curRootChar));
 				Helper::ConcatBuffer(fileBrowser.curFolderPath, "\\");
-
-				// Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
-				// Helper::CopyBuffer(rootPath, fileBrowser.curFolderPath, 200);
 
 				selectingFbxToLoad = true;
 			}

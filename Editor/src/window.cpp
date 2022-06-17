@@ -62,6 +62,7 @@ Window::Window(Input* _input) {
 	// create fonts
 	float fontSize = 16.0f;
 
+	// get font paths
 	char fontPath[200] = {};
 	Helper::GetApplicationPath(fontPath);
 	Helper::ConcatBuffer(fontPath, "\\assets\\fonts\\OpenSans-Bold.ttf");
@@ -77,10 +78,6 @@ Window::Window(Input* _input) {
 	*(fontPath + slashIdx + 1) = 0;
 	Helper::ConcatBuffer(fontPath, "OpenSans-Regular.ttf");
 	io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
-
-	// Window::openSansBold = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Bold.ttf", fontSize);
-	// Window::openSansLight = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Light.ttf", fontSize);
-	// io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Regular.ttf", fontSize);
 
 	input = _input;
 }

@@ -45,7 +45,6 @@ void ShaderProgram::loadDefaultTexture() {
 	char imgPath[200] = {};
 	Helper::GetApplicationPath(imgPath);
 	Helper::ConcatBuffer(imgPath, "\\src\\images\\uv_mapper.jpg");
-	// const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
 	texture = Texture(imgPath, 0);
 }
 

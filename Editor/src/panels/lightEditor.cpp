@@ -21,14 +21,12 @@ static float quadVertices[] = {
 
 LightEditor::LightEditor() {
 
+	// get depth shader paths
 	char depthVert[200] = {};
 	char depthFrag[200] = {};
-
 	Helper::GetPathForPredefinedShader(depthVert, "depth.vert");
 	Helper::GetPathForPredefinedShader(depthFrag, "depth.frag");
 
-	// const char* depthVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.vert";
-	// const char* depthFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\depth.frag";
 	depthShader = ShaderProgram(depthVert, depthFrag);
 	depthShader.setInt("depthTexUnit", 1);
 	depthShader.setInt("extraVisible", extraVisible);
