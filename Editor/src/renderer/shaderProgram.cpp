@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "helper.h"
 
 int ShaderProgram::shaderId = 0;
 
@@ -11,9 +12,7 @@ ShaderProgram::ShaderProgram() {
 
 	normalDisplacement = 0;
 
-	// create default texture
-	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
-	texture = Texture(defaultTexPath, 0);
+	loadDefaultTexture();
 }
 
 ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
@@ -38,9 +37,16 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
 	glDeleteShader(vertexId);
 	glDeleteShader(fragmentId);
 
+	loadDefaultTexture();
+}
+
+void ShaderProgram::loadDefaultTexture() {
 	// create default texture
-	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
-	texture = Texture(defaultTexPath, 0);
+	char imgPath[200] = {};
+	Helper::GetApplicationPath(imgPath);
+	Helper::ConcatBuffer(imgPath, "\\src\\images\\uv_mapper.jpg");
+	// const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\uv_mapper.jpg";
+	texture = Texture(imgPath, 0);
 }
 
 void ShaderProgram::bind() {

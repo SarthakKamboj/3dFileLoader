@@ -14,5 +14,6 @@ namespace Helper {
 	void CheckFrameBufferStatus();
 	glm::mat4 GetRotationMatrix(const glm::vec3& rot);
 	void GetApplicationPath(char* bufferToCopyInfo);
+	void GetPathForPredefinedShader(char* bufferToCopyInto, const char* shaderName);
 	int GetLength(const char* buffer);
 }

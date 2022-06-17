@@ -16,17 +16,24 @@ extern PanelsManager* g_PanelsManager;
 MeshRenderer::MeshRenderer() {
 	meshIdx = -1;
 
+	/*
 	const char* wireframeVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.vert";
 	const char* wireframeFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.frag";
 	wireFrameShaderProgram = ShaderProgram(wireframeVert, wireframeFrag);
+	*/
+
+	createWireframeShader();
 
 }
 
 MeshRenderer::MeshRenderer(const Mesh& _mesh, int _meshIdx) {
 
+	/*
 	const char* wireframeVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.vert";
 	const char* wireframeFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.frag";
 	wireFrameShaderProgram = ShaderProgram(wireframeVert, wireframeFrag);
+	*/
+	createWireframeShader();
 
 	meshIdx = _meshIdx;
 	const Mesh* mesh = &_mesh;
@@ -44,6 +51,20 @@ MeshRenderer::MeshRenderer(const Mesh& _mesh, int _meshIdx) {
 
 	vao.unbind();
 	vbo.unbind();
+}
+
+void MeshRenderer::createWireframeShader() {
+
+	char wireframeVert[200] = {};
+	char wireframeFrag[200] = {};
+	Helper::GetPathForPredefinedShader(wireframeVert, "wireframe.vert");
+	Helper::GetPathForPredefinedShader(wireframeFrag, "wireframe.frag");
+
+	// const char* wireframeVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.vert";
+	// const char* wireframeFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\wireframe.frag";
+	wireFrameShaderProgram = ShaderProgram(wireframeVert, wireframeFrag);
+
+
 }
 
 void MeshRenderer::render() {

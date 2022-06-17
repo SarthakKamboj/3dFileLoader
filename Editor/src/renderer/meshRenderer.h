@@ -23,4 +23,7 @@ struct MeshRenderer {
 
 	VAO vao;
 	VBO vbo;
+
+private:
+	void createWireframeShader();
 };

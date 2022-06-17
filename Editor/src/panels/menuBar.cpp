@@ -4,7 +4,9 @@
 #include "imgui.h"
 #include "panels/panelsManager.h"
 #include "helper.h"
+#include <filesystem>
 
+namespace fs = std::filesystem;
 extern PanelsManager* g_PanelsManager;
 
 void MenuBar::update() {
@@ -18,8 +20,19 @@ void MenuBar::update() {
 				fileBrowser.resultBuffer = fbxToLoadPath;
 				fileBrowser.loadMode = FileBrowserLoadMode::SCENE;
 				memset(fileBrowser.curFolderPath, 0, 200);
-				// later change default filebrowser path
-				Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
+
+				// char rootPath[200] = {};
+				memset(fileBrowser.curFolderPath, 0, 200);
+
+				fs::path currentPath = fs::current_path();
+				std::string curRootStr = currentPath.root_name().string();
+				const char* curRootChar = curRootStr.c_str();
+				Helper::CopyBuffer(curRootChar, fileBrowser.curFolderPath, Helper::GetLength(curRootChar));
+				Helper::ConcatBuffer(fileBrowser.curFolderPath, "\\");
+
+				// Helper::CopyBuffer("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\3d", fileBrowser.curFolderPath, 200);
+				// Helper::CopyBuffer(rootPath, fileBrowser.curFolderPath, 200);
+
 				selectingFbxToLoad = true;
 			}
 
