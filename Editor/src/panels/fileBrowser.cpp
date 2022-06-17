@@ -38,6 +38,7 @@ void FileBrowser::update() {
 		std::string path(curFolderPath);
 		static bool once = true;
 		int i = 0;
+		bool doubleClickedOnEntry = false;
 		// iterate through all items in current directory
 		for (const auto& entry : fs::directory_iterator(path)) {
 			std::string filePathStr = entry.path().u8string();
@@ -51,10 +52,15 @@ void FileBrowser::update() {
 				memset(file, 0, 100);
 				strcpy_s(file, buffer);
 			}
+
+			// see if entry was double clicked
+			int mouseClicks = ImGui::GetMouseClickedCount(0);
+			bool doubleClicked = (mouseClicks == 2);
+			doubleClickedOnEntry |= (ImGui::IsItemHovered() && doubleClicked);
 			i++;
 		}
 
-		if (ImGui::Button("Select") || g_Input->enterPressed) {
+		if (ImGui::Button("Select") || g_Input->enterPressed || doubleClickedOnEntry) {
 
 			if (selectedIdx == -1) {
 				if (ImGui::Button("Cancel")) {
