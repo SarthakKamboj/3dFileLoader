@@ -95,8 +95,22 @@ void MeshRendererSettingsPanel::update() {
 	}
 
 	if (ImGui::Button("Create new shader")) {
+		// get default shader paths
+		/*
+		char defaultVert[200] = {};
+		char defaultFrag[200] = {};
+		Helper::GetApplicationPath(defaultVert);
+		Helper::GetApplicationPath(defaultFrag);
+		const char* relativeShadersFolderPath = "\\src\\shaders\\";
+		Helper::ConcatBuffer(defaultVert, relativeShadersFolderPath);
+		Helper::ConcatBuffer(defaultFrag, relativeShadersFolderPath);
+		Helper::ConcatBuffer(defaultVert, "default.vert");
+		Helper::ConcatBuffer(defaultFrag, "default.frag");
+		*/
 		const char* defaultVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.vert";
 		const char* defaultFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\default.frag";
+
+		// create default shader program
 		ShaderProgram shaderProgram(defaultVert, defaultFrag);
 		shaderProgram.setInt("renderTexture", 0);
 		shaderProgram.setInt("material.diffuse", 0);

@@ -5,4 +5,6 @@
 struct WorldView {
 	WorldView();
 	void update();
+private:
+	Texture testTexture;
 };

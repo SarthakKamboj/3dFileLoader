@@ -6,7 +6,10 @@
 
 extern SceneRenderer* g_SceneRenderer;
 
-WorldView::WorldView() {}
+WorldView::WorldView() {
+	const char* imgPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\suzanneTexture.png";
+	testTexture = Texture(imgPath, 0);
+}
 
 void WorldView::update() {
 
@@ -24,7 +27,11 @@ void WorldView::update() {
 		ImVec2 winSize = ImGui::GetWindowSize();
 		ImVec2 actualRenderView(winSize.x - sceneViewWinPadding.x, winSize.y - (2.0f * fontSize) - (2 * sceneViewWinPadding.y));
 		// render color texture from scene framebuffer
+		// g_SceneRenderer->sceneFbo.bind();
+		// FrameBuffer::ClearBuffers(glm::vec3(1, 0, 0));
+		// g_SceneRenderer->sceneFbo.unbind();
 		ImGui::Image((ImTextureID)g_SceneRenderer->sceneFbo.colorTexture, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
+		// ImGui::Image((ImTextureID)testTexture.texture, actualRenderView, ImVec2(0, 1), ImVec2(1, 0));
 	}
 
 	ImGui::End();

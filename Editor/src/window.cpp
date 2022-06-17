@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
+#include "helper.h"
 
 ImFont* Window::openSansBold = NULL;
 ImFont* Window::openSansLight = NULL;
@@ -60,9 +61,24 @@ Window::Window(Input* _input) {
 
 	// create fonts
 	float fontSize = 16.0f;
-	Window::openSansBold = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Bold.ttf", fontSize);
-	Window::openSansLight = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Light.ttf", fontSize);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Sarthak\\programming\\3dFileLoader\\Editor\\assets\\fonts\\OpenSans-Regular.ttf", fontSize);
+
+	char fontPath[200] = {};
+	Helper::GetApplicationPath(fontPath);
+	const char* relativeShadersFolderPath = "\\assets\\fonts\\";
+	Helper::ConcatBuffer(fontPath, relativeShadersFolderPath);
+	Helper::ConcatBuffer(fontPath, "OpenSans-Bold.ttf");
+	Window::openSansBold = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
+
+	const char* slash = "\\";
+	int slashIdx = Helper::GetLastIndex(fontPath, *slash);
+	*(fontPath + slashIdx + 1) = 0;
+	Helper::ConcatBuffer(fontPath, "OpenSans-Light.ttf");
+	Window::openSansLight = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
+
+	slashIdx = Helper::GetLastIndex(fontPath, *slash);
+	*(fontPath + slashIdx + 1) = 0;
+	Helper::ConcatBuffer(fontPath, "OpenSans-Regular.ttf");
+	io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath, fontSize);
 
 	input = _input;
 }

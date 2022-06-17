@@ -18,4 +18,5 @@ struct LightEditor {
 
 private:
 	glm::vec4 openGlViewportLightWin;
+	Texture testTexture;
 };

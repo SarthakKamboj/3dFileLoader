@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "helper.h"
 
 int ShaderProgram::shaderId = 0;
 
@@ -12,6 +13,13 @@ ShaderProgram::ShaderProgram() {
 	normalDisplacement = 0;
 
 	// create default texture
+	/*
+	char defaultTexPath[200] = {};
+	Helper::GetApplicationPath(defaultTexPath);
+	const char* relativeImgPath = "\\src\\images\\images.jpg";
+	Helper::ConcatBuffer(defaultTexPath, relativeImgPath);
+	*/
+
 	const char* defaultTexPath = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\images\\images.jpg";
 	texture = Texture(defaultTexPath, 0);
 }

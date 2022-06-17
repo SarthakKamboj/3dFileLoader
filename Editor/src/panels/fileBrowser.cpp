@@ -14,6 +14,7 @@ FileBrowser::FileBrowser() {
 	memset(curFolderPath, 0, 200);
 	memset(file, 0, 100);
 	resultBuffer = NULL;
+	// std::cout << p << std::endl;
 }
 
 void FileBrowser::update() {

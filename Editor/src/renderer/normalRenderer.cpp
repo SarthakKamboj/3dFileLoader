@@ -1,4 +1,5 @@
 #include "normalRenderer.h"
+#include "helper.h"
 
 NormalRenderer::NormalRenderer() {
 	// set vbo to house NUM_LINES Linepoints
@@ -8,6 +9,18 @@ NormalRenderer::NormalRenderer() {
 	vao.attachVBO(vbo, 0, 3, 3 * sizeof(float), 0);
 	vao.unbind();
 	vbo.unbind();
+
+	/*
+	char lineVert[200] = {};
+	char lineFrag[200] = {};
+	Helper::GetApplicationPath(lineVert);
+	Helper::GetApplicationPath(lineFrag);
+	const char* relativeShadersFolderPath = "\\src\\shaders\\";
+	Helper::ConcatBuffer(lineVert, relativeShadersFolderPath);
+	Helper::ConcatBuffer(lineFrag, relativeShadersFolderPath);
+	Helper::ConcatBuffer(lineVert, "line.vert");
+	Helper::ConcatBuffer(lineFrag, "line.frag");
+	*/
 
 	const char* lineVert = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.vert";
 	const char* lineFrag = "C:\\Sarthak\\programming\\3dFileLoader\\Editor\\src\\shaders\\line.frag";

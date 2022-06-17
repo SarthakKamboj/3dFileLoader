@@ -1,5 +1,6 @@
 - separate renderer from data, especially when using multiple graphics APIs
+- make file path relative
 - use const reference by default - done
 - maintain semantic consistency - done
 - make sure to delete stuff as you go when necessary - done
-- comment overview and maybe stuff in algorithmic parts of code to help other programmers read your code
+- comment overview and maybe stuff in algorithmic parts of code to help other programmers read your code - done
