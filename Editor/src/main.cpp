@@ -1,3 +1,5 @@
+#define ADDING_VULKAN
+
 #include <iostream>
 #include "renderer/light.h"
 #include "renderer/normalRenderer.h"
@@ -5,6 +7,8 @@
 #include "input.h"
 #include "panels/panelsManager.h"
 #include "sceneRenderer.h"
+#include <stdexcept>
+#include "vulkanApp.h"
 
 NormalRenderer* g_SplitNormalRendererPtr;
 NormalRenderer* g_NormalRendererPtr;
@@ -14,6 +18,8 @@ SceneRenderer* g_SceneRenderer;
 Window* g_Window;
 
 int main(int argc, char* args[]) {
+
+#ifndef ADDING_VULKAN
 
 	Input input;
 	g_Input = &input;
@@ -60,6 +66,18 @@ int main(int argc, char* args[]) {
 
 		window.swapBuffers();
 	}
+
+#else	
+
+	VulkanApp vulkanApp;
+	try {
+		vulkanApp.run();
+	}
+	catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
+#endif
 
 	return -1;
 }
