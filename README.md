@@ -2,7 +2,7 @@
 
 A project to learn more about 3D asset file loading to render 3D models and their animations while also implementing rendering techniques using OpenGL and Vulkan.
 
-## <a href="https://trello.com/b/tq5n7U4q/3d-fileloading-graphics-engine">Trello Board</a>
+## <a target="_blank" href="https://trello.com/b/tq5n7U4q/3d-fileloading-graphics-engine">Trello Board</a>
 
 ## List of Features
 
