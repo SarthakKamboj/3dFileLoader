@@ -225,6 +225,7 @@
     <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\compile.bat" />
     <None Include="src\shaders\cube.frag" />
     <None Include="src\shaders\cube.vert" />
     <None Include="src\shaders\default.frag" />
@@ -237,6 +238,8 @@
     <None Include="src\shaders\line.vert" />
     <None Include="src\shaders\quad.frag" />
     <None Include="src\shaders\quad.vert" />
+    <None Include="src\shaders\vulkan.frag" />
+    <None Include="src\shaders\vulkan.vert" />
     <None Include="src\shaders\wireframe.frag" />
     <None Include="src\shaders\wireframe.vert" />
   </ItemGroup>

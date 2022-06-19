@@ -228,6 +228,11 @@
     <None Include="src\shaders\lightPass.vert" />
     <None Include="src\shaders\wireframe.vert" />
     <None Include="src\shaders\wireframe.frag" />
+    <None Include="src\shaders\vulkan.vert" />
+    <None Include="src\shaders\vulkan.frag" />
+    <None Include="src\shaders\compile.bat">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
