@@ -40,6 +40,7 @@ private:
 	void mainLoop();
 	void cleanup();
 
+	void drawFrame();
 	void createInstance();
 	void createSurface();
 	bool checkValidationSupport();
@@ -63,6 +64,9 @@ private:
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void createFrameBuffers();
 	void createCommandPool();
+	void createCommandBuffer();
+	void writeToCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIdx);
+	void createSyncObjects();
 
 	const char* validationLayers[1] = { "VK_LAYER_KHRONOS_validation" };
 	int numValidationLayers = 1;
@@ -97,5 +101,9 @@ private:
 	VkRenderPass renderPass;
 	VkPipeline graphicsPipeline;
 	std::vector<VkFramebuffer> swapChainFrameBuffers;
-	VkCommandPool commandPool;
+	VkCommandPool graphicsCommandPool;
+	VkCommandBuffer graphicsCommandBuffer;
+	VkSemaphore imageAvailableSemaphore;
+	VkSemaphore renderFinishedSemaphore;
+	VkFence inFlightFence;
 };
