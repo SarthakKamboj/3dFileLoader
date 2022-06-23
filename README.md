@@ -31,3 +31,7 @@ A project to learn more about 3D asset file loading to render 3D models and thei
   ├─ ext - external libraries used
   ├─ src - source code for loading fbx files into internal data structures
 ```
+
+## Demo
+
+<img src="vids/demo.gif" alt="Demo">
